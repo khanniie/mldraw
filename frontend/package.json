@@ -1,6 +1,18 @@
 {
   "name": "mldraw-frontend",
   "version": "0.0.1",
-  "main": "fixme.js",
-  "license": "MIT"
+  "main": "src/basic.ts",
+  "license": "MIT",
+  "scripts": {
+    "dev": "yarn run parcel src/index.html"
+  },
+  "dependencies": {
+    "@types/p5": "^0.7.0",
+    "p5": "^0.7.2",
+    "socket.io": "^2.1.1",
+    "typescript": "^3.2.0-dev.20181019"
+  },
+  "devDependencies": {
+    "parcel-bundler": "^1.10.3"
+  }
 }
