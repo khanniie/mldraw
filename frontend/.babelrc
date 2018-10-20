@@ -3,7 +3,7 @@
         ["transform-runtime",
         {
             "polyfill": false,
-            "regenerator": false
+            "regenerator": true
         }]
     ]
 }
