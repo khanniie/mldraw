@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "yarn run parcel src/index.html --no-hmr"
   },
-  "browserlist": ["last 1 Chrome version"],
+  "browserlist": [
+    "last 1 Chrome version"
+  ],
   "dependencies": {
     "json5": "^2.1.0",
     "p5": "^0.7.2",
@@ -14,14 +16,15 @@
     "socket.io-client": "^2.1.1"
   },
   "devDependencies": {
-    "typescript": "^3.2.0-dev.20181019",
     "@types/p5": "^0.7.0",
     "@types/socket.io": "^1.4.38",
     "@types/socket.io-client": "^1.4.32",
-    "babel-polyfill": "^6.26.0",
-    "babel-runtime": "^6.26.0",
     "babel-core": "^6.26.3",
     "babel-plugin-transform-runtime": "^6.23.0",
-    "parcel-bundler": "^1.10.3"
+    "babel-polyfill": "^6.26.0",
+    "babel-preset-env": "^1.7.0",
+    "babel-runtime": "^6.26.0",
+    "parcel-bundler": "^1.10.3",
+    "typescript": "^3.2.0-dev.20181019"
   }
 }

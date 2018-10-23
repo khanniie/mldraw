@@ -1,5 +1,5 @@
 from io import BytesIO
-
+from functools import wraps
 from aiohttp import web
 from PIL import Image
 from PIL import ImageOps
@@ -10,22 +10,49 @@ sio = socketio.AsyncServer()
 app = web.Application()
 sio.attach(app)
 
-def deserialise_canvas(canvas):
-    raise NotImplementedError()
+def canvas_message_valid(data):
+    return 'canvasData' in data
+
+def canvas_message_handler(message: str):
+    ''' Bind the following function to be a handler for socket.io `message`
+    to be called with a PIL image representing the canvas.
+
+    The handler should return the new bytes of the resulting image.
+    The result image is required to be the same size at the input image.
+    e.g:
+    ```python
+        @canvas_message_handler('process-image')
+        def process_image(img):
+            result = process(img)
+            return result.tobytes()```
+    '''
+
+    def decorator(handler):
+
+        @sio.on(message)
+        @wraps(handler)
+        async def canvas_handler(sid, data):
+            print(f'recieved {message} request')
+            if canvas_message_valid(data):
+                blob = BytesIO(data['canvasData'])
+                img = Image.open(blob)
+                newBytes = handler(img)
+                print(f'executed {message} request')
+                return {'canvasData': newBytes}
+            else:
+                print(f'rejected {message} request')
+                return {'error': 'canvas message invalid'}
+
+    return decorator
+
+@canvas_message_handler('flip-canvas')
+def flip_canvas(img):
+    flipped = ImageOps.flip(img)
+    return flipped.tobytes()
 
 @sio.on('connect')
 def connect(sid, environ):
     print("connect ", sid)
-
-@sio.on('flip-canvas')
-async def message(sid, data):
-    print("recieved flip-canvas request")
-    blob = BytesIO(data['canvasData'])
-    img = Image.open(blob)
-    img = ImageOps.flip(img)
-    newBytes = img.tobytes()
-    print("executed flip-canvas request")
-    return {"canvasData": newBytes}
 
 @sio.on('disconnect')
 def disconnect(sid):

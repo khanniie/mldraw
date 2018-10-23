@@ -1,4 +1,3 @@
-import "babel-polyfill"
 import * as p5 from 'p5'
 import { Comm, toBlob, Operation } from './comm'
 
