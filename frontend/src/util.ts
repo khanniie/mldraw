@@ -9,7 +9,7 @@
  */
 export function doNothingIfRunning(fn: () => void): () => void {
     let running = false;
-    let bound = fn.bind ? fn.bind(this) : fn; // arrow functions have no bind
+    const bound = fn.bind ? fn.bind(this) : fn; // arrow functions have no bind
     return async function () {
         if(running) return;
         running = true;
