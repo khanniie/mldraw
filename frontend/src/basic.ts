@@ -1,21 +1,19 @@
 import * as p5 from 'p5'
 import { Comm, toBlob, Operation } from './comm'
+import { doNothingIfRunning } from './util'
 
 // the type definition for p5.Graphics is wrong so
 // we have to make our own
 type Graphics = p5 & p5.Element
 type Layer = Graphics;
 
-async function make_sketch(p: p5) {
+const make_sketch = (comm: Comm) => (p: p5) => {
     let prev_x: number = null;
     let prev_y: number = null;
     let renderer: p5.Renderer;
     let layers: Layer[] = [];
     let layerIdx = 0;
     let currentLayer: Layer;
-
-    const comm = new Comm();
-    await comm.connect('localhost:8080');
 
     const makeLayer = (w: number, h: number): Layer => {
         const gfx = p.createGraphics(w, h) as any as Graphics;
@@ -50,13 +48,13 @@ async function make_sketch(p: p5) {
         }
     }
 
-    p.keyPressed = async function() {
+    p.keyPressed = doNothingIfRunning(async function() {
         console.log("flip-canvas requested");
         await executeOp(Operation.flip_canvas, 
                         renderer, // normally this would be layer[some idx]
                         layers[0]);
         console.log("flip-canvas executed");
-    }
+    })
 
     // converts fromGraphics to a Blob, sends it to the server,
     // copies the pixel data in the response into toGraphics
@@ -81,5 +79,20 @@ async function make_sketch(p: p5) {
     }
 }
 
-const container = document.querySelector("#container") as HTMLElement;
-const sketch = new (p5 as any).default(make_sketch, container); // the typings are a little outdated :(
+async function main() {
+    const container = document.querySelector("#container") as HTMLElement;
+    container.innerText = 'Trying to connect to backend...'
+    const comm = new Comm();
+    try {
+        await comm.connect('localhost:8080');
+    } catch (err) {
+        container.innerText = err.toString()
+        return
+    }
+    container.innerText = ''
+    
+    const sketch = new (p5 as any).default(make_sketch(comm), container); // the typings are a little outdated :(
+}
+
+main()
+
