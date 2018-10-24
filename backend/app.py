@@ -29,14 +29,14 @@ def canvas_message_handler(message: str):
 
     def decorator(handler):
 
-        @sio.on(message)
-        @wraps(handler)
+        @sio.on(message) #bind it to the socketio message
+        @wraps(handler) #better error messages
         async def canvas_handler(sid, data):
             print(f'recieved {message} request')
             if canvas_message_valid(data):
                 blob = BytesIO(data['canvasData'])
                 img = Image.open(blob)
-                newBytes = handler(img)
+                newBytes = await handler(img)
                 print(f'executed {message} request')
                 return {'canvasData': newBytes}
             else:
