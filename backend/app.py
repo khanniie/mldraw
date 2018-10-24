@@ -1,10 +1,15 @@
 from io import BytesIO
 from functools import wraps
+from inspect import isawaitable
+import asyncio
+
 from aiohttp import web
 from PIL import Image
 from PIL import ImageOps
 
 import socketio
+
+from fix_windows import hotfix # workaround asyncio issue in windows
 
 sio = socketio.AsyncServer()
 app = web.Application()
@@ -19,6 +24,7 @@ def canvas_message_handler(message: str):
 
     The handler should return the new bytes of the resulting image.
     The result image is required to be the same size at the input image.
+    The handler is allowed to be an async function as long as it returns an awaitable.
     e.g:
     ```python
         @canvas_message_handler('process-image')
@@ -36,7 +42,9 @@ def canvas_message_handler(message: str):
             if canvas_message_valid(data):
                 blob = BytesIO(data['canvasData'])
                 img = Image.open(blob)
-                newBytes = await handler(img)
+                newBytes = handler(img)
+                if isawaitable(newBytes): # handler was async
+                    newBytes = await newBytes 
                 print(f'executed {message} request')
                 return {'canvasData': newBytes}
             else:
@@ -62,4 +70,6 @@ def main():
     web.run_app(app)
 
 if __name__ == '__main__':
+    hotfix(asyncio.get_event_loop())
     main()
+    
