@@ -4,7 +4,8 @@
   "main": "src/basic.ts",
   "license": "MIT",
   "scripts": {
-    "dev": "yarn run parcel src/index.html --no-hmr"
+    "dev": "yarn run parcel src/index.html --no-hmr",
+    "dev-backend": "cd ../backend && python app.py"
   },
   "browserlist": [
     "last 1 Chrome version"
