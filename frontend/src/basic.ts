@@ -7,6 +7,12 @@ import { doNothingIfRunning } from './util'
 type Graphics = p5 & p5.Element
 type Layer = Graphics;
 
+// in its own function so it can be JIT compiled for performance
+function copy<T>(fromArr: ArrayLike<T>, toArr: Array<T>) {
+    const len = toArr.length;
+    for(let i = 0; i < len; i++) toArr[i] = fromArr[i];
+}
+
 const make_sketch = (comm: Comm) => (p: p5) => {
     let prev_x: number = null;
     let prev_y: number = null;
@@ -68,18 +74,16 @@ const make_sketch = (comm: Comm) => (p: p5) => {
         
         if('error' in reply) {
             console.error(`Error: ${reply.error}`);
-            return
+            return reply.error;
         }
 
         const flippedByes = new Uint8Array(reply.canvasData);
 
         toGraphics.loadPixels(); // required even though we don't read from pixels
-        const len = toGraphics.pixels.length;
-        const pixels = toGraphics.pixels;
-
         // annoying that this copy is needed
-        for(let i = 0; i < len; i++) pixels[i] = flippedByes[i];
+        copy(flippedByes, toGraphics.pixels);
         toGraphics.updatePixels();
+
         return toGraphics;
 
     }
