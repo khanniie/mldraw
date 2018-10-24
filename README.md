@@ -15,4 +15,4 @@ Frontend requires:
 
 To start the development servers:
 * For the frontend: `cd frontend && yarn dev`
-* For the backend: `cd fronted && yarn dev-backend`
+* For the backend: `cd frontend && yarn dev-backend`
