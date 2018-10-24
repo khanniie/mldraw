@@ -12,6 +12,10 @@ export type ReplyMessage = {
     canvasData: ArrayBuffer
 }
 
+export type ErrorMessage = {
+    error: string
+}
+
 export async function toBlob(canvas: HTMLCanvasElement): Promise<Blob> {
     return new Promise<Blob>((res, rej) => { 
         try { 
@@ -38,7 +42,7 @@ export class Comm {
         })
     }
 
-    async send(tag: Operation, data: RequestMessage): Promise<ReplyMessage> {
+    async send(tag: Operation, data: RequestMessage): Promise<ReplyMessage | ErrorMessage> {
         return new Promise<ReplyMessage>(res => this.socket.emit(tag, data, res))
     }
 }

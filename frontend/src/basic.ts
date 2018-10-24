@@ -65,6 +65,12 @@ const make_sketch = (comm: Comm) => (p: p5) => {
         const canvas = fromGraphics.elt as HTMLCanvasElement;
         const canvasData = await toBlob(canvas);
         const reply = await comm.send(op, { canvasData });
+        
+        if('error' in reply) {
+            console.error(`Error: ${reply.error}`);
+            return
+        }
+
         const flippedByes = new Uint8Array(reply.canvasData);
 
         toGraphics.loadPixels(); // required even though we don't read from pixels
