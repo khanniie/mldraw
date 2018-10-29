@@ -20,6 +20,7 @@ const make_sketch = (comm: Comm) => (p: p5) => {
     let layers: Layer[] = [];
     let layerIdx = 0;
     let currentLayer: Layer;
+    let prevTouchTime = -1
 
     const makeLayer = (w: number, h: number): Layer => {
         const gfx = p.createGraphics(w, h) as any as Graphics;
@@ -28,15 +29,15 @@ const make_sketch = (comm: Comm) => (p: p5) => {
     }
 
     p.setup = function() {
-        renderer = p.createCanvas(200, 200);
+        renderer = p.createCanvas(256, 256);
         
         layers.push(makeLayer(p.width, p.height));
 
-        p.background(0);
-        p.fill(255);
-        p.stroke(255);
+        p.background(255);
+        p.fill(0);
+        p.stroke(0);
         p.strokeCap('round');
-        p.strokeWeight(5);
+        p.strokeWeight(1);
     }
 
     p.draw = function() { 
@@ -47,16 +48,20 @@ const make_sketch = (comm: Comm) => (p: p5) => {
         if(prev_x == null && prev_y == null){
             prev_x = p.mouseX;
             prev_y = p.mouseY;
+            prevTouchTime = p.millis();
         } else {
-            p.line(prev_x, prev_y, p.mouseX, p.mouseY);
+            if(p.millis() - prevTouchTime < 100) {
+                p.line(prev_x, prev_y, p.mouseX, p.mouseY);
+            }
             prev_x = p.mouseX;
             prev_y = p.mouseY;
+            prevTouchTime = p.millis();
         }
     }
 
     p.keyPressed = doNothingIfRunning(async function() {
         console.log("flip-canvas requested");
-        await executeOp(Operation.flip_canvas, 
+        await executeOp(Operation.edges2shoes_pretrained, 
                         renderer, // normally this would be layer[some idx]
                         layers[0]);
         console.log("flip-canvas executed");

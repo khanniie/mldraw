@@ -9,11 +9,15 @@ from PIL import ImageOps
 
 import socketio
 
-from fix_windows import hotfix # workaround asyncio issue in windows
+from .fix_windows import hotfix # workaround asyncio issue in windows
 
 sio = socketio.AsyncServer()
 app = web.Application()
 sio.attach(app)
+
+available_handlers = {}
+
+from .models.autoimport_models import all_exported_models
 
 def canvas_message_valid(data):
     return 'canvasData' in data
@@ -51,12 +55,22 @@ def canvas_message_handler(message: str):
                 print(f'rejected {message} request')
                 return {'error': 'canvas message invalid'}
 
+        global available_handlers
+        available_handlers[message] = handler
+
+        return canvas_handler
+
     return decorator
+
 
 @canvas_message_handler('flip-canvas')
 def flip_canvas(img):
     flipped = ImageOps.flip(img)
     return flipped.tobytes()
+
+
+for message, fn in all_exported_models.items():
+    canvas_message_handler(message)(fn)
 
 @sio.on('connect')
 def connect(sid, environ):
@@ -71,5 +85,5 @@ def main():
 
 if __name__ == '__main__':
     hotfix(asyncio.get_event_loop())
+    print('available handlers:', available_handlers)
     main()
-    
