@@ -1,7 +1,8 @@
 import * as socketio from "socket.io-client"
 
 export enum Operation {
-    flip_canvas = 'flip-canvas'
+    flip_canvas = 'flip-canvas',
+    edges2shoes_pretrained = 'edges2shoes_pretrained'
 }
 
 export type RequestMessage = {
