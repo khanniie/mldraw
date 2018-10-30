@@ -81,7 +81,7 @@ def disconnect(sid):
     print('disconnect ', sid)
 
 def main():
-    web.run_app(app)
+    web.run_app(app, port=8080)
 
 if __name__ == '__main__':
     hotfix(asyncio.get_event_loop())

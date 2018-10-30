@@ -1,6 +1,6 @@
 import * as p5 from 'p5'
 import { Comm, toBlob, Operation } from './comm'
-import { doNothingIfRunning } from './util'
+import { doNothingIfRunning, urlParam } from './util'
 
 // the type definition for p5.Graphics is wrong so
 // we have to make our own
@@ -60,11 +60,11 @@ const make_sketch = (comm: Comm) => (p: p5) => {
     }
 
     p.keyPressed = doNothingIfRunning(async function() {
-        console.log("flip-canvas requested");
+        console.log("edges2shoes requested");
         await executeOp(Operation.edges2shoes_pretrained, 
                         renderer, // normally this would be layer[some idx]
                         layers[0]);
-        console.log("flip-canvas executed");
+        console.log("edges2shoes executed");
     })
 
     // converts fromGraphics to a Blob, sends it to the server,
@@ -99,7 +99,8 @@ async function main() {
     container.innerText = 'Trying to connect to backend...'
     const comm = new Comm();
     try {
-        await comm.connect('localhost:8080');
+        const serverUrl = urlParam('server') || 'localhost:8080'
+        await comm.connect(serverUrl);
     } catch (err) {
         container.innerText = err.toString()
         return

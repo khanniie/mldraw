@@ -17,3 +17,13 @@ export function doNothingIfRunning(asyncFn: () => void): () => void {
         running = false;
     }
 }
+
+/**
+ * Helper function to get a parameter from the URL query string
+ * (i.e the key=value part)
+ * @param key Key in params
+ */
+export function urlParam(key: string): string | null {
+    const params = new URLSearchParams(window.location.search);
+    return params.get(key)
+}
