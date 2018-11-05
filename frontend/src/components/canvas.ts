@@ -28,7 +28,7 @@ const make_sketch = (comm: Comm, emit: Emit, component: CanvasComponent) => (p: 
     let layerIdx = 0;
     let currentLayer: Layer;
     let prevTouchTime = -1
-    
+
     let appState
 
     const makeLayer = (w: number, h: number): Layer => {
@@ -38,6 +38,7 @@ const make_sketch = (comm: Comm, emit: Emit, component: CanvasComponent) => (p: 
     }
 
     p.setup = function () {
+        p.pixelDensity(1);
         renderer = p.createCanvas(256, 256);
 
         layers.push(makeLayer(p.width, p.height));
@@ -81,7 +82,7 @@ const make_sketch = (comm: Comm, emit: Emit, component: CanvasComponent) => (p: 
     async function executeOp(op: Operation,
         fromGraphics: Graphics | p5.Renderer,
         toGraphics: Graphics) {
-
+        fromGraphics.loadPixels();
         const canvas = fromGraphics.elt as HTMLCanvasElement;
         const canvasData = await toBlob(canvas);
         const reply = await comm.send(op, { canvasData });
@@ -92,9 +93,10 @@ const make_sketch = (comm: Comm, emit: Emit, component: CanvasComponent) => (p: 
         }
 
         const flippedByes = new Uint8Array(reply.canvasData);
-
+        //debugger
         toGraphics.loadPixels(); // required even though we don't read from pixels
         // annoying that this copy is needed
+        console.log(toGraphics.pixels.length, flippedByes.length);
         copy(flippedByes, toGraphics.pixels);
         toGraphics.updatePixels();
 
@@ -149,7 +151,7 @@ export function canvasStore(state: State, emitter: Emitter) {
         emitter.emit('render')
     })
     emitter.on('mlrender', () => {
-        // hacky 
+        // hacky
         console.log(state.cache(CanvasComponent, 'p5-canvas'))
         state.cache(CanvasComponent, 'p5-canvas').sketch.renderCanvas()
     })
