@@ -93,10 +93,8 @@ const make_sketch = (comm: Comm, emit: Emit, component: CanvasComponent) => (p: 
         }
 
         const flippedByes = new Uint8Array(reply.canvasData);
-        //debugger
         toGraphics.loadPixels(); // required even though we don't read from pixels
         // annoying that this copy is needed
-        console.log(toGraphics.pixels.length, flippedByes.length);
         copy(flippedByes, toGraphics.pixels);
         toGraphics.updatePixels();
 
