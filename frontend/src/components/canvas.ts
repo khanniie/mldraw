@@ -87,6 +87,11 @@ const make_sketch = (comm: Comm, emit: Emit, component: CanvasComponent) => (p: 
         const canvasData = await toBlob(canvas);
         const reply = await comm.send(op, { canvasData });
 
+        if(reply == undefined) {
+            console.error('No reply from server')
+            return
+        }
+
         if ('error' in reply) {
             console.error(`Error: ${reply.error}`);
             return reply.error;
