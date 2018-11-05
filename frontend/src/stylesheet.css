@@ -1,0 +1,9 @@
+ul {
+    padding: 0;
+}
+
+.menu-item {
+    float: left;
+    list-style-type: none;
+    padding: 0.5em;
+}

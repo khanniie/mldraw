@@ -33,10 +33,11 @@ export class Comm {
     constructor() {}
 
     async connect(url: string) {
+        if(this.socket !== undefined) this.socket.disconnect()
         this.socket = socketio.connect(url, {
             transports: ['websocket']
         })
-
+        
         return new Promise((res, rej) => {
             this.socket.once('connect', res)
             this.socket.once('connect_error', () => rej('connection error'))
