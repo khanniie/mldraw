@@ -82,7 +82,7 @@ const make_sketch = (comm: Comm, emit: Emit, component: CanvasComponent) => (p: 
     async function executeOp(op: Operation,
         fromGraphics: Graphics | p5.Renderer,
         toGraphics: Graphics) {
-        fromGraphics.loadPixels();
+
         const canvas = fromGraphics.elt as HTMLCanvasElement;
         const canvasData = await toBlob(canvas);
         const reply = await comm.send(op, { canvasData });
