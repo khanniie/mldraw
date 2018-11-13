@@ -2,7 +2,8 @@
 export interface AppState {
     server: {
         address: string
-    }
+    },
+    ml_output: ArrayBuffer
 }
 
 /**
@@ -14,9 +15,11 @@ export interface Events {
     // choo's events
     render: undefined
 
-    // our events  
+    // our events
     setURL: string
     mlrender: undefined
+    drawoutput: ArrayBuffer
+    clear: undefined
 }
 
 // type magic ~

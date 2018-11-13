@@ -14,12 +14,6 @@ import { doNothingIfRunning } from '../util'
 type Graphics = p5 & p5.Element
 type Layer = Graphics;
 
-// in its own function so it can be JIT compiled for performance
-function copy<T>(fromArr: ArrayLike<T>, toArr: Array<T>) {
-    const len = toArr.length;
-    for (let i = 0; i < len; i++) toArr[i] = fromArr[i];
-}
-
 const make_sketch = (comm: Comm, emit: Emit, component: CanvasComponent) => (p: p5) => {
     let prev_x: number = null;
     let prev_y: number = null;
@@ -27,9 +21,9 @@ const make_sketch = (comm: Comm, emit: Emit, component: CanvasComponent) => (p: 
     let layers: Layer[] = [];
     let layerIdx = 0;
     let currentLayer: Layer;
-    let prevTouchTime = -1
+    let prevTouchTime = -1;
 
-    let appState
+    let appState;
 
     const makeLayer = (w: number, h: number): Layer => {
         const gfx = p.createGraphics(w, h) as any as Graphics;
@@ -72,16 +66,14 @@ const make_sketch = (comm: Comm, emit: Emit, component: CanvasComponent) => (p: 
     const renderCanvas = doNothingIfRunning(async function () {
         console.log("edges2shoes requested");
         await executeOp(Operation.edges2shoes_pretrained,
-            renderer, // normally this would be layer[some idx]
-            layers[0]);
+            renderer);
         console.log("edges2shoes executed");
     })
 
     // converts fromGraphics to a Blob, sends it to the server,
     // copies the pixel data in the response into toGraphics
     async function executeOp(op: Operation,
-        fromGraphics: Graphics | p5.Renderer,
-        toGraphics: Graphics) {
+        fromGraphics: Graphics | p5.Renderer) {
 
         const canvas = fromGraphics.elt as HTMLCanvasElement;
         const canvasData = await toBlob(canvas);
@@ -91,37 +83,35 @@ const make_sketch = (comm: Comm, emit: Emit, component: CanvasComponent) => (p: 
             console.error('No reply from server')
             return
         }
-
         if ('error' in reply) {
             console.error(`Error: ${reply.error}`);
             return reply.error;
         }
+        component.appState.ml_output = reply.canvasData;
+        emit('render');
+        return;
+    }
 
-        const flippedByes = new Uint8Array(reply.canvasData);
-        toGraphics.loadPixels(); // required even though we don't read from pixels
-        // annoying that this copy is needed
-        copy(flippedByes, toGraphics.pixels);
-        toGraphics.updatePixels();
-
-        return toGraphics;
-
+    function clear() {
+        p.background(255);
     }
 
     component.sketch = {
-        renderCanvas
+        renderCanvas, clear
     }
 }
 
 // functions returned by the p5 sketchs
 type SketchMethods = {
-    renderCanvas: () => void
+    renderCanvas: () => void,
+    clear: () => void
 }
 
 export class CanvasComponent extends Component {
     comm: Comm;
     emit: Emit;
     appState: AppState;
-    sketch: SketchMethods
+    sketch: SketchMethods;
     constructor(id: string, state: State, emit: Emit) {
         super(id)
         this.appState = state.app;
@@ -157,5 +147,10 @@ export function canvasStore(state: State, emitter: Emitter) {
         // hacky
         console.log(state.cache(CanvasComponent, 'p5-canvas'))
         state.cache(CanvasComponent, 'p5-canvas').sketch.renderCanvas()
+    })
+    emitter.on('clear', () => {
+        // hacky
+        console.log('clearing mirror');
+        state.cache(CanvasComponent, 'p5-canvas').sketch.clear()
     })
 }
