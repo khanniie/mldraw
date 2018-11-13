@@ -14,9 +14,11 @@ export interface Events {
     // choo's events
     render: undefined
 
-    // our events  
+    // our events
     setURL: string
     mlrender: undefined
+    clear: undefined
+    drawoutput: ArrayBuffer
 }
 
 // type magic ~

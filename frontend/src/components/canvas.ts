@@ -77,6 +77,14 @@ const make_sketch = (comm: Comm, emit: Emit, component: CanvasComponent) => (p: 
         console.log("edges2shoes executed");
     })
 
+    function clear() {
+
+      for (const layer of layers) layer.clear();
+
+      p.background(255);
+
+    }
+
     // converts fromGraphics to a Blob, sends it to the server,
     // copies the pixel data in the response into toGraphics
     async function executeOp(op: Operation,
@@ -97,24 +105,22 @@ const make_sketch = (comm: Comm, emit: Emit, component: CanvasComponent) => (p: 
             return reply.error;
         }
 
-        const flippedByes = new Uint8Array(reply.canvasData);
-        toGraphics.loadPixels(); // required even though we don't read from pixels
-        // annoying that this copy is needed
-        copy(flippedByes, toGraphics.pixels);
-        toGraphics.updatePixels();
+        emit('drawoutput', reply.canvasData)
 
         return toGraphics;
 
     }
 
     component.sketch = {
-        renderCanvas
+        renderCanvas,
+        clear
     }
 }
 
 // functions returned by the p5 sketchs
 type SketchMethods = {
-    renderCanvas: () => void
+    renderCanvas: () => void,
+    clear: () => void
 }
 
 export class CanvasComponent extends Component {
@@ -157,5 +163,10 @@ export function canvasStore(state: State, emitter: Emitter) {
         // hacky
         console.log(state.cache(CanvasComponent, 'p5-canvas'))
         state.cache(CanvasComponent, 'p5-canvas').sketch.renderCanvas()
+    })
+    emitter.on('clear', () => {
+        // hacky
+        console.log('clearing canvas');
+        state.cache(CanvasComponent, 'p5-canvas').sketch.clear()
     })
 }
