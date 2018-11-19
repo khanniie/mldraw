@@ -130,7 +130,7 @@ export class PaperCanvasComponent extends Component {
         //element.innerText = 'Trying to connect to backend...'
         this.comm = new Comm()
         await this.comm.connect(this.appState.server.address)
-        new (paper as any).default(make_sketch(this.comm, this.emit, this), element)
+        //new (paper as any).default(make_sketch(this.comm, this.emit, this), element)
     }
 
     update(state: State) {
