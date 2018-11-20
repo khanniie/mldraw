@@ -3,15 +3,16 @@ import html from 'choo/html'
 import devTools from 'choo-devtools'
 import { State, AppState, Emit } from './types'
 import { CanvasComponent, canvasStore } from './components/canvas'
-import { PaperCanvasComponent, paperCanvasStore } from './components/paper_canvas'
+import { PaperCanvasComponent, paperStore} from './components/paper_canvas'
 import { MirrorComponent, mirrorStore } from './components/mirror'
+import { paper } from './paperfix'
 
 const app = new (choo as any).default()
-
+console.log(paper)
 app.use(devTools())
 app.use(initialState)
 app.use(canvasStore)
-app.use(paperCanvasStore)
+app.use(paperStore)
 app.use(mirrorStore)
 app.route('/', mainView)
 app.mount('body')
@@ -32,6 +33,7 @@ function mainView(state: choo.IState, emit: Emit) {
             <h1>mldraw</h1>
             ${topBar(state.app, emit)}
             ${state.cache(CanvasComponent, 'p5-canvas').render(state.app)}
+            ${state.cache(PaperCanvasComponent, 'paper-canvas').render(state.app)}
             ${state.cache(MirrorComponent, 'p5-mirror').render(state.app)}
         </body>`
 }
