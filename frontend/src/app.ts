@@ -32,7 +32,6 @@ function mainView(state: choo.IState, emit: Emit) {
         <body>
             <h1>mldraw</h1>
             ${topBar(state.app, emit)}
-            ${state.cache(CanvasComponent, 'p5-canvas').render(state.app)}
             ${state.cache(PaperCanvasComponent, 'paper-canvas').render(state.app)}
             ${state.cache(MirrorComponent, 'p5-mirror').render(state.app)}
         </body>`

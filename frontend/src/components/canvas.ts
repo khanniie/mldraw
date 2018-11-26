@@ -27,9 +27,9 @@ const make_sketch = (comm: Comm, emit: Emit, component: CanvasComponent) => (p: 
     let layers: Layer[] = [];
     let layerIdx = 0;
     let currentLayer: Layer;
-    let prevTouchTime = -1
+    let prevTouchTime = -1;
 
-    let appState
+    let appState;
 
     const makeLayer = (w: number, h: number): Layer => {
         const gfx = p.createGraphics(w, h) as any as Graphics;
@@ -162,7 +162,7 @@ export function canvasStore(state: State, emitter: Emitter) {
     emitter.on('mlrender', () => {
         // hacky
         console.log(state.cache(CanvasComponent, 'p5-canvas'))
-        state.cache(CanvasComponent, 'p5-canvas').sketch.renderCanvas()
+        //state.cache(CanvasComponent, 'p5-canvas').sketch.renderCanvas()
     })
     emitter.on('clear', () => {
         // hacky

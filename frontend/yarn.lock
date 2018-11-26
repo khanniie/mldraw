@@ -653,6 +653,11 @@
   version "0.7.0"
   resolved "https://registry.yarnpkg.com/@types/p5/-/p5-0.7.0.tgz#b30709f9c0ef48f459151f56f1369647f2bba3ae"
 
+"@types/paper@^0.11.2":
+  version "0.11.2"
+  resolved "https://registry.yarnpkg.com/@types/paper/-/paper-0.11.2.tgz#0cf60651bf046cb593883c798dcfd43c265a61a3"
+  integrity sha512-g7eWQfgtwxpbZ+Q87A5JJsVLBsYH6QnCsfYyfsGW+tqDY15fS16Q9YksIKxNLXUiqm4SaV+SpztvhAxQFQVs4g==
+
 "@types/semver@^5.5.0":
   version "5.5.0"
   resolved "https://registry.yarnpkg.com/@types/semver/-/semver-5.5.0.tgz#146c2a29ee7d3bae4bf2fcb274636e264c813c45"
