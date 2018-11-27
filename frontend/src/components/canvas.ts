@@ -28,7 +28,7 @@ const make_sketch = (comm: Comm, emit: Emit, component: CanvasComponent) => (p: 
     let layerIdx = 0;
     let currentLayer: Layer;
     let prevTouchTime = -1
-    
+
     let appState
 
     const makeLayer = (w: number, h: number): Layer => {
@@ -38,6 +38,7 @@ const make_sketch = (comm: Comm, emit: Emit, component: CanvasComponent) => (p: 
     }
 
     p.setup = function () {
+        p.pixelDensity(1);
         renderer = p.createCanvas(256, 256);
 
         layers.push(makeLayer(p.width, p.height));
@@ -76,6 +77,14 @@ const make_sketch = (comm: Comm, emit: Emit, component: CanvasComponent) => (p: 
         console.log("edges2shoes executed");
     })
 
+    function clear() {
+
+      for (const layer of layers) layer.clear();
+
+      p.background(255);
+
+    }
+
     // converts fromGraphics to a Blob, sends it to the server,
     // copies the pixel data in the response into toGraphics
     async function executeOp(op: Operation,
@@ -86,30 +95,32 @@ const make_sketch = (comm: Comm, emit: Emit, component: CanvasComponent) => (p: 
         const canvasData = await toBlob(canvas);
         const reply = await comm.send(op, { canvasData });
 
+        if(reply == undefined) {
+            console.error('No reply from server')
+            return
+        }
+
         if ('error' in reply) {
             console.error(`Error: ${reply.error}`);
             return reply.error;
         }
 
-        const flippedByes = new Uint8Array(reply.canvasData);
-
-        toGraphics.loadPixels(); // required even though we don't read from pixels
-        // annoying that this copy is needed
-        copy(flippedByes, toGraphics.pixels);
-        toGraphics.updatePixels();
+        emit('drawoutput', reply.canvasData)
 
         return toGraphics;
 
     }
 
     component.sketch = {
-        renderCanvas
+        renderCanvas,
+        clear
     }
 }
 
 // functions returned by the p5 sketchs
 type SketchMethods = {
-    renderCanvas: () => void
+    renderCanvas: () => void,
+    clear: () => void
 }
 
 export class CanvasComponent extends Component {
@@ -149,8 +160,13 @@ export function canvasStore(state: State, emitter: Emitter) {
         emitter.emit('render')
     })
     emitter.on('mlrender', () => {
-        // hacky 
+        // hacky
         console.log(state.cache(CanvasComponent, 'p5-canvas'))
         state.cache(CanvasComponent, 'p5-canvas').sketch.renderCanvas()
+    })
+    emitter.on('clear', () => {
+        // hacky
+        console.log('clearing canvas');
+        state.cache(CanvasComponent, 'p5-canvas').sketch.clear()
     })
 }

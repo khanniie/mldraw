@@ -3,12 +3,14 @@ import html from 'choo/html'
 import devTools from 'choo-devtools'
 import { State, AppState, Emit } from './types'
 import { CanvasComponent, canvasStore } from './components/canvas'
+import { MirrorComponent, mirrorStore } from './components/mirror'
 
 const app = new (choo as any).default()
 
 app.use(devTools())
 app.use(initialState)
 app.use(canvasStore)
+app.use(mirrorStore)
 app.route('/', mainView)
 app.mount('body')
 
@@ -28,6 +30,7 @@ function mainView(state: choo.IState, emit: Emit) {
             <h1>mldraw</h1>
             ${topBar(state.app, emit)}
             ${state.cache(CanvasComponent, 'p5-canvas').render(state.app)}
+            ${state.cache(MirrorComponent, 'p5-mirror').render(state.app)}
         </body>`
 }
 
@@ -37,6 +40,7 @@ function topBar(state: AppState, emit: Emit) {
         <ul>
         <li class="menu-item">${serverSelector(state.server, emit)}</li>
         <li class="menu-item">${renderButton(emit)}</li>
+        <li class="menu-item">${clearButton(emit)}</li>
         </ul>
     </div>`
 }
@@ -61,5 +65,12 @@ function renderButton(emit: Emit) {
     const onclick = () => emit('mlrender')
     return html`
         <button onclick=${onclick}>Render</button>
+    `
+}
+
+function clearButton(emit: Emit) {
+    const onclick = () => emit('clear')
+    return html`
+        <button onclick=${onclick}>clear</button>
     `
 }
