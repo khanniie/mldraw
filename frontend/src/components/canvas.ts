@@ -105,7 +105,7 @@ const make_sketch = (comm: Comm, emit: Emit, component: CanvasComponent) => (p: 
             return reply.error;
         }
 
-        emit('drawoutput', reply.canvasData)
+        emit('drawoutput', [reply.canvasData, null])
 
         return toGraphics;
 

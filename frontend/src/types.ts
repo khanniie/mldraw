@@ -1,3 +1,5 @@
+import {paper} from './paperfix';
+
 // Our application's state
 export interface AppState {
     server: {
@@ -18,7 +20,7 @@ export interface Events {
     setURL: string
     mlrender: undefined
     clear: undefined
-    drawoutput: ArrayBuffer
+    drawoutput: [string, paper.Group]
 }
 
 // type magic ~

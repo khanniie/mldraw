@@ -9,16 +9,25 @@ import {paper} from '../paperfix';
 import { Comm, toBlob, Operation } from '../comm'
 import { doNothingIfRunning } from '../util'
 
+let debugcanvas;
+
 const make_paper = (component: PaperCanvasComponent,
                     canvas: HTMLCanvasElement, element, comm: Comm,
                     emit: Emit) => {
-  // Create an empty project and a view for the canvas:
-    paper.setup(canvas);
+    // Create an empty project and a view for the canvas:
+    const project = new paper.Project(canvas);
+    //new paper.View();
+    let rec = new paper.Rectangle(0, 0, 256, 256);
+    var path_rec = new paper.Path.Rectangle(rec);
+    path_rec.fillColor = '#ffffff';
     console.log(paper);
     var path;
     let appState;
+    let paths = new paper.Group();
+    paths.visible = false;
 
     paper.project.view.onMouseDown = function(event) {
+      project.activate();
   	  // If we produced a path before, deselect it:
   	  if (path) {
   		  path.selected = false;
@@ -36,7 +45,11 @@ const make_paper = (component: PaperCanvasComponent,
     }
     paper.project.view.onMouseUp = function(event) {
 	     // When the mouse is released, simplify it:
+        path.selected = false;
+        path.closed = true;
 	      path.simplify(10);
+        let temp_path = path.clone()
+        paths.addChild(temp_path);
     }
     function rasterize(){
 
@@ -62,12 +75,16 @@ const make_paper = (component: PaperCanvasComponent,
     })
 
     async function executeOp(op: Operation ) {
-        console.log(paper);
-        paper.view.viewSize = new paper.Size(256, 256);
+        project.activate();
         console.log(paper);
         const canvas :HTMLCanvasElement= paper.view.element;
-        console.log(canvas.width, canvas.height, canvas);
-        const canvasData = await toBlob(canvas);
+        let ctx = debugcanvas.getContext('2d');
+        if(canvas.width == 512){
+          ctx.drawImage(canvas, 0, 0, 512, 512, 0, 0, 256, 256);
+        } else {
+          ctx.drawImage(canvas, 0, 0, 256, 256, 0, 0, 256, 256);
+        }
+        const canvasData = await toBlob(debugcanvas);
         const reply = await comm.send(op, { canvasData });
 
         if(reply == undefined) {
@@ -80,7 +97,7 @@ const make_paper = (component: PaperCanvasComponent,
             return reply.error;
         }
         console.log("got a reply...")
-        emit('drawoutput', reply.canvasData);
+        emit('drawoutput', [reply.canvasData, paths]);
 
     }
 
@@ -114,9 +131,8 @@ export class PaperCanvasComponent extends Component {
         newcanvas.style.backgroundColor = "white";
         newcanvas.width = 256;
         newcanvas.height = 256;
-        newcanvas.style.width = '256px';
-        newcanvas.style.height = '256px';
         newcanvas.id = "new";
+        element.appendChild(newcanvas);
 
         //for debug purposes
         var newcanvas2 : HTMLCanvasElement = document.createElement('canvas');
@@ -128,6 +144,7 @@ export class PaperCanvasComponent extends Component {
         newcanvas2.id = "new2";
         element.appendChild(newcanvas2);
         console.log(newcanvas2);
+        debugcanvas = newcanvas2;
 
       //  make_paper(this, newcanvas, newcanvas2, element, this.comm, this.emit);
       make_paper(this, newcanvas, element, this.comm, this.emit);
@@ -142,7 +159,7 @@ export class PaperCanvasComponent extends Component {
     }
 
     createElement() {
-        return html`<div id="container"></div>`
+        return html`<div id="container"><p>paper input</p></div>`
     }
 }
 
