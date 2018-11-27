@@ -115,6 +115,7 @@ try:
                     self.model.eval()
 
         def infer(self, img: Image):
+            img.save("input.png")
             with torch.no_grad():
                 tensor_rgb, alpha = img2tensor(img, self.model.device)
                 tensor_input = tensor_rgb.unsqueeze(0)
@@ -123,7 +124,9 @@ try:
                 r = ((result * 0.5 + 0.5).numpy() * 255).astype(np.uint8)
                 r = np.concatenate((r, alpha), axis=0)
                 r = np.transpose(r, (1, 2, 0))
-            return r.tobytes()
+            output_img = Image.fromarray(r)
+            output_img.save("output.png")
+            return output_img
 
     for checkpoint in pix2pix_checkpoints:
         with remember_cwd():

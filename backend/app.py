@@ -2,6 +2,7 @@ from io import BytesIO
 from functools import wraps
 from inspect import isawaitable
 import asyncio
+import base64
 
 from aiohttp import web
 from PIL import Image
@@ -46,11 +47,14 @@ def canvas_message_handler(message: str):
             if canvas_message_valid(data):
                 blob = BytesIO(data['canvasData'])
                 img = Image.open(blob)
-                newBytes = handler(img)
-                if isawaitable(newBytes): # handler was async
-                    newBytes = await newBytes 
+                output_img = handler(img)
+                if isawaitable(output_img): # handler was async
+                    output_img = await output_img 
+                output_buf = BytesIO()
+                output_img.save(output_buf, format="PNG")
+                base64_img = base64.b64encode(output_buf.getvalue())
                 print(f'executed {message} request')
-                return {'canvasData': newBytes}
+                return {'canvasData': base64_img.decode('utf-8')}
             else:
                 print(f'rejected {message} request')
                 return {'error': 'canvas message invalid'}
