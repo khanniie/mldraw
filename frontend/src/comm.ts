@@ -10,7 +10,7 @@ export type RequestMessage = {
 }
 
 export type ReplyMessage = {
-    canvasData: ArrayBuffer
+    canvasData: string
 }
 
 export type ErrorMessage = {
@@ -18,12 +18,12 @@ export type ErrorMessage = {
 }
 
 export async function toBlob(canvas: HTMLCanvasElement): Promise<Blob> {
-    return new Promise<Blob>((res, rej) => { 
-        try { 
-            canvas.toBlob(res) 
-        } catch (err) { 
-            rej(err) 
-        } 
+    return new Promise<Blob>((res, rej) => {
+        try {
+            canvas.toBlob(res)
+        } catch (err) {
+            rej(err)
+        }
     })
 }
 
@@ -33,6 +33,7 @@ export class Comm {
     constructor() {}
 
     async connect(url: string) {
+        if(this.socket !== undefined) this.socket.disconnect()
         this.socket = socketio.connect(url, {
             transports: ['websocket']
         })
