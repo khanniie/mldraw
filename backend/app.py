@@ -21,7 +21,7 @@ available_handlers = {}
 from .models.autoimport_models import all_exported_models
 
 def canvas_message_valid(data):
-    return 'canvasData' in data
+    return 'canvasData' in data or 'imageData' in data
 
 def canvas_message_handler(message: str):
     ''' Bind the following function to be a handler for socket.io `message`
@@ -45,8 +45,11 @@ def canvas_message_handler(message: str):
         async def canvas_handler(sid, data):
             print(f'recieved {message} request')
             if canvas_message_valid(data):
-                blob = BytesIO(data['canvasData'])
-                img = Image.open(blob)
+                if 'canvasData' in data:
+                    blob = BytesIO(data['canvasData'])
+                    img = Image.open(blob)
+                else:
+                    print(list(data.keys()))
                 output_img = handler(img)
                 if isawaitable(output_img): # handler was async
                     output_img = await output_img 
