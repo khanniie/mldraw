@@ -12,76 +12,76 @@ import { doNothingIfRunning } from '../util'
 // the type definition for p5.Graphics is wrong so
 // we have to make our own
 type Graphics = p5 & p5.Element
-type Layer = Graphics;
+type Layer = Graphics
 
 // in its own function so it can be JIT compiled for performance
 function copy<T>(fromArr: ArrayLike<T>, toArr: Array<T>) {
-    const len = toArr.length;
-    for (let i = 0; i < len; i++) toArr[i] = fromArr[i];
+    const len = toArr.length
+    for (let i = 0; i < len; i++) toArr[i] = fromArr[i]
 }
 
 const make_sketch = (comm: Comm, emit: Emit, component: CanvasComponent) => (p: p5) => {
-    let prev_x: number = null;
-    let prev_y: number = null;
-    let renderer: p5.Renderer;
-    let layers: Layer[] = [];
-    let layerIdx = 0;
-    let currentLayer: Layer;
-    let prevTouchTime = -1;
+    let prev_x: number = null
+    let prev_y: number = null
+    let renderer: p5.Renderer
+    let layers: Layer[] = []
+    let layerIdx = 0
+    let currentLayer: Layer
+    let prevTouchTime = -1
 
-    let appState;
+    let appState
 
     const makeLayer = (w: number, h: number): Layer => {
-        const gfx = p.createGraphics(w, h) as any as Graphics;
-        gfx.background(0, 0, 0, 0);
-        return gfx;
+        const gfx = p.createGraphics(w, h) as any as Graphics
+        gfx.background(0, 0, 0, 0)
+        return gfx
     }
 
     p.setup = function () {
-        p.pixelDensity(1);
-        renderer = p.createCanvas(256, 256);
+        p.pixelDensity(1)
+        renderer = p.createCanvas(256, 256)
 
-        layers.push(makeLayer(p.width, p.height));
+        layers.push(makeLayer(p.width, p.height))
 
-        p.background(255);
-        p.fill(0);
-        p.stroke(0);
-        p.strokeCap('round');
-        p.strokeWeight(1);
+        p.background(255)
+        p.fill(0)
+        p.stroke(0)
+        p.strokeCap('round')
+        p.strokeWeight(1)
     }
 
     p.draw = function () {
-        for (const layer of layers) p.image(layer, 0, 0);
+        for (const layer of layers) p.image(layer, 0, 0)
     }
 
     p.mouseDragged = function () {
         if (prev_x == null && prev_y == null) {
-            prev_x = p.mouseX;
-            prev_y = p.mouseY;
-            prevTouchTime = p.millis();
+            prev_x = p.mouseX
+            prev_y = p.mouseY
+            prevTouchTime = p.millis()
         } else {
             if (p.millis() - prevTouchTime < 100) {
-                p.line(prev_x, prev_y, p.mouseX, p.mouseY);
+                p.line(prev_x, prev_y, p.mouseX, p.mouseY)
             }
-            prev_x = p.mouseX;
-            prev_y = p.mouseY;
-            prevTouchTime = p.millis();
+            prev_x = p.mouseX
+            prev_y = p.mouseY
+            prevTouchTime = p.millis()
         }
     }
 
     const renderCanvas = doNothingIfRunning(async function () {
-        console.log("edges2shoes requested");
+        console.log("edges2shoes requested")
         await executeOp(Operation.edges2shoes_pretrained,
             renderer, // normally this would be layer[some idx]
-            layers[0]);
-        console.log("edges2shoes executed");
+            layers[0])
+        console.log("edges2shoes executed")
     })
 
     function clear() {
 
-      for (const layer of layers) layer.clear();
+      for (const layer of layers) layer.clear()
 
-      p.background(255);
+      p.background(255)
 
     }
 
@@ -91,9 +91,9 @@ const make_sketch = (comm: Comm, emit: Emit, component: CanvasComponent) => (p: 
         fromGraphics: Graphics | p5.Renderer,
         toGraphics: Graphics) {
 
-        const canvas = fromGraphics.elt as HTMLCanvasElement;
-        const canvasData = await toBlob(canvas);
-        const reply = await comm.send(op, { canvasData });
+        const canvas = fromGraphics.elt as HTMLCanvasElement
+        const canvasData = await toBlob(canvas)
+        const reply = await comm.send(op, { canvasData })
 
         if(reply == undefined) {
             console.error('No reply from server')
@@ -101,13 +101,13 @@ const make_sketch = (comm: Comm, emit: Emit, component: CanvasComponent) => (p: 
         }
 
         if ('error' in reply) {
-            console.error(`Error: ${reply.error}`);
-            return reply.error;
+            console.error(`Error: ${reply.error}`)
+            return reply.error
         }
 
         emit('drawoutput', [reply.canvasData, null])
 
-        return toGraphics;
+        return toGraphics
 
     }
 
@@ -124,14 +124,14 @@ type SketchMethods = {
 }
 
 export class CanvasComponent extends Component {
-    comm: Comm;
-    emit: Emit;
-    appState: AppState;
+    comm: Comm
+    emit: Emit
+    appState: AppState
     sketch: SketchMethods
     constructor(id: string, state: State, emit: Emit) {
         super(id)
-        this.appState = state.app;
-        this.emit = emit;
+        this.appState = state.app
+        this.emit = emit
     }
 
     async load(element) {
@@ -143,7 +143,7 @@ export class CanvasComponent extends Component {
 
     update(state: State) {
         if (state.app.server.address !== this.appState.server.address) {
-            this.appState = state.app;
+            this.appState = state.app
             this.comm.connect(state.app.server.address)
         }
         return false // doesn't need choo to re-render it
@@ -156,7 +156,7 @@ export class CanvasComponent extends Component {
 
 export function canvasStore(state: State, emitter: Emitter) {
     emitter.on('setURL', url => {
-        state.app.server.address = url;
+        state.app.server.address = url
         emitter.emit('render')
     })
     emitter.on('mlrender', () => {
@@ -166,7 +166,7 @@ export function canvasStore(state: State, emitter: Emitter) {
     })
     emitter.on('clear', () => {
         // hacky
-        console.log('clearing canvas');
+        console.log('clearing canvas')
         state.cache(CanvasComponent, 'p5-canvas').sketch.clear()
     })
 }

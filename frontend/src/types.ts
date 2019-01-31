@@ -1,10 +1,21 @@
-import {paper} from './paperfix';
+/**
+ * API Types
+ */
 
+
+/**
+ * UI Types
+ */
+
+type Layer = {  layer: paper.Layer, group: paper.Group, model: string }
+ 
 // Our application's state
 export interface AppState {
     server: {
         address: string
-    }
+    },
+    activeLayer: number,
+    layers: Layer[]
 }
 
 /**
@@ -21,6 +32,8 @@ export interface Events {
     mlrender: undefined
     clear: undefined
     drawoutput: [string, paper.Group]
+    changeLayer: number,
+    addLayer: undefined,
 }
 
 // type magic ~
@@ -44,4 +57,4 @@ declare module "choo" {
     }
 }
 
-export type State = import("choo").Choo.IState;
+export type State = import("choo").Choo.IState

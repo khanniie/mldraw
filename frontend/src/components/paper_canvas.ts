@@ -1,180 +1,280 @@
 /**
  * In this file we wrap the p5.js basic sketch in a choojs component
  */
-import html from 'choo/html';
-import Component from 'choo/component';
-import { State, AppState, Emit, Emitter } from '../types';
+import html from 'choo/html'
+import Component from 'choo/component'
+import { State, AppState, Emit, Emitter } from '../types'
 
-import {paper} from '../paperfix';
-import { Comm, toBlob, Operation } from '../comm'
+import { paper } from '../paperfix'
+import { Comm, serialize, Operation } from '../comm'
 import { doNothingIfRunning } from '../util'
 
-let debugcanvas;
+let debugcanvas
+
+type Layer = {
+    model: string
+    layer: paper.Layer
+    clippingGroup?: paper.Group
+}
+
+// class LayerManager {
+//     public layers: Layer[]
+//     public activeIdx: number;
+//     constructor(public project: paper.Project, numLayers = 2) {
+//         project.activate()
+//         this.layers = Array.from({ length: numLayers }).map((_, i) => {
+//             let layer = new paper.Layer()
+//             layer.activate()
+//             if (i == 0) {
+//                 let rectangle = new paper.Rectangle(0, 0, 256, 256)
+//                 var pathRectangle = new paper.Path.Rectangle(rectangle)
+//                 pathRectangle.fillColor = '#ffffff'
+//                 return { layer, model: 'background layer, no model', clippingGroup: null }
+//             } else {
+//                 let clippingGroup = new paper.Group()
+//                 return {
+//                     layer, model: 'edges2shoes_pretrained', clippingGroup
+//                 }
+//             }
+//         });
+//         this.activeIdx = 1;
+//         this.layers[1].layer.activate()
+//     }
+
+//     selectLayer()
+
+//     addPath(path: paper.Path) {
+//         this.paths.addChild(path)
+//     }
+// }
 
 const make_paper = (component: PaperCanvasComponent,
-                    canvas: HTMLCanvasElement, element, comm: Comm,
-                    emit: Emit) => {
-    // Create an empty project and a view for the canvas:
-    const project = new paper.Project(canvas);
-    //new paper.View();
-    let rec = new paper.Rectangle(0, 0, 256, 256);
-    var path_rec = new paper.Path.Rectangle(rec);
-    path_rec.fillColor = '#ffffff';
-    console.log(paper);
-    var path;
-    let appState;
-    let paths = new paper.Group();
-    paths.visible = false;
+    canvas: HTMLCanvasElement, element, comm: Comm,
+    emit: Emit) => {
+    const project = new paper.Project(canvas)       
+    console.log('papercanvas', project)
+    let background = new paper.Layer(); //background
+    background.activate()
+    background.name = 'background'
+    let rec = new paper.Rectangle(0, 0, 256, 256)
+    var path_rec = new paper.Path.Rectangle(rec)
+    path_rec.fillColor = '#ffffff'
+    project.addLayer(background)
 
-    paper.project.view.onMouseDown = function(event) {
-      project.activate();
-  	  // If we produced a path before, deselect it:
-  	  if (path) {
-  		  path.selected = false;
-  	  }
-  	   // Create a new path and set its stroke color to black:
-  	  path = new paper.Path({
-  		  segments: [event.point],
-  		  strokeColor: 'black',
-  	  	// Select the path, so we can see its segment points:
-  		  fullySelected: true
-  	  });
-    }
-    paper.project.view.onMouseDrag = function(event) {
-	     path.add(event.point);
-    }
-    paper.project.view.onMouseUp = function(event) {
-	     // When the mouse is released, simplify it:
-        path.selected = false;
-        path.closed = true;
-	      path.simplify(10);
-        let temp_path = path.clone()
-        paths.addChild(temp_path);
-    }
-    function rasterize(){
+    let mTool = new paper.Tool();
 
-      const raster = paper.project.activeLayer.rasterize();
-      console.log(raster.width, raster.height, paper.project.activeLayer);
-      const pt_topleft = new paper.Point(0, 0);
-      const pt_bottomright = new paper.Point(raster.width, raster.height);
-      console.log("raster", raster.getImageData(new paper.Rectangle(pt_topleft, pt_bottomright)));
+    console.log(paper)
+    var pathBeingDrawn: paper.Path
+    addLayer()
 
-      //later, probably want to make new canvas, draw layer and send
-      var newcanvas : HTMLCanvasElement = document.createElement('canvas');
-      newcanvas.style.backgroundColor = "white";
-      newcanvas.width = 256;
-      newcanvas.height = 256;
-      newcanvas.id = "hidden";
-      element.appendChild(newcanvas);
+    paper.project.view.onMouseDown = function (event) {
+        project.activate()
+        pathBeingDrawn = new paper.Path({
+            segments: [event.point],
+            strokeColor: 'black',
+            fullySelected: true,
+            name: 'temp'
+        })
+    }
+    
+    paper.project.view.onMouseDrag = function (event) {
+        pathBeingDrawn.add(event.point)
+    }
+
+    paper.project.view.onMouseUp = function (event) {
+        if(pathBeingDrawn.length < 3) {
+            pathBeingDrawn.remove()
+        }
+        pathBeingDrawn.selected = false
+        pathBeingDrawn.closed = true
+        pathBeingDrawn.fillColor = "#FF000001"
+        pathBeingDrawn.selectedColor = new paper.Color(0, 0, 0, 1);
+        pathBeingDrawn.simplify(10)
+        console.log(project.activeLayer.name, project.layers)
+        project.activeLayer.children['clippingGroup'].addChild(pathBeingDrawn)
+        if (pathBeingDrawn) {
+            pathBeingDrawn.selected = false
+        }
+    }
+
+    mTool.onMouseDown = function (event) {
+        let hitOptions = {
+            segments: false,
+            stroke: true,
+            fill: true,
+            tolerance: 5
+        };
+        project.activeLayer.selected = false;
+        let hitResult = project.activeLayer.hitTestAll(event.point, hitOptions);
+        console.log(hitResult);
+        if(hitResult[0] != undefined && hitResult[0].item) hitResult[0].item.selected = true; 
+    }    
+
+    mTool.onMouseMove = function(event) {
+        let hitOptions = {
+            segments: false,
+            stroke: true,
+            fill: true,
+            tolerance: 5
+        };
+        project.activeLayer.selected = false;
+
+        let hitResult = project.activeLayer.hitTestAll(event.point, hitOptions);
+        if(hitResult[0] != undefined && hitResult[0].item) hitResult[0].item.selected = true; 
+    }
+
+    function rasterize() {
+        project.activate()
+        let rec = new paper.Rectangle(0, 0, 256, 256)
+        var path_rec = new paper.Path.Rectangle(rec)
+        path_rec.fillColor = '#ffffff'
+        path_rec.sendToBack();
+        const raster = paper.project.activeLayer.rasterize(72, false)
+        path_rec.remove();
+        const pt_topleft = new paper.Point(0, 0)
+        const pt_bottomright = new paper.Point(raster.width, raster.height)
+        if (raster.width > 256 || raster.height > 256) throw new Error('TODO: make it work for when u draw outside of the canvas')
+        console.log(pt_bottomright, pt_topleft, paper.project.view)
+        return raster.getImageData(new paper.Rectangle(pt_topleft, pt_bottomright))
     }
 
     const renderCanvas = doNothingIfRunning(async function () {
-        console.log("edges2shoes requested");
-        await executeOp(Operation.edges2shoes_pretrained);
-        console.log("edges2shoes executed");
+        console.log("edges2shoes requested")
+        await executeOp(Operation.edges2shoes_pretrained)
+        console.log("edges2shoes executed")
     })
 
-    async function executeOp(op: Operation ) {
-        project.activate();
-        console.log(paper);
-        const canvas :HTMLCanvasElement= paper.view.element;
-        let ctx = debugcanvas.getContext('2d');
-        if(canvas.width == 512){
-          ctx.drawImage(canvas, 0, 0, 512, 512, 0, 0, 256, 256);
-        } else {
-          ctx.drawImage(canvas, 0, 0, 256, 256, 0, 0, 256, 256);
-        }
-        const canvasData = await toBlob(debugcanvas);
-        const reply = await comm.send(op, { canvasData });
+    async function executeOp(op: Operation) {
+        project.activate()
+        console.log("active layer:", project.activeLayer);
+        const canvas: HTMLCanvasElement = paper.view.element
+        console.log("executing")
+        console.log("rasterize", rasterize())
+        const msg = await serialize(rasterize())
+        const reply = await comm.send(op, msg)
 
-        if(reply == undefined) {
+        if (reply == undefined) {
             console.error('No reply from server')
             return
         }
 
         if ('error' in reply) {
-            console.error(`Error: ${reply.error}`);
-            return reply.error;
+            console.error(`Error: ${reply.error}`)
+            return reply.error
         }
+
         console.log("got a reply...")
-        emit('drawoutput', [reply.canvasData, paths]);
+        emit('drawoutput', [reply.canvasData, paths])
+        console.log("active layer AFTER", project.activeLayer);
 
     }
 
+    function clear() {
+        project.activate()
+        paper.project.activeLayer.removeChildren()
+    }
+
+    function addLayer() {
+        project.activate()
+        const layer = new paper.Layer()
+        const clippingGroup = new paper.Group()
+        clippingGroup.name = 'clippingGroup'
+        project.addLayer(layer)
+        return {
+            layer, clippingGroup, model: 'edges2cat_pretrained'
+        }
+    }
+
+    function switchLayer(idx: number) {
+        project.activate()
+        project.layers[idx].activate()
+        console.log("active layer:", project.activeLayer);
+    }
+
+    function swapLayers(idxA: number, idxB: number) {
+        const layerA = project.layers[idxA]
+        const layerB = project.layers[idxB]
+        project.insertLayer(idxA, layerB);
+        project.insertLayer(idxB, layerA);
+    }
+
     component.sketch = {
-          renderCanvas
+        renderCanvas,
+        clear,
+        switchLayer,
+        swapLayers,
+        addLayer
     }
 }
 
 type SketchMethods = {
-  renderCanvas: () => void,
+    renderCanvas: () => void,
+    clear: () => void,
+    switchLayer: (idx: number) => void,
+    swapLayers: (idxA: number, idxB: number) => void,
+    addLayer: () => void
 }
 
 export class PaperCanvasComponent extends Component {
-    comm: Comm;
-    emit: Emit;
-    appState: AppState;
-    sketch: SketchMethods;
+    comm: Comm
+    emit: Emit
+    appState: AppState
+    sketch: SketchMethods
 
     constructor(id: string, state: State, emit: Emit) {
         super(id)
-        this.appState = state.app;
-        this.emit = emit;
+        this.appState = state.app
+        this.emit = emit
     }
 
     async load(element: HTMLElement) {
-        //element.innerText = 'Trying to connect to backend...'
         this.comm = new Comm()
         await this.comm.connect(this.appState.server.address)
 
-        var newcanvas : HTMLCanvasElement = document.createElement('canvas');
-        newcanvas.style.backgroundColor = "white";
-        newcanvas.width = 256;
-        newcanvas.height = 256;
-        newcanvas.id = "new";
-        element.appendChild(newcanvas);
+        var newcanvas: HTMLCanvasElement = document.createElement('canvas')
+        newcanvas.style.backgroundColor = "white"
+        newcanvas.width = 256
+        newcanvas.height = 256
+        newcanvas.id = "new"
+        element.appendChild(newcanvas)
 
-        //for debug purposes
-        var newcanvas2 : HTMLCanvasElement = document.createElement('canvas');
-        newcanvas2.style.backgroundColor = "white";
-        newcanvas2.width = 256;
-        newcanvas2.height = 256;
-        newcanvas2.style.width = '256px';
-        newcanvas2.style.height = '256px';
-        newcanvas2.id = "new2";
-        element.appendChild(newcanvas2);
-        console.log(newcanvas2);
-        debugcanvas = newcanvas2;
-
-      //  make_paper(this, newcanvas, newcanvas2, element, this.comm, this.emit);
-      make_paper(this, newcanvas, element, this.comm, this.emit);
+        make_paper(this, newcanvas, element, this.comm, this.emit)
+        setTimeout(() => this.emit('addLayer'), 10)
     }
 
-    update(state: State) {
-        if (state.app.server.address !== this.appState.server.address) {
-            this.appState = state.app;
-            this.comm.connect(state.app.server.address)
+    update(state: AppState) {
+        if (state.server.address !== this.appState.server.address) {
+            this.appState = state
+            this.comm.connect(state.server.address)
         }
         return false // doesn't need choo to re-render it
     }
 
     createElement() {
-        return html`<div id="container"><p>paper input</p></div>`
+        return html`<div id="container">
+    <p>paper input</p>
+</div>`
     }
 }
 
 export function paperStore(state: State, emitter: Emitter) {
-    // emitter.on('setURL', url => {
-    //     state.app.server.address = url;
-    //     emitter.emit('render')
-    // })
     emitter.on('mlrender', () => {
         // hacky
         state.cache(PaperCanvasComponent, 'paper-canvas').sketch.renderCanvas()
     })
     emitter.on('clear', () => {
         // hacky
-        // console.log('clearing canvas');
-        // state.cache(PaperCanvasComponent, 'paper-canvas').sketch.clear()
+        console.log('clearing canvas')
+        state.cache(PaperCanvasComponent, 'paper-canvas').sketch.clear()
+    })
+    emitter.on('changeLayer', (layerIdx) => {
+        state.cache(PaperCanvasComponent, 'paper-canvas').sketch.switchLayer(layerIdx)
+        state.app.activeLayer = layerIdx;
+        emitter.emit('render')
+    })
+    emitter.on('addLayer', () => {
+        state.app.layers.push(state.cache(PaperCanvasComponent, 'paper-canvas').sketch.addLayer())
+        console.log(state.app.layers)
+        emitter.emit('render')
     })
 }

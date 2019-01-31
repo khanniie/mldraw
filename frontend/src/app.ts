@@ -2,7 +2,6 @@ import * as choo from 'choo'
 import html from 'choo/html'
 import devTools from 'choo-devtools'
 import { State, AppState, Emit } from './types'
-import { CanvasComponent, canvasStore } from './components/canvas'
 import { PaperCanvasComponent, paperStore} from './components/paper_canvas'
 import { MirrorComponent, mirrorStore } from './components/mirror'
 import { paper } from './paperfix'
@@ -11,18 +10,18 @@ const app = new (choo as any).default()
 console.log(paper)
 app.use(devTools())
 app.use(initialState)
-app.use(canvasStore)
 app.use(paperStore)
 app.use(mirrorStore)
 app.route('/', mainView)
 app.mount('body')
-
 function initialState(state: choo.IState, emit: Emit) {
     Object.assign(state, {
         app: {
             server: {
                 address: '128.237.225.218:8080'
-            }
+            },
+            activeLayer: 1,
+            layers: []
         }
     })
 }
@@ -38,12 +37,18 @@ function mainView(state: choo.IState, emit: Emit) {
 }
 
 function topBar(state: AppState, emit: Emit) {
+    const layers = state.layers.map((layer, i) => {
+        return html`<li class="menu-item"><button onclick=${() => emit('changeLayer', i + 1)}>Layer ${i + 1}</button></li>`
+    })
     return html`
     <div>
         <ul>
         <li class="menu-item">${serverSelector(state.server, emit)}</li>
         <li class="menu-item">${renderButton(emit)}</li>
         <li class="menu-item">${clearButton(emit)}</li>
+        <li class="menu-item"><p>${state.activeLayer}</p></li>
+        <li class="menu-item"><button onclick=${() => emit('addLayer')}>+</button></li>
+        ${layers}
         </ul>
     </div>`
 }

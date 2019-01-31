@@ -8,13 +8,13 @@
  * @param fn Async functionn
  */
 export function doNothingIfRunning(asyncFn: () => void): () => void {
-    let running = false;
-    const bound = asyncFn.bind ? asyncFn.bind(this) : asyncFn; // arrow functions have no bind
+    let running = false
+    const bound = asyncFn.bind ? asyncFn.bind(this) : asyncFn // arrow functions have no bind
     return async function () {
-        if(running) return;
-        running = true;
-        await bound();
-        running = false;
+        if(running) return
+        running = true
+        await bound()
+        running = false
     }
 }
 
@@ -24,6 +24,6 @@ export function doNothingIfRunning(asyncFn: () => void): () => void {
  * @param key Key in params
  */
 export function urlParam(key: string): string | null {
-    const params = new URLSearchParams(window.location.search);
+    const params = new URLSearchParams(window.location.search)
     return params.get(key)
 }

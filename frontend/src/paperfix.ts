@@ -1,3 +1,3 @@
-import * as paperJS from 'paper';
+import * as paperJS from 'paper'
 
-export const paper = (paperJS as any).default as typeof paperJS;
+export const paper = (paperJS as any).default as typeof paperJS

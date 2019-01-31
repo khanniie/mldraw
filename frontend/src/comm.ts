@@ -6,7 +6,12 @@ export enum Operation {
 }
 
 export type RequestMessage = {
-    canvasData: Blob
+    canvasData?: Blob,
+    imageData?: {
+        data: ArrayBuffer,
+        width: number,
+        height: number
+    }
 }
 
 export type ReplyMessage = {
@@ -17,7 +22,7 @@ export type ErrorMessage = {
     error: string
 }
 
-export async function toBlob(canvas: HTMLCanvasElement): Promise<Blob> {
+async function toBlob(canvas: HTMLCanvasElement): Promise<Blob> {
     return new Promise<Blob>((res, rej) => {
         try {
             canvas.toBlob(res)
@@ -27,13 +32,30 @@ export async function toBlob(canvas: HTMLCanvasElement): Promise<Blob> {
     })
 }
 
+function viewToBuffer(view: ArrayBufferView) {
+    if(view.byteOffset == 0 && view.byteLength == view.buffer.byteLength) return view.buffer
+    else return view.buffer.slice(view.byteOffset, view.byteOffset + view.byteLength)
+}
+
+export async function serialize(canvasOrImageData: HTMLCanvasElement | ImageData): Promise<RequestMessage> {
+    console.log(canvasOrImageData)
+    if (canvasOrImageData instanceof HTMLCanvasElement) return { canvasData: await toBlob(canvasOrImageData) }
+    else return Promise.resolve({ 
+        imageData: {
+            data: viewToBuffer(canvasOrImageData.data),
+            width: canvasOrImageData.width,
+            height: canvasOrImageData.height 
+        }
+    })
+}
+
 export class Comm {
     socket: SocketIOClient.Socket
 
-    constructor() {}
+    constructor() { }
 
     async connect(url: string) {
-        if(this.socket !== undefined) this.socket.disconnect()
+        if (this.socket !== undefined) this.socket.disconnect()
         this.socket = socketio.connect(url, {
             transports: ['websocket']
         })
