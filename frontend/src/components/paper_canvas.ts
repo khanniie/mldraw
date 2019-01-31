@@ -51,7 +51,7 @@ type Layer = {
 const make_paper = (component: PaperCanvasComponent,
     canvas: HTMLCanvasElement, element, comm: Comm,
     emit: Emit) => {
-    const project = new paper.Project(canvas)       
+    const project = new paper.Project(canvas)
     console.log('papercanvas', project)
     let background = new paper.Layer(); //background
     background.activate()
@@ -69,6 +69,7 @@ const make_paper = (component: PaperCanvasComponent,
 
     paper.project.view.onMouseDown = function (event) {
         project.activate()
+        if(selectedObject) return;
         pathBeingDrawn = new paper.Path({
             segments: [event.point],
             strokeColor: 'black',
@@ -76,43 +77,67 @@ const make_paper = (component: PaperCanvasComponent,
             name: 'temp'
         })
     }
-    
+
     paper.project.view.onMouseDrag = function (event) {
+        if(selectedObject) return;
         pathBeingDrawn.add(event.point)
     }
 
     paper.project.view.onMouseUp = function (event) {
+        if (selectedObject){
+          selectedObject = null;
+          return;
+        }
         if(pathBeingDrawn.length < 3) {
             pathBeingDrawn.remove()
         }
         pathBeingDrawn.selected = false
         pathBeingDrawn.closed = true
         pathBeingDrawn.fillColor = "#FF000001"
-        pathBeingDrawn.selectedColor = new paper.Color(0, 0, 0, 1);
         pathBeingDrawn.simplify(10)
-        console.log(project.activeLayer.name, project.layers)
+        //console.log(project.activeLayer.name, project.layers)
         project.activeLayer.children['clippingGroup'].addChild(pathBeingDrawn)
         if (pathBeingDrawn) {
             pathBeingDrawn.selected = false
         }
     }
 
+    var segment, path;
+    var movePath = false;
+    var selectedObject = null;
+
     mTool.onMouseDown = function (event) {
-        let hitOptions = {
-            segments: false,
-            stroke: true,
-            fill: true,
-            tolerance: 5
-        };
+        segment = path = null;
+
         project.activeLayer.selected = false;
-        let hitResult = project.activeLayer.hitTestAll(event.point, hitOptions);
-        console.log(hitResult);
-        if(hitResult[0] != undefined && hitResult[0].item) hitResult[0].item.selected = true; 
-    }    
+        if (selectedObject == null)
+          return
+
+      	// if (event.modifiers.shift) {
+      	// 	if (selectedObject.type == 'segment') {
+        //     console.log("shifting");
+      	// 		selectedObject.segment.remove();
+      	// 	};
+      	// 	return;
+      	// }
+
+    		path = selectedObject.item
+    		if (selectedObject.type == 'segment') {
+    			segment = selectedObject.segment;
+    		} else if (selectedObject.type == 'stroke') {
+    			var location = selectedObject.location;
+          console.log("location: ", location.index, event.point);
+    			segment = path.insert(location.index + 1, event.point);
+    		}
+
+      	// movePath = selectedObject.type == 'fill';
+      	// if (movePath)
+      	// 	project.activeLayer.addChild(selectedObject.item);
+    }
 
     mTool.onMouseMove = function(event) {
         let hitOptions = {
-            segments: false,
+            segments: true,
             stroke: true,
             fill: true,
             tolerance: 5
@@ -120,7 +145,25 @@ const make_paper = (component: PaperCanvasComponent,
         project.activeLayer.selected = false;
 
         let hitResult = project.activeLayer.hitTestAll(event.point, hitOptions);
-        if(hitResult[0] != undefined && hitResult[0].item) hitResult[0].item.selected = true; 
+        if(hitResult[0] != undefined && hitResult[0].item) {
+          hitResult[0].item.selected = true
+          selectedObject = hitResult[0]
+        } else {
+          selectedObject = null
+        }
+    }
+
+
+    mTool.onMouseDrag = function(event) {
+    	if (segment) {
+    		segment.point.x += event.delta.x;
+        segment.point.y += event.delta.y;
+    	} else if (path) {
+        console.log("shifting position, pos before", path.position);
+    		path.position.x += event.delta.x;
+        path.position.y += event.delta.y;
+        console.log("shifting position, pos after", path.position);
+    	}
     }
 
     function rasterize() {
