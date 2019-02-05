@@ -84,21 +84,31 @@ const make_paper = (component: PaperCanvasComponent,
     }
 
     paper.project.view.onMouseUp = function (event) {
-        if (selectedObject){
-          selectedObject = null;
-          return;
-        }
+        if(pathBeingDrawn == null) return;
         if(pathBeingDrawn.length < 3) {
             pathBeingDrawn.remove()
         }
         pathBeingDrawn.selected = false
         pathBeingDrawn.closed = true
         pathBeingDrawn.fillColor = "#FF000001"
-        pathBeingDrawn.simplify(10)
+        pathBeingDrawn.simplify(10);
         //console.log(project.activeLayer.name, project.layers)
-        project.activeLayer.children['clippingGroup'].addChild(pathBeingDrawn)
+        if(project.activeLayer.children['clippingGroup']){
+          project.activeLayer.children['clippingGroup'].addChild(pathBeingDrawn)
+        } else {
+          debugger;
+          console.log("error", project.activeLayer);
+          const clippingGroup = new paper.Group()
+          clippingGroup.name = 'clippingGroup'
+          project.activeLayer.children['clippingGroup'].addChild(pathBeingDrawn)
+        }
+
         if (pathBeingDrawn) {
             pathBeingDrawn.selected = false
+        }
+        pathBeingDrawn = null;
+        if (selectedObject){
+          selectedObject = null;
         }
     }
 
@@ -140,7 +150,7 @@ const make_paper = (component: PaperCanvasComponent,
             segments: true,
             stroke: true,
             fill: true,
-            tolerance: 5
+            tolerance: 2
         };
         project.activeLayer.selected = false;
 
@@ -207,7 +217,7 @@ const make_paper = (component: PaperCanvasComponent,
         }
 
         console.log("got a reply...")
-        emit('drawoutput', [reply.canvasData, paths])
+        emit('drawoutput', [reply.canvasData, project.activeLayer.children['clippingGroup']])
         console.log("active layer AFTER", project.activeLayer);
 
     }
