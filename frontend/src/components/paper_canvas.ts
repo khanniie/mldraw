@@ -50,7 +50,7 @@ type Layer = {
 
 const make_paper = (component: PaperCanvasComponent,
     canvas: HTMLCanvasElement, element, comm: Comm,
-    emit: Emit) => {
+    emit: Emit, appState) => {
     const project = new paper.Project(canvas)
     console.log('papercanvas', project)
     let background = new paper.Layer(); //background
@@ -61,7 +61,7 @@ const make_paper = (component: PaperCanvasComponent,
     path_rec.fillColor = '#ffffff'
     project.addLayer(background)
 
-    let mTool = new paper.Tool();
+    let mTool = new paper.Tool()
 
     console.log(paper)
     var pathBeingDrawn: paper.Path
@@ -216,15 +216,15 @@ const make_paper = (component: PaperCanvasComponent,
             return reply.error
         }
 
-        console.log("got a reply...")
-        emit('drawoutput', [reply.canvasData, project.activeLayer.children['clippingGroup']])
+        console.log("got a reply...", appState, appState.activeLayer)
+        emit('drawoutput', [reply.canvasData, project.activeLayer.children['clippingGroup'], appState.activeLayer])
         console.log("active layer AFTER", project.activeLayer);
 
     }
 
     function clear() {
         project.activate()
-        paper.project.activeLayer.removeChildren()
+        paper.project.activeLayer.children['clippingGroup'].removeChildren()
     }
 
     function addLayer() {
@@ -234,7 +234,10 @@ const make_paper = (component: PaperCanvasComponent,
         clippingGroup.name = 'clippingGroup'
         project.addLayer(layer)
         return {
-            layer, clippingGroup, model: 'edges2cat_pretrained'
+            'paperLayer': layer,
+            'clippingGroup': clippingGroup,
+            'mirrorLayer': null,
+            'model': 'edges2cat_pretrained'
         }
     }
 
@@ -291,7 +294,7 @@ export class PaperCanvasComponent extends Component {
         newcanvas.id = "new"
         element.appendChild(newcanvas)
 
-        make_paper(this, newcanvas, element, this.comm, this.emit)
+        make_paper(this, newcanvas, element, this.comm, this.emit, this.appState)
         setTimeout(() => this.emit('addLayer'), 10)
     }
 
@@ -322,11 +325,13 @@ export function paperStore(state: State, emitter: Emitter) {
     })
     emitter.on('changeLayer', (layerIdx) => {
         state.cache(PaperCanvasComponent, 'paper-canvas').sketch.switchLayer(layerIdx)
-        state.app.activeLayer = layerIdx;
+        state.app.activeLayer = state.app.layers[layerIdx - 1];
         emitter.emit('render')
     })
     emitter.on('addLayer', () => {
-        state.app.layers.push(state.cache(PaperCanvasComponent, 'paper-canvas').sketch.addLayer())
+        let resultLayer = state.cache(PaperCanvasComponent, 'paper-canvas').sketch.addLayer()
+        state.app.layers.push(resultLayer)
+        state.app.activeLayer = resultLayer;
         console.log(state.app.layers)
         emitter.emit('render')
     })

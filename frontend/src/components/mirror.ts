@@ -3,17 +3,12 @@
  */
 import html from 'choo/html'
 import Component from 'choo/component'
-import { State, AppState, Emit, Emitter } from '../types'
+import { State, AppState, Emit, Emitter, Layer } from '../types'
 import {paper} from '../paperfix'
 
 import * as p5 from 'p5'
 
 let debugcanvas
-
-// the type definition for p5.Graphics is wrong so
-// we have to make our own
-type Graphics = p5 & p5.Element
-type Layer = Graphics
 
 // in its own function so it can be JIT compiled for performance
 function copy<T>(fromArr: ArrayLike<T>, toArr: Array<T>) {
@@ -23,35 +18,38 @@ function copy<T>(fromArr: ArrayLike<T>, toArr: Array<T>) {
 
 const make_mirror = (component: MirrorComponent,
                     canvas: HTMLCanvasElement, element,
-                    emit: Emit) => {
+                    emit: Emit, state) => {
     // Create an empty project and a view for the canvas:
     const project = new paper.Project(canvas)
     console.log('mirror', project)
     //new paper.View()
-    let appState
+    let appState = state
 
-    function drawOutput([bytes, paths]: [string, paper.Group]) {
+    function drawOutput([bytes, paths, layer]: [string, paper.Group, Layer]) {
         project.activate()
-        console.log("mirror's active layer", project.activeLayer)
         let temp = bytes
         var image = document.createElement('img')
         image.src = 'data:image/png;base64,' + temp
         image.width = 256
         image.height = 256
         document.body.appendChild(image)
+        let mirrorLayer = layer.mirrorLayer != null ? layer.mirrorLayer : new paper.Layer();
+        mirrorLayer.activate();
+        mirrorLayer.removeChildren();
+
         var raster = new paper.Raster(image, new paper.Point(128, 128))
         paths.visible = true
         var gg = paths.clone()
-        console.log(paper.project, paper.projects, gg, gg)
-        project.activate();
+        //project.activate();
         var g = new paper.Group([gg, raster])
         g.clipped = true
+        layer.mirrorLayer = project.activeLayer;
         console.log('mirror children', project.activeLayer.children)
         return
     }
 
     function clear() {
-        project.activeLayer.removeChildren();
+        if(state.activeLayer.mirrorLayer) state.activeLayer.mirrorLayer.removeChildren();
     }
 
     component.sketch = {
@@ -60,7 +58,7 @@ const make_mirror = (component: MirrorComponent,
 }
 
 type SketchMethods = {
-    drawOutput: ([str, group]: [string, paper.Group]) => void
+    drawOutput: ([str, group, layer]: [string, paper.Group, Layer]) => void
     clear: () => void
 }
 
@@ -83,7 +81,7 @@ export class MirrorComponent extends Component {
         newcanvas.id = "mirror"
         element.appendChild(newcanvas)
 
-        make_mirror(this, newcanvas, element, this.emit)
+        make_mirror(this, newcanvas, element, this.emit, this.appState)
     }
 
     update() {}
@@ -94,9 +92,9 @@ export class MirrorComponent extends Component {
 }
 
 export function mirrorStore(state: State, emitter: Emitter) {
-    emitter.on('drawoutput', ([bytes, path]) => {
+    emitter.on('drawoutput', ([bytes, path, layer]) => {
         // hacky
-        state.cache(MirrorComponent, 'p5-mirror').sketch.drawOutput([bytes, path])
+        state.cache(MirrorComponent, 'p5-mirror').sketch.drawOutput([bytes, path, layer])
     })
     emitter.on('clear', () => {
         // hacky

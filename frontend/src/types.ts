@@ -7,14 +7,18 @@
  * UI Types
  */
 
-type Layer = {  layer: paper.Layer, group: paper.Group, model: string }
- 
+export type Layer = {
+  paperLayer: paper.Layer,
+  clippingGroup: paper.Group,
+  mirrorLayer: any,
+  model: string }
+
 // Our application's state
 export interface AppState {
     server: {
         address: string
     },
-    activeLayer: number,
+    activeLayer: Layer,
     layers: Layer[]
 }
 
@@ -23,6 +27,7 @@ export interface AppState {
  * This is a map of event names to the types the handlers take
  * e.g, the event setURL has a payload of string
  */
+
 export interface Events {
     // choo's events
     render: undefined
@@ -31,7 +36,7 @@ export interface Events {
     setURL: string
     mlrender: undefined
     clear: undefined
-    drawoutput: [string, paper.Group]
+    drawoutput: [string, paper.Group, Layer]
     changeLayer: number,
     addLayer: undefined,
 }
