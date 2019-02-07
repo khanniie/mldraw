@@ -17,37 +17,6 @@ type Layer = {
     clippingGroup?: paper.Group
 }
 
-// class LayerManager {
-//     public layers: Layer[]
-//     public activeIdx: number;
-//     constructor(public project: paper.Project, numLayers = 2) {
-//         project.activate()
-//         this.layers = Array.from({ length: numLayers }).map((_, i) => {
-//             let layer = new paper.Layer()
-//             layer.activate()
-//             if (i == 0) {
-//                 let rectangle = new paper.Rectangle(0, 0, 256, 256)
-//                 var pathRectangle = new paper.Path.Rectangle(rectangle)
-//                 pathRectangle.fillColor = '#ffffff'
-//                 return { layer, model: 'background layer, no model', clippingGroup: null }
-//             } else {
-//                 let clippingGroup = new paper.Group()
-//                 return {
-//                     layer, model: 'edges2shoes_pretrained', clippingGroup
-//                 }
-//             }
-//         });
-//         this.activeIdx = 1;
-//         this.layers[1].layer.activate()
-//     }
-
-//     selectLayer()
-
-//     addPath(path: paper.Path) {
-//         this.paths.addChild(path)
-//     }
-// }
-
 const make_paper = (component: PaperCanvasComponent,
     canvas: HTMLCanvasElement, element, comm: Comm,
     emit: Emit, appState) => {
@@ -123,14 +92,6 @@ const make_paper = (component: PaperCanvasComponent,
         if (selectedObject == null)
           return
 
-      	// if (event.modifiers.shift) {
-      	// 	if (selectedObject.type == 'segment') {
-        //     console.log("shifting");
-      	// 		selectedObject.segment.remove();
-      	// 	};
-      	// 	return;
-      	// }
-
     		path = selectedObject.item
     		if (selectedObject.type == 'segment') {
     			segment = selectedObject.segment;
@@ -139,10 +100,6 @@ const make_paper = (component: PaperCanvasComponent,
           console.log("location: ", location.index, event.point);
     			segment = path.insert(location.index + 1, event.point);
     		}
-
-      	// movePath = selectedObject.type == 'fill';
-      	// if (movePath)
-      	// 	project.activeLayer.addChild(selectedObject.item);
     }
 
     mTool.onMouseMove = function(event) {
@@ -191,15 +148,19 @@ const make_paper = (component: PaperCanvasComponent,
         return raster.getImageData(new paper.Rectangle(pt_topleft, pt_bottomright))
     }
 
-    const renderCanvas = doNothingIfRunning(async function () {
-        console.log("edges2shoes requested")
-        await executeOp(Operation.edges2shoes_pretrained)
-        console.log("edges2shoes executed")
+    const renderCanvas = doNothingIfRunning(async function (opName:string) {
+        console.log("!!!!", opName, Operation[opName])
+        await executeOp(Operation[opName])
+        // if(opName in Operation) {
+        //
+        // } else {
+        //   console.error("operation string doesn't exist!");
+        // }
+        console.log("Executed, finished awaiting")
     })
 
     async function executeOp(op: Operation) {
         project.activate()
-        console.log("active layer:", project.activeLayer);
         const canvas: HTMLCanvasElement = paper.view.element
         console.log("executing")
         console.log("rasterize", rasterize())
@@ -216,10 +177,7 @@ const make_paper = (component: PaperCanvasComponent,
             return reply.error
         }
 
-        console.log("got a reply...", appState, appState.activeLayer)
         emit('drawoutput', [reply.canvasData, project.activeLayer.children['clippingGroup'], appState.activeLayer])
-        console.log("active layer AFTER", project.activeLayer);
-
     }
 
     function clear() {
@@ -237,14 +195,13 @@ const make_paper = (component: PaperCanvasComponent,
             'paperLayer': layer,
             'clippingGroup': clippingGroup,
             'mirrorLayer': null,
-            'model': 'edges2cat_pretrained'
+            'model': 'edges2shoes_pretrained'
         }
     }
 
     function switchLayer(idx: number) {
         project.activate()
         project.layers[idx].activate()
-        console.log("active layer:", project.activeLayer);
     }
 
     function swapLayers(idxA: number, idxB: number) {
@@ -252,6 +209,7 @@ const make_paper = (component: PaperCanvasComponent,
         const layerB = project.layers[idxB]
         project.insertLayer(idxA, layerB);
         project.insertLayer(idxB, layerA);
+        //we also need to switch the layers inside the appState
     }
 
     component.sketch = {
@@ -264,7 +222,7 @@ const make_paper = (component: PaperCanvasComponent,
 }
 
 type SketchMethods = {
-    renderCanvas: () => void,
+    renderCanvas: (s: string) => void,
     clear: () => void,
     switchLayer: (idx: number) => void,
     swapLayers: (idxA: number, idxB: number) => void,
@@ -316,7 +274,8 @@ export class PaperCanvasComponent extends Component {
 export function paperStore(state: State, emitter: Emitter) {
     emitter.on('mlrender', () => {
         // hacky
-        state.cache(PaperCanvasComponent, 'paper-canvas').sketch.renderCanvas()
+        console.log(state.app.activeLayer.model)
+        state.cache(PaperCanvasComponent, 'paper-canvas').sketch.renderCanvas(state.app.activeLayer.model)
     })
     emitter.on('clear', () => {
         // hacky

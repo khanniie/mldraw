@@ -18,12 +18,25 @@ function initialState(state: choo.IState, emit: Emit) {
     Object.assign(state, {
         app: {
             server: {
-                address: '128.237.225.218:8080'
+                address: '128.2.103.85:8080'
             },
-            activeLayer: 1,
+            activeLayer: null,
             layers: []
         }
     })
+}
+
+function dropdownContent(emit:Emit, layer, i:number, state){
+  return html`<div class="dropdown-content">
+   <a href="#" onclick=${() => changeModel(state, i, 'edges2shoes_pretrained')}>Shoes</a>
+   <a href="#" onclick=${() => changeModel(state, i, 'flip_canvas')}>Flip</a>
+ </div>`;
+}
+
+function changeModel(appState:AppState, idx, model){
+  appState.layers[idx].model = model;
+  console.log("model changed idx: ", idx);
+  console.log('current state', appState);
 }
 
 function mainView(state: choo.IState, emit: Emit) {
@@ -38,7 +51,9 @@ function mainView(state: choo.IState, emit: Emit) {
 
 function topBar(state: AppState, emit: Emit) {
     const layers = state.layers.map((layer, i) => {
-        return html`<li class="menu-item"><button onclick=${() => emit('changeLayer', i + 1)}>Layer ${i + 1}</button></li>`
+        let name = layer == state.activeLayer ? 'SELECTED Layer' + (i + 1) : 'Layer' + (i + 1);
+        return html`<li class="menu-item dropdown"><button onclick=${() => emit('changeLayer', i + 1)}>
+            ${name}</button>${dropdownContent(emit, layer, i, state)}</></li>`
     })
     return html`
     <div>

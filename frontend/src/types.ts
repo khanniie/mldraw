@@ -39,6 +39,7 @@ export interface Events {
     drawoutput: [string, paper.Group, Layer]
     changeLayer: number,
     addLayer: undefined,
+    changeModel: number,
 }
 
 // type magic ~

@@ -32,8 +32,11 @@ const make_mirror = (component: MirrorComponent,
         image.src = 'data:image/png;base64,' + temp
         image.width = 256
         image.height = 256
-        document.body.appendChild(image)
-        let mirrorLayer = layer.mirrorLayer != null ? layer.mirrorLayer : new paper.Layer();
+        //document.body.appendChild(image)
+        //we need the index of where it is in the paper layers project to put it in the correct
+        //layering position on the mirror project
+        let idx = layer.paperLayer.index;
+        let mirrorLayer = layer.mirrorLayer != null ? layer.mirrorLayer : project.insertLayer(idx,new paper.Layer());
         mirrorLayer.activate();
         mirrorLayer.removeChildren();
 
@@ -43,8 +46,9 @@ const make_mirror = (component: MirrorComponent,
         //project.activate();
         var g = new paper.Group([gg, raster])
         g.clipped = true
-        layer.mirrorLayer = project.activeLayer;
-        console.log('mirror children', project.activeLayer.children)
+        layer.mirrorLayer = project.activeLayer
+        console.log('mirror children', project.layers)
+        console.log('????????????????', project.activeLayer.children)
         return
     }
 

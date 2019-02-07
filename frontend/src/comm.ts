@@ -40,11 +40,11 @@ function viewToBuffer(view: ArrayBufferView) {
 export async function serialize(canvasOrImageData: HTMLCanvasElement | ImageData): Promise<RequestMessage> {
     console.log(canvasOrImageData)
     if (canvasOrImageData instanceof HTMLCanvasElement) return { canvasData: await toBlob(canvasOrImageData) }
-    else return Promise.resolve({ 
+    else return Promise.resolve({
         imageData: {
             data: viewToBuffer(canvasOrImageData.data),
             width: canvasOrImageData.width,
-            height: canvasOrImageData.height 
+            height: canvasOrImageData.height
         }
     })
 }

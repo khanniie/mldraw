@@ -1,19 +1,19 @@
 
 /**
  * Wraps fn, returning a function that will do nothing if it has already been called
- * and the inner async function hasn't returned yet. 
+ * and the inner async function hasn't returned yet.
  * This lets us use async functions with p5.js's synchronous input API without an async
- * function being called twice whilst it's running 
+ * function being called twice whilst it's running
  * (e.g we'll never send a message to run a layer until the previous input has been fully processed)
  * @param fn Async functionn
  */
-export function doNothingIfRunning(asyncFn: () => void): () => void {
+export function doNothingIfRunning<T>(asyncFn: (s:T) => void): (s:T) => void {
     let running = false
     const bound = asyncFn.bind ? asyncFn.bind(this) : asyncFn // arrow functions have no bind
-    return async function () {
+    return async function (s) {
         if(running) return
         running = true
-        await bound()
+        await bound(s)
         running = false
     }
 }
