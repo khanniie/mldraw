@@ -99,7 +99,8 @@ async def register(self_url, server_url):
     print("registered with {}".format(server_url))
     
 
-def start(self_url, server_url):
-    web.run_app(app, port=8080)
+async def start(self_url, server_url):
     print("available handlers: {}".format(available_handlers.keys()))
-    register(self_url, server_url)
+    await register(self_url, server_url)
+
+    web.run_app(app, port=8081)
