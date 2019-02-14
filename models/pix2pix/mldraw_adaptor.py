@@ -31,7 +31,6 @@ from aiohttp import web
 from PIL import Image, ImageOps
 
 import socketio
-import socketio.asyncio_client
 
 sio = socketio.AsyncServer()
 app = web.Application()
@@ -94,7 +93,7 @@ def get_available_handlers():
     return list(available_handlers.keys())
 
 async def register(self_url, server_url):
-    client = socketio.asyncio_client.AsyncClient()
+    client = socketio.AsyncClient()
     await client.connect(server_url)
     await client.emit('register', {'addr': self_url, 'handlers': list(available_handlers.keys())})
     print("registered with {}".format(server_url))
