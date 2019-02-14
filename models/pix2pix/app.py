@@ -1,6 +1,8 @@
+import argparse
+import asyncio 
+
 from .mldraw_adaptor import start, canvas_message_handler
 from .wrapper import exported_models
-import argparse
 
 def args():
     parser = argparse.ArgumentParser()
@@ -14,4 +16,7 @@ for message, fn in exported_models.items():
 if __name__ == '__main__':
 
     opts = args()
-    start(opts.self_url, opts.backend_url)
+    loop = asyncio.get_event_loop()
+    # Blocking call which returns when the display_date() coroutine is done
+    loop.run_until_complete(start(opts.self_url, opts.backend_url))
+
