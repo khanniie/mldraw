@@ -47,6 +47,7 @@ def register(sid, data):
     addr = data['addr']
     handlers = data['handlers']
     available_handlers[addr] = handlers
+    print("discovered new handlers, now available: {}".format(available_handlers))
     sio.emit('available-handlers', available_handlers)
 
 @sio.on('disconnect')
