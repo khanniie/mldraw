@@ -93,6 +93,7 @@ def get_available_handlers():
     return list(available_handlers.keys())
 
 async def register(self_url, server_url):
+    print("registering to {} {}".format(self_url, server_url))
     client = socketio.AsyncClient()
     await client.connect(server_url)
     await client.emit('register', {'addr': self_url, 'handlers': list(available_handlers.keys())})
