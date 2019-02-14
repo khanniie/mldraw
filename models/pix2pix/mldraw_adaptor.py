@@ -103,4 +103,4 @@ def start(self_url, server_url):
     print("available handlers: {}".format(available_handlers.keys()))
     register(self_url, server_url)
 
-    web.run_app(app, port=8080)
+    web.run_app(app, port=8081)
