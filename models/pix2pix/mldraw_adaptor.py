@@ -38,6 +38,12 @@ sio.attach(app)
 
 available_handlers = {}
 
+routes = web.RouteTableDef()
+
+@routes.get('/')
+async def get_handler(request):
+  return web.Response(text='test test test\n')
+
 def canvas_message_valid(data):
     return 'canvasData' in data or 'imageData' in data
 
@@ -48,7 +54,7 @@ def canvas_message_handler(message: str):
     The handler should return the new bytes of the resulting image.
     The result image is required to be the same size at the input image.
     The handler is allowed to be an async function as long as it returns an awaitable.
-    e.g:
+    e.g: 
     ```python
         @canvas_message_handler('process-image')
         def process_image(img):
@@ -80,7 +86,7 @@ def canvas_message_handler(message: str):
             else:
                 print(f'rejected {message} request')
                 return {'error': 'canvas message invalid'}
-
+        
         global available_handlers
         available_handlers[message] = handler
 
@@ -88,20 +94,22 @@ def canvas_message_handler(message: str):
 
     return decorator
 
-@sio.on('available-handlers')
+@sio.on('list-available-handlers')
 def get_available_handlers():
     return list(available_handlers.keys())
 
 async def register(self_url, server_url):
-    print("registering to {} {}".format(self_url, server_url))
+    print("registering to {}".format(server_url))
     client = socketio.AsyncClient()
     await client.connect(server_url)
     await client.emit('register', {'addr': self_url, 'handlers': list(available_handlers.keys())})
     print("registered with {}".format(server_url))
     
+app.add_routes(routes)
 
-async def start(self_url, server_url):
+def start(opts):
     print("available handlers: {}".format(available_handlers.keys()))
-    await register(self_url, server_url)
+    sio.start_background_task(register, opts.self_url, opts.backend_url)
 
     web.run_app(app, port=8081)
+

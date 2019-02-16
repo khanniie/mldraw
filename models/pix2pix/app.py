@@ -16,7 +16,9 @@ for message, fn in exported_models.items():
 if __name__ == '__main__':
 
     opts = args()
-    loop = asyncio.get_event_loop()
+    #loop = asyncio.get_event_loop()
+    print(opts)
+    start(opts)
     # Blocking call which returns when the display_date() coroutine is done
-    loop.run_until_complete(start(opts.self_url, opts.backend_url))
+    #loop.run_until_complete(start(opts))
 

@@ -38,17 +38,23 @@ sio.attach(app)
 available_handlers = {}
 
 @sio.on('connect')
-def connect(sid, environ):
+async def connect(sid, environ):
     print("connect ", sid)
-    return available_handlers
+
 
 @sio.on('register')
-def register(sid, data):
+async def register(sid, data):
     addr = data['addr']
     handlers = data['handlers']
     available_handlers[addr] = handlers
     print("discovered new handlers, now available: {}".format(available_handlers))
-    sio.emit('available-handlers', available_handlers)
+    await sio.emit('update-available-handlers', available_handlers)
+
+@sio.on('list-models')
+def list_models(sid):
+  print("listing models", available_handlers)
+  return available_handlers
+  
 
 @sio.on('disconnect')
 def disconnect(sid):
