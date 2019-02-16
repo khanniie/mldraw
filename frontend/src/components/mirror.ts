@@ -75,13 +75,13 @@ export class MirrorComponent extends Component {
     }
 
     async load(element) {
-
+        let parent = document.getElementById("mirror-container");
         var newcanvas : HTMLCanvasElement = document.createElement('canvas')
         newcanvas.style.backgroundColor = "white"
         newcanvas.width = 256
         newcanvas.height = 256
         newcanvas.id = "mirror"
-        element.appendChild(newcanvas)
+        parent.appendChild(newcanvas)
 
         make_mirror(this, newcanvas, element, this.emit)
     }
@@ -89,7 +89,12 @@ export class MirrorComponent extends Component {
     update() {}
 
     createElement() {
-        return html`<div></div>`
+        return html`
+        <div>
+          <div class="border border-horz top"><div class="border border-horz bottom"><div class="border-vert border left "><div class="border-vert border right">
+            <div id="mirror-container"></div>
+          </div></div></div></div>
+        </div>`
     }
 }
 
