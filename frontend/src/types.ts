@@ -12,7 +12,8 @@ type Layer = {  layer: paper.Layer, group: paper.Group, model: string }
 // Our application's state
 export interface AppState {
     server: {
-        address: string
+        address: string,
+        isConnected: boolean
     },
     activeLayer: number,
     layers: Layer[]

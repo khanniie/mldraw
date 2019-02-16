@@ -17,37 +17,6 @@ type Layer = {
     clippingGroup?: paper.Group
 }
 
-// class LayerManager {
-//     public layers: Layer[]
-//     public activeIdx: number;
-//     constructor(public project: paper.Project, numLayers = 2) {
-//         project.activate()
-//         this.layers = Array.from({ length: numLayers }).map((_, i) => {
-//             let layer = new paper.Layer()
-//             layer.activate()
-//             if (i == 0) {
-//                 let rectangle = new paper.Rectangle(0, 0, 256, 256)
-//                 var pathRectangle = new paper.Path.Rectangle(rectangle)
-//                 pathRectangle.fillColor = '#ffffff'
-//                 return { layer, model: 'background layer, no model', clippingGroup: null }
-//             } else {
-//                 let clippingGroup = new paper.Group()
-//                 return {
-//                     layer, model: 'edges2shoes_pretrained', clippingGroup
-//                 }
-//             }
-//         });
-//         this.activeIdx = 1;
-//         this.layers[1].layer.activate()
-//     }
-
-//     selectLayer()
-
-//     addPath(path: paper.Path) {
-//         this.paths.addChild(path)
-//     }
-// }
-
 const make_paper = (component: PaperCanvasComponent,
     canvas: HTMLCanvasElement, element, comm: Comm,
     emit: Emit) => {
@@ -292,7 +261,8 @@ export class PaperCanvasComponent extends Component {
         element.appendChild(newcanvas)
 
         make_paper(this, newcanvas, element, this.comm, this.emit)
-        setTimeout(() => this.emit('addLayer'), 10)
+        setTimeout(() => this.emit('isConnected'), 1)
+        setTimeout(() => this.emit('addLayer'), 20)
     }
 
     update(state: AppState) {
@@ -304,30 +274,36 @@ export class PaperCanvasComponent extends Component {
     }
 
     createElement() {
-        return html`<div id="container">
-    <p>paper input</p>
-</div>`
+        return html`<div id="paper-canvas"></div>`
     }
 }
 
 export function paperStore(state: State, emitter: Emitter) {
+    emitter.on('isConnected', () => {
+        state.app.server.isConnected = true;
+        console.log(state.app.server, state.app.server.isConnected)
+        emitter.emit('render')
+    })
+    
     emitter.on('mlrender', () => {
         // hacky
         state.cache(PaperCanvasComponent, 'paper-canvas').sketch.renderCanvas()
     })
+
     emitter.on('clear', () => {
         // hacky
         console.log('clearing canvas')
         state.cache(PaperCanvasComponent, 'paper-canvas').sketch.clear()
     })
+
     emitter.on('changeLayer', (layerIdx) => {
         state.cache(PaperCanvasComponent, 'paper-canvas').sketch.switchLayer(layerIdx)
         state.app.activeLayer = layerIdx;
         emitter.emit('render')
     })
+
     emitter.on('addLayer', () => {
         state.app.layers.push(state.cache(PaperCanvasComponent, 'paper-canvas').sketch.addLayer())
-        console.log(state.app.layers)
         emitter.emit('render')
     })
 }

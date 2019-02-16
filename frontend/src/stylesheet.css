@@ -35,7 +35,7 @@ body{
 }
 
 #cat{
-  width:25%;
+  height: 5em;
 }
 
 .border{
@@ -59,3 +59,40 @@ canvas{
   margin: 5px;
   display: inline-block;
 }
+
+#paper-canvas{
+  width: 75vh;
+  height: calc(100vh - 10em - 6px);
+}
+
+html, body{
+  width: 100%;
+  height: 100%;
+  padding: 0px;
+  margin:0px;
+}
+
+#left{
+  margin-left: 2em;
+  position: relative;
+  height: 100%;
+  left: 0px;
+  top: 0px;
+  width: 75vh;
+  float:left;
+}
+
+#right{
+  margin-left: 2em;
+  
+}
+
+#bar{
+  position: absolute;
+  bottom: calc(1em + 6px);
+  height: 3em;
+  width: 100%;
+  background-color: #F7D1D4;
+  border-radius: 3px;
+}
+

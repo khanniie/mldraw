@@ -38,7 +38,6 @@ function viewToBuffer(view: ArrayBufferView) {
 }
 
 export async function serialize(canvasOrImageData: HTMLCanvasElement | ImageData): Promise<RequestMessage> {
-    console.log(canvasOrImageData)
     if (canvasOrImageData instanceof HTMLCanvasElement) return { canvasData: await toBlob(canvasOrImageData) }
     else return Promise.resolve({ 
         imageData: {
@@ -57,6 +56,7 @@ export class Comm {
     url2socket: {[key: string]: Promise<SocketIOClient.Socket>}
     constructor() {
         this.model2url = {}
+        this.url2socket = {}
      }
 
     async connect(url: string) {
@@ -65,12 +65,14 @@ export class Comm {
             transports: ['websocket']
         })
 
-        const all_handlers = await new Promise((res, rej) => {
+        await new Promise((res, rej) => {
             this.socket.once('connect', res)
             this.socket.once('connect_error', () => rej('connection error'))
         }) as {[key: string]: string[]}
-        this.update_models(all_handlers)
-        this.socket.on('available-handlers', msg => this.update_models(msg))
+        const models = await new Promise(res => this.socket.emit('list-models', res)) as {[key: string]: string[]}
+        console.log(models)
+        this.update_models(models)
+        this.socket.on('update-available-handlers', msg => this.update_models(msg))
     }
 
     // update map of models & urls and connect to newly discovered models
@@ -99,6 +101,7 @@ export class Comm {
     }
 
     async send(tag: Operation, data: RequestMessage): Promise<ReplyMessage | ErrorMessage> {
+        console.log(this.model2url, this.url2socket)
         if(!(tag in this.model2url)) throw new Error(`No model connected with name ${tag}, available: ${this.available_models()}`)
         return this.url2socket[this.model2url[tag]]
             .then(socket => new Promise<ReplyMessage>(res => socket.emit(tag, data, res)))
