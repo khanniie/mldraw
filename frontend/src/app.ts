@@ -6,6 +6,8 @@ import { PaperCanvasComponent, paperStore} from './components/paper_canvas'
 import { MirrorComponent, mirrorStore } from './components/mirror'
 import { paper } from './paperfix'
 
+const cat = require('./assets/cat.png');
+
 const app = new (choo as any).default()
 console.log(paper)
 app.use(devTools())
@@ -18,7 +20,7 @@ function initialState(state: choo.IState, emit: Emit) {
     Object.assign(state, {
         app: {
             server: {
-                address: '128.237.225.218:8080'
+                address: '128.2.103.85:8080'
             },
             activeLayer: 1,
             layers: []
@@ -29,7 +31,7 @@ function initialState(state: choo.IState, emit: Emit) {
 function mainView(state: choo.IState, emit: Emit) {
     return html`
         <body>
-            <h1>mldraw</h1>
+            <img id="cat" src=${cat}/>
             ${topBar(state.app, emit)}
             ${state.cache(PaperCanvasComponent, 'paper-canvas').render(state.app)}
             ${state.cache(MirrorComponent, 'p5-mirror').render(state.app)}
