@@ -51,8 +51,13 @@ export async function serialize(canvasOrImageData: HTMLCanvasElement | ImageData
 
 export class Comm {
     socket: SocketIOClient.Socket
-
-    constructor() { }
+    // map from available models to url of model
+    model2url: {[key: string]: string}
+    // map from urls to sockets
+    url2socket: {[key: string]: Promise<SocketIOClient.Socket>}
+    constructor() {
+        this.model2url = {}
+     }
 
     async connect(url: string) {
         if (this.socket !== undefined) this.socket.disconnect()
@@ -60,13 +65,42 @@ export class Comm {
             transports: ['websocket']
         })
 
-        return new Promise((res, rej) => {
+        const all_handlers = await new Promise((res, rej) => {
             this.socket.once('connect', res)
             this.socket.once('connect_error', () => rej('connection error'))
-        })
+        }) as {[key: string]: string[]}
+        this.update_models(all_handlers)
+        this.socket.on('available-handlers', msg => this.update_models(msg))
+    }
+
+    // update map of models & urls and connect to newly discovered models
+    update_models(handlers: {[key: string]: string[]}) {
+        const new_handlers = {}
+        const urls = Object.keys(handlers)
+        urls.forEach(url => handlers[url].forEach(handler => new_handlers[handler] = url))
+        this.model2url = {...this.model2url, ...new_handlers}
+
+        for(const model of Object.keys(this.model2url)) {
+            const url = this.model2url[model]
+            if(this.url2socket[url] == undefined) {
+                const new_socket = socketio.connect(url, {
+                    transports: ['websocket']
+                })
+                this.url2socket[url] = new Promise((res, rej) => {
+                    new_socket.once('connect', () => res(new_socket))
+                    new_socket.once('connect_error', () => rej(`connection error to ${url}`))
+                })
+            }
+        }
+    }
+
+    available_models() {
+        return Object.keys(this.model2url)
     }
 
     async send(tag: Operation, data: RequestMessage): Promise<ReplyMessage | ErrorMessage> {
-        return new Promise<ReplyMessage>(res => this.socket.emit(tag, data, res))
+        if(!(tag in this.model2url)) throw new Error(`No model connected with name ${tag}, available: ${this.available_models()}`)
+        return this.url2socket[this.model2url[tag]]
+            .then(socket => new Promise<ReplyMessage>(res => socket.emit(tag, data, res)))
     }
 }
