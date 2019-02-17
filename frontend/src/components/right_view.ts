@@ -5,6 +5,7 @@ import { State, AppState, Emit } from './../types'
 import html from 'choo/html'
 import {mirrorView} from './mirror_component'
 
+
 function layerBuilder(state: AppState, emit: Emit) {
     const layers = state.layers.map((l, i) => {
         return html`${layer(state, emit, i)}`;
@@ -15,6 +16,12 @@ function layerBuilder(state: AppState, emit: Emit) {
         <ul id="layer-menu">
         <li class="menu-item"><p>${state.activeLayer}</p></li>
         <li class="menu-item"><button onclick=${() => emit('addLayer')}>+</button></li>
+        <li class="menu-item"><input type="checkbox" onclick=${({srcElement}) => emit('setSmoothness', srcElement.checked)} name="smooth">
+        <label for="smooth">smooth</label>
+        </li>
+        <li class="menu-item"><input type="checkbox" onclick=${({srcElement}) => emit('setClosed', srcElement.checked)} name="closed" checked>
+        <label for="closed">closed</label>
+        </li>
         ${layers}
         </ul>
     </div>`

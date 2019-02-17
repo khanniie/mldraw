@@ -25,18 +25,23 @@ const make_paper = (component: PaperCanvasComponent,
     let background = new paper.Layer(); //background
     background.activate()
     background.name = 'background'
-    let rec = new paper.Rectangle(0, 0, 256, 256)
-    var path_rec = new paper.Path.Rectangle(rec)
+    const {width: viewWidth, height: viewHeight} = paper.project.view.bounds
+    let rec = new paper.Rectangle(0, 0, background.bounds.width, background.bounds.height)
+    let path_rec = new paper.Path.Rectangle(rec)
     path_rec.fillColor = '#ffffff'
     project.addLayer(background)
-
-    let mTool = new paper.Tool();
+    
+    let smoothing = false;
+    let autoclose = true;
+    let dragTool = new paper.Tool();
+    let drawTool = new paper.Tool();
+    drawTool.activate();
 
     console.log(paper)
     var pathBeingDrawn: paper.Path
     addLayer()
 
-    paper.project.view.onMouseDown = function (event) {
+    drawTool.onMouseDown = function (event) {
         project.activate()
         if(selectedObject) return;
         pathBeingDrawn = new paper.Path({
@@ -45,22 +50,28 @@ const make_paper = (component: PaperCanvasComponent,
             fullySelected: true,
             name: 'temp'
         })
+        pathBeingDrawn.closed = autoclose
+
     }
 
-    paper.project.view.onMouseDrag = function (event) {
+    drawTool.onMouseDrag = function (event) {
         if(selectedObject) return;
+        if(event.point.x < 0) event.point.x = 0
+        if(event.point.y < 0) event.point.y = 0
+        if(event.point.x >= viewWidth) event.point.x = Math.floor(viewWidth)
+        if(event.point.y >= viewHeight) event.point.y = Math.floor(viewHeight)
+        console.log(event.point)
         pathBeingDrawn.add(event.point)
     }
 
-    paper.project.view.onMouseUp = function (event) {
+    drawTool.onMouseUp = function (event) {
         if(pathBeingDrawn == null) return;
         if(pathBeingDrawn.length < 3) {
             pathBeingDrawn.remove()
         }
         pathBeingDrawn.selected = false
-        pathBeingDrawn.closed = true
         pathBeingDrawn.fillColor = "#FF000001"
-        pathBeingDrawn.simplify(10);
+        if(smoothing) pathBeingDrawn.simplify(10);
         //console.log(project.activeLayer.name, project.layers)
         if(project.activeLayer.children['clippingGroup']){
           project.activeLayer.children['clippingGroup'].addChild(pathBeingDrawn)
@@ -85,7 +96,7 @@ const make_paper = (component: PaperCanvasComponent,
     var movePath = false;
     var selectedObject = null;
 
-    mTool.onMouseDown = function (event) {
+    dragTool.onMouseDown = function (event) {
         segment = path = null;
 
         project.activeLayer.selected = false;
@@ -114,7 +125,7 @@ const make_paper = (component: PaperCanvasComponent,
       	// 	project.activeLayer.addChild(selectedObject.item);
     }
 
-    mTool.onMouseMove = function(event) {
+    dragTool.onMouseMove = function(event) {
         let hitOptions = {
             segments: true,
             stroke: true,
@@ -133,7 +144,7 @@ const make_paper = (component: PaperCanvasComponent,
     }
 
 
-    mTool.onMouseDrag = function(event) {
+    dragTool.onMouseDrag = function(event) {
     	if (segment) {
     		segment.point.x += event.delta.x;
         segment.point.y += event.delta.y;
@@ -145,15 +156,15 @@ const make_paper = (component: PaperCanvasComponent,
     	}
     }
 
-    function rasterize() {
+    function rasterize():  [ImageData, paper.Group] {
         project.activate()
         const bgRect = new paper.Path.Rectangle(new paper.Rectangle(0, 0, paper.project.view.bounds.width, paper.project.view.bounds.height))
         bgRect.fillColor = "#ffffff"
         bgRect.sendToBack()
         const {width, height} = paper.project.activeLayer.bounds
 
-        paper.project.activeLayer.scale(256/width, 256/height, new paper.Point(0, 0))
-        const scaledClippingGroup: paper.Item = paper.project.activeLayer.children['clippingGroup'].clone()
+        paper.project.activeLayer.scale(255/width, 255/height, new paper.Point(0, 0))
+        const scaledClippingGroup: paper.Group = paper.project.activeLayer.children['clippingGroup'].clone()
         scaledClippingGroup.remove()
         const raster = paper.project.activeLayer.rasterize(72, false)
 
@@ -161,8 +172,8 @@ const make_paper = (component: PaperCanvasComponent,
         const pt_bottomright = new paper.Point(raster.width, raster.height)
 
         bgRect.remove()
-        paper.project.activeLayer.scale(width/256, height/256, new paper.Point(0, 0))
-        if (raster.width > 256 || raster.height > 256) throw new Error(`Raster too big! ${raster.width} < 256 && ${raster.height} < 256`)
+        paper.project.activeLayer.scale(width/255, height/255, new paper.Point(0, 0))
+        if (raster.width > 256 || raster.height > 256) throw new Error(`Raster too big! ${raster.width} =< 256 && ${raster.height} =< 256`)
         return [raster.getImageData(new paper.Rectangle(pt_topleft, pt_bottomright)), scaledClippingGroup]
     }
 
@@ -193,7 +204,6 @@ const make_paper = (component: PaperCanvasComponent,
             console.error(`Error: ${reply.error}`)
             return reply.error
         }
-
         console.log("got a reply...")
         emit('drawoutput', [reply.canvasData, clippingGroup])
         console.log("active layer AFTER", project.activeLayer);
@@ -209,10 +219,11 @@ const make_paper = (component: PaperCanvasComponent,
         project.activate()
         const layer = new paper.Layer()
         const clippingGroup = new paper.Group()
+        const mirrorLayer = null
         clippingGroup.name = 'clippingGroup'
         project.addLayer(layer)
         return {
-            layer, clippingGroup, model: 'edges2cat_pretrained'
+            layer, clippingGroup, model: 'edges2cat_pretrained', mirrorLayer
         }
     }
 
@@ -229,12 +240,37 @@ const make_paper = (component: PaperCanvasComponent,
         project.insertLayer(idxB, layerA);
     }
 
+    function setSmoothing(smooth: boolean) {
+        smoothing = smooth
+    }
+
+    function setClosed(closed: boolean) {
+        autoclose = closed
+    }
+
+    function switchTool(tool){
+        switch (tool) {
+            case 'drag':
+                dragTool.activate();
+                break;
+            case 'draw':
+                drawTool.activate();
+                break;
+            default:
+                //donothing
+                break;
+        }
+    }
+
     component.sketch = {
         renderCanvas,
         clear,
         switchLayer,
         swapLayers,
-        addLayer
+        addLayer,
+        setSmoothing,
+        setClosed,
+        switchTool
     }
 }
 
@@ -243,7 +279,10 @@ type SketchMethods = {
     clear: () => void,
     switchLayer: (idx: number) => void,
     swapLayers: (idxA: number, idxB: number) => void,
-    addLayer: () => void
+    addLayer: () => void,
+    setSmoothing: (smooth: boolean) => void,
+    setClosed: (closed: boolean) => void,
+    switchTool: (tool: string) => void
 }
 
 export class PaperCanvasComponent extends Component {
@@ -315,5 +354,18 @@ export function paperStore(state: State, emitter: Emitter) {
     emitter.on('addLayer', () => {
         state.app.layers.push(state.cache(PaperCanvasComponent, 'paper-canvas').sketch.addLayer())
         emitter.emit('render')
+    })
+
+    emitter.on('setSmoothness', smooth => {
+        state.cache(PaperCanvasComponent, 'paper-canvas').sketch.setSmoothing(smooth)
+    })
+
+    emitter.on('setClosed', close => {
+        state.cache(PaperCanvasComponent, 'paper-canvas').sketch.setClosed(close)
+    })
+
+    emitter.on('switchTool', (tool) => {
+        console.log(state.cache(PaperCanvasComponent, 'paper-canvas').sketch)
+        state.cache(PaperCanvasComponent, 'paper-canvas').sketch.switchTool(tool)
     })
 }

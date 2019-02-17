@@ -7,7 +7,6 @@ import { MirrorComponent, mirrorStore } from './components/mirror'
 import { leftView } from './components/left_view'
 import { rightView } from './components/right_view'
 
-
 import {mirrorView} from './components/mirror_component'
 
 const app = new (choo as any).default()
@@ -17,6 +16,7 @@ app.use(paperStore)
 app.use(mirrorStore)
 app.route('/', mainView)
 app.mount('body')
+
 function initialState(state: choo.IState, emit: Emit) {
     Object.assign(state, {
         app: {

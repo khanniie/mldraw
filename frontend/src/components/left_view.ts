@@ -6,14 +6,27 @@ import html from 'choo/html'
 import {drawView} from './drawing_component'
 
 const cat = require('./../assets/cat.png')
-const toolbar = require('./../assets/toolbar.png')
+const toolbar = require('./../assets/toolbar-naked.png')
 const render = require('./../assets/render.png')
+const paintbucket = require('./../assets/paintbucket.png')
+const eraser = require('./../assets/eraser.png')
+const pencil = require('./../assets/pencil.png')
+const transform = require('./../assets/transform.png')
+const trash = require('./../assets/trash.png')
 
 function topBar(state: AppState, emit: Emit) {
     return html`
     <div id="bar">
         <div id="toolbar">
-        <img src=${toolbar}/></div>
+        <img src=${toolbar}/>
+        <div id="icons">
+            <img onclick=${() => emit('switchTool', 'draw')} src="${pencil}">
+            <img src="${eraser}">
+            <img src="${paintbucket}">
+            <img onclick=${() => emit('switchTool', 'drag')} src="${transform}">
+            <img src="${trash}">
+        </div>
+        </div>
         <div id="render">${renderButton(emit)}</div>
     </div>`
 }
@@ -56,7 +69,7 @@ export function leftView(state: choo.IState, emit: Emit) {
     return html`
     <div id="left">
         <img id="cat" src=${cat}/>
-        ${topBar(state.app, emit)}
         ${drawView(state, emit)}
+        ${topBar(state.app, emit)}
     </div>`
 }

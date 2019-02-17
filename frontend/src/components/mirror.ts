@@ -32,7 +32,7 @@ const make_mirror = (component: MirrorComponent,
 
     function drawOutput([bytes, clippingPath]: [string, paper.Group]) {
         project.activate()
-        project.activeLayer.children.map(c => c.remove())
+        project.activeLayer.removeChildren()
         const image = document.createElement('img')
         image.src = 'data:image/png;base64,' + bytes
         image.width = 256
@@ -40,25 +40,40 @@ const make_mirror = (component: MirrorComponent,
         document.body.appendChild(image)
         const raster = new paper.Raster(image, new paper.Point(128, 128))
         clippingPath.visible = true
-        project.activate();
-        const clippingGroup = new paper.Group([clippingPath, raster])
+        const path = clippingPath.children.filter(ch => ch instanceof paper.Path)
+        const united = path.reduce((a, p) => a.unite(p))
+        project.activate()
+        const clippingGroup = new paper.Group([united, raster])
         clippingGroup.clipped = true
-        //console.log('mirror children', project.activeLayer.children)
-        return
+    }
+
+    function addLayer() {
+        project.activate()
+        const layer = new paper.Layer()
+        console.log('adding mirror lyr')
+        project.addLayer(layer)
+    }
+
+    function switchLayer(idx: number) {
+        project.activate()
+        console.log(idx, project.layers)
+        project.layers[idx].activate()
     }
 
     function clear() {
-        project.activeLayer.removeChildren();
+        project.activeLayer.removeChildren()
     }
-
+    
     component.sketch = {
-        drawOutput, clear
+        drawOutput, clear, switchLayer, addLayer
     }
 }
 
 type SketchMethods = {
     drawOutput: ([str, group]: [string, paper.Group]) => void
-    clear: () => void
+    clear: () => void,
+    addLayer: () => void,
+    switchLayer: (idx: number) => void
 }
 
 export class MirrorComponent extends Component {
@@ -101,4 +116,12 @@ export function mirrorStore(state: State, emitter: Emitter) {
         console.log('clearing mirror')
         state.cache(MirrorComponent, 'mirror-canvas').sketch.clear()
     })
+    emitter.on('changeLayer', (layerIdx) => {
+        state.cache(MirrorComponent, 'mirror-canvas').sketch.switchLayer(layerIdx - 1)
+    })
+
+    emitter.on('addLayer', () => {
+        state.cache(MirrorComponent, 'mirror-canvas').sketch.addLayer()
+    })
+
 }
