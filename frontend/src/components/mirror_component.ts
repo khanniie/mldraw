@@ -6,8 +6,8 @@ import html from 'choo/html'
 
 export function mirrorView(state: choo.IState, emit: Emit) {
     return html`
-    <div class="border border-horz top"><div class="border border-horz bottom"><div class="border-vert border left "><div class="border-vert border right">
+    <div id="mirror">
         ${state.cache(MirrorComponent, 'mirror-canvas').render(state.app)}
-    </div></div></div></div>
+    </div>
     `
 }

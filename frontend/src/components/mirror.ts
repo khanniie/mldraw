@@ -30,23 +30,20 @@ const make_mirror = (component: MirrorComponent,
     //new paper.View()
     let appState
 
-    function drawOutput([bytes, paths]: [string, paper.Group]) {
+    function drawOutput([bytes, clippingPath]: [string, paper.Group]) {
         project.activate()
-        console.log("mirror's active layer", project.activeLayer)
-        let temp = bytes
-        var image = document.createElement('img')
-        image.src = 'data:image/png;base64,' + temp
+        project.activeLayer.children.map(c => c.remove())
+        const image = document.createElement('img')
+        image.src = 'data:image/png;base64,' + bytes
         image.width = 256
         image.height = 256
         document.body.appendChild(image)
-        var raster = new paper.Raster(image, new paper.Point(128, 128))
-        paths.visible = true
-        var gg = paths.clone()
-        console.log(paper.project, paper.projects, gg, gg)
+        const raster = new paper.Raster(image, new paper.Point(128, 128))
+        clippingPath.visible = true
         project.activate();
-        var g = new paper.Group([gg, raster])
-        g.clipped = true
-        console.log('mirror children', project.activeLayer.children)
+        const clippingGroup = new paper.Group([clippingPath, raster])
+        clippingGroup.clipped = true
+        //console.log('mirror children', project.activeLayer.children)
         return
     }
 

@@ -147,32 +147,41 @@ const make_paper = (component: PaperCanvasComponent,
 
     function rasterize() {
         project.activate()
-        let rec = new paper.Rectangle(0, 0, 256, 256)
-        var path_rec = new paper.Path.Rectangle(rec)
-        path_rec.fillColor = '#ffffff'
-        path_rec.sendToBack();
+        const bgRect = new paper.Path.Rectangle(new paper.Rectangle(0, 0, paper.project.view.bounds.width, paper.project.view.bounds.height))
+        bgRect.fillColor = "#ffffff"
+        bgRect.sendToBack()
+        const {width, height} = paper.project.activeLayer.bounds
+
+        paper.project.activeLayer.scale(256/width, 256/height, new paper.Point(0, 0))
+        const scaledClippingGroup: paper.Item = paper.project.activeLayer.children['clippingGroup'].clone()
+        scaledClippingGroup.remove()
         const raster = paper.project.activeLayer.rasterize(72, false)
-        path_rec.remove();
+
         const pt_topleft = new paper.Point(0, 0)
         const pt_bottomright = new paper.Point(raster.width, raster.height)
-        if (raster.width > 256 || raster.height > 256) throw new Error('TODO: make it work for when u draw outside of the canvas')
-        console.log(pt_bottomright, pt_topleft, paper.project.view)
-        return raster.getImageData(new paper.Rectangle(pt_topleft, pt_bottomright))
+
+        bgRect.remove()
+        paper.project.activeLayer.scale(width/256, height/256, new paper.Point(0, 0))
+        if (raster.width > 256 || raster.height > 256) throw new Error(`Raster too big! ${raster.width} < 256 && ${raster.height} < 256`)
+        return [raster.getImageData(new paper.Rectangle(pt_topleft, pt_bottomright)), scaledClippingGroup]
     }
 
     const renderCanvas = doNothingIfRunning(async function () {
         console.log("edges2shoes requested")
-        await executeOp(Operation.edges2shoes_pretrained)
-        console.log("edges2shoes executed")
+        try {
+            await executeOp(Operation.edges2shoes_pretrained)
+            console.log("edges2shoes executed")
+        } catch (e) {
+            console.error('edges2shoes failed', e)
+        }
     })
 
     async function executeOp(op: Operation) {
-        project.activate()
         console.log("active layer:", project.activeLayer);
         const canvas: HTMLCanvasElement = paper.view.element
         console.log("executing")
-        console.log("rasterize", rasterize())
-        const msg = await serialize(rasterize())
+        const [raster, clippingGroup] = rasterize()
+        const msg = await serialize(raster)
         const reply = await comm.send(op, msg)
 
         if (reply == undefined) {
@@ -186,7 +195,7 @@ const make_paper = (component: PaperCanvasComponent,
         }
 
         console.log("got a reply...")
-        emit('drawoutput', [reply.canvasData, project.activeLayer.children['clippingGroup']])
+        emit('drawoutput', [reply.canvasData, clippingGroup])
         console.log("active layer AFTER", project.activeLayer);
 
     }
@@ -255,6 +264,7 @@ export class PaperCanvasComponent extends Component {
 
         var newcanvas: HTMLCanvasElement = document.createElement('canvas')
         newcanvas.style.backgroundColor = "white"
+        newcanvas.style.height = "100%"
         newcanvas.width = 256
         newcanvas.height = 256
         newcanvas.id = "new"
@@ -284,7 +294,7 @@ export function paperStore(state: State, emitter: Emitter) {
         console.log(state.app.server, state.app.server.isConnected)
         emitter.emit('render')
     })
-    
+
     emitter.on('mlrender', () => {
         // hacky
         state.cache(PaperCanvasComponent, 'paper-canvas').sketch.renderCanvas()

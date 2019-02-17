@@ -12,7 +12,7 @@ function layerBuilder(state: AppState, emit: Emit) {
     //!state.app.server.isConnected
     return html`
     <div id="layers">
-        <ul>
+        <ul id="layer-menu">
         <li class="menu-item"><p>${state.activeLayer}</p></li>
         <li class="menu-item"><button onclick=${() => emit('addLayer')}>+</button></li>
         ${layers}

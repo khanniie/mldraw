@@ -5,17 +5,21 @@ import { State, AppState, Emit } from './../types'
 import html from 'choo/html'
 import {drawView} from './drawing_component'
 
-const cat = require('./../assets/cat.png');
-
+const cat = require('./../assets/cat.png')
+const toolbar = require('./../assets/toolbar.png')
+const render = require('./../assets/render.png')
 
 function topBar(state: AppState, emit: Emit) {
     return html`
     <div id="bar">
-        <ul>
-        <li class="menu-item">${renderButton(emit)}</li>
-        <li class="menu-item">${clearButton(emit)}</li>
+        <div id="toolbar">
+        <img src=${toolbar}/></div>
+        <div id="render">${renderButton(emit)}</div>
     </div>`
 }
+
+// <li class="menu-item">${renderButton(emit)}</li>
+// <li class="menu-item">${clearButton(emit)}</li>
 
 // function serverSelector({ address }: AppState['server'], emit: Emit) {
 //     const onsubmit = (e: Event) => {
@@ -36,7 +40,7 @@ function topBar(state: AppState, emit: Emit) {
 function renderButton(emit: Emit) {
     const onclick = () => emit('mlrender')
     return html`
-        <button onclick=${onclick}>Render</button>
+        <img id="render-img" src=${render} onclick=${onclick}/>
     `
 }
 
