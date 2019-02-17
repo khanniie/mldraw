@@ -76,7 +76,6 @@ const make_paper = (component: PaperCanvasComponent,
         if(project.activeLayer.children['clippingGroup']){
           project.activeLayer.children['clippingGroup'].addChild(pathBeingDrawn)
         } else {
-          debugger;
           console.log("error", project.activeLayer);
           const clippingGroup = new paper.Group()
           clippingGroup.name = 'clippingGroup'
@@ -212,7 +211,7 @@ const make_paper = (component: PaperCanvasComponent,
 
     function clear() {
         project.activate()
-        paper.project.activeLayer.removeChildren()
+        project.activeLayer.children['clippingGroup'].removeChildren()
     }
 
     function addLayer() {

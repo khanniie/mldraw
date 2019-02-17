@@ -24,7 +24,7 @@ function topBar(state: AppState, emit: Emit) {
             <img src="${eraser}">
             <img src="${paintbucket}">
             <img onclick=${() => emit('switchTool', 'drag')} src="${transform}">
-            <img src="${trash}">
+            <img onclick=${() => emit('clear')} src="${trash}">
         </div>
         </div>
         <div id="render">${renderButton(emit)}</div>
