@@ -179,7 +179,7 @@ const make_paper = (component: PaperCanvasComponent,
     const renderCanvas = doNothingIfRunning(async function () {
         console.log("edges2shoes requested")
         try {
-            await executeOp(Operation.edges2shoes_pretrained)
+            await executeOp('edges2cat' as any)
             console.log("edges2shoes executed")
         } catch (e) {
             console.error('edges2shoes failed', e)
@@ -191,8 +191,7 @@ const make_paper = (component: PaperCanvasComponent,
         const canvas: HTMLCanvasElement = paper.view.element
         console.log("executing")
         const [raster, clippingGroup] = rasterize()
-        const msg = await serialize(raster)
-        const reply = await comm.send(op, msg)
+        const reply = await comm.send(op, raster)
 
         if (reply == undefined) {
             console.error('No reply from server')

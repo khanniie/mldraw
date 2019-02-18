@@ -1,4 +1,5 @@
 import * as socketio from "socket.io-client"
+import { localModels } from "./local-models"
 
 export enum Operation {
     flip_canvas = 'flip-canvas',
@@ -97,13 +98,14 @@ export class Comm {
     }
 
     available_models() {
-        return Object.keys(this.model2url)
+        return Object.keys(this.model2url).concat(localModels.available_models())
     }
 
-    async send(tag: Operation, data: RequestMessage): Promise<ReplyMessage | ErrorMessage> {
-        console.log(this.model2url, this.url2socket)
+    async send(tag: Operation, data: ImageData): Promise<ReplyMessage | ErrorMessage> {
+        if(localModels.available_models().includes(tag)) return localModels.execute(tag, data)
         if(!(tag in this.model2url)) throw new Error(`No model connected with name ${tag}, available: ${this.available_models()}`)
+        const serialized = await serialize(data)
         return this.url2socket[this.model2url[tag]]
-            .then(socket => new Promise<ReplyMessage>(res => socket.emit(tag, data, res)))
+            .then(socket => new Promise<ReplyMessage>(res => socket.emit(tag, serialized, res)))
     }
 }

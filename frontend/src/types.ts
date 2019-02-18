@@ -16,7 +16,8 @@ export interface AppState {
         isConnected: boolean
     },
     activeLayer: number,
-    layers: Layer[]
+    layers: Layer[],
+    localModels: {[key:string]: string}
 }
 
 /**
@@ -38,7 +39,9 @@ export interface Events {
     isConnected: undefined,
     setSmoothness: boolean,
     setClosed: boolean,
-    switchTool: string
+    switchTool: string,
+    loadmodel: string,
+    loadedmodel: string
 }
 
 // type magic ~
