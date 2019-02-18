@@ -7,13 +7,13 @@
  * (e.g we'll never send a message to run a layer until the previous input has been fully processed)
  * @param fn Async functionn
  */
-export function doNothingIfRunning(asyncFn: () => void): () => void {
+export function doNothingIfRunning(asyncFn: (...args: any[]) => void): () => void {
     let running = false
     const bound = asyncFn.bind ? asyncFn.bind(this) : asyncFn // arrow functions have no bind
-    return async function () {
+    return async (...args) => {
         if(running) return
         running = true
-        await bound()
+        await bound(...args)
         running = false
     }
 }

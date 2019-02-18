@@ -30,14 +30,19 @@ const make_mirror = (component: MirrorComponent,
     //new paper.View()
     let appState
 
-    function drawOutput([bytes, clippingPath]: [string, paper.Group]) {
+    function drawOutput([bytes, clippingPath]: [string | HTMLImageElement, paper.Group]) {
         project.activate()
         project.activeLayer.removeChildren()
-        const image = document.createElement('img')
-        image.src = 'data:image/png;base64,' + bytes
-        image.width = 256
-        image.height = 256
-        document.body.appendChild(image)
+        let image;
+        if(bytes instanceof HTMLImageElement) {
+            image = bytes
+        } else {
+            image = document.createElement('img')
+            image.src = 'data:image/png;base64,' + bytes
+            image.width = 256
+            image.height = 256
+            document.body.appendChild(image)
+        }
         const raster = new paper.Raster(image, new paper.Point(128, 128))
         clippingPath.visible = true
         const path = clippingPath.children.filter(ch => ch instanceof paper.Path)
