@@ -22,7 +22,8 @@ function topBar(state: AppState, emit: Emit) {
         <div id="icons">
             <img onclick=${() => emit('switchTool', 'draw')} src="${pencil}">
             <img src="${eraser}">
-            <img src="${paintbucket}">
+            <img onclick=${() => state.paintbucket.active ? emit('paintbucketclicked') : void''} 
+                src="${paintbucket}" style=${state.paintbucket.active ? '""' : "opacity:50%"}>
             <img onclick=${() => emit('switchTool', 'drag')} src="${transform}">
             <img onclick=${() => emit('clear')} src="${trash}">
         </div>
