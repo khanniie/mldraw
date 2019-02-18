@@ -38,12 +38,12 @@ export function paintBucketStore(state: State, emitter: Emitter) {
     emitter.on('paintbucketclicked', () => {
         if(!state.app.paintbucket.active) {
             console.error('paint bucket deactivated but still got click :/')
-        } else if(!(state.app.layers[state.app.activeLayer].model in modelPalettes)) {
-            console.error(`no palette for model ${state.app.layers[state.app.activeLayer].model} known`)
+        } else if(!(state.app.layers[state.app.activeLayer - 1].model in modelPalettes)) {
+            console.error(`no palette for model ${state.app.layers[state.app.activeLayer - 1].model} known`)
         }else {
             const palette = state.app.paintbucket.palette;
-            const totalColors = Object.keys(palette).length
-            state.app.paintbucket.colorIdx = (state.app.paintbucket.colorIdx + 1) % totalColors;
+            const totalColors = Object.keys(palette)
+            state.app.paintbucket.colorIdx = (state.app.paintbucket.colorIdx + 1) % totalColors.length;
             state.app.paintbucket.colorName = totalColors[state.app.paintbucket.colorIdx]
             emitter.emit('setFill', palette[state.app.paintbucket.colorName])
         }

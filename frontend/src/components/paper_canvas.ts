@@ -230,7 +230,7 @@ const make_paper = (component: PaperCanvasComponent,
         clippingGroup.name = 'clippingGroup'
         project.addLayer(layer)
         return {
-            layer, clippingGroup, model: 'edges2cat_pretrained', mirrorLayer
+            layer, clippingGroup, model: 'edges2shoes_pretrained', mirrorLayer
         }
     }
 
@@ -274,10 +274,11 @@ const make_paper = (component: PaperCanvasComponent,
 
     function setFill(color: string | boolean) {
         if(color == false) {
-            fill = false;
+            fill = false
         } else if (color == true) {
             throw new Error('invalid argument!')
         } else {
+            fill = true
             fillColor = color
         }
     }

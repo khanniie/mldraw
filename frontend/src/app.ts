@@ -31,10 +31,12 @@ function initialState(state: choo.IState, emit: Emit) {
             layers: [],
             localModels: {},
             paintbucket: {
-                active: false,
+                active: true,
                 colorIdx: 0,
                 colorName: '',
-                palette: {}
+                palette: {
+                    '': ''
+                }
             }
         }
     })
