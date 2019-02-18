@@ -4,7 +4,8 @@ import { ReplyMessage } from './comm';
 
 const modelUrls = {
     'edges2cat': 'https://rawcdn.githack.com/affinelayer/pix2pix-tensorflow-models/68fd4e2cf7fbf42ea82a379d49045416ebb857ec/edges2cats_AtoB.pict',
-    'edges2handbag': 'https://rawcdn.githack.com/affinelayer/pix2pix-tensorflow-models/68fd4e2cf7fbf42ea82a379d49045416ebb857ec/edges2handbags_AtoB.pict'
+    'edges2handbag': 'https://rawcdn.githack.com/affinelayer/pix2pix-tensorflow-models/68fd4e2cf7fbf42ea82a379d49045416ebb857ec/edges2handbags_AtoB.pict',
+    'edges2pikachu': 'https://rawgit.com/ml5js/pix2pix_models/master/edges2pikachu_AtoB.pict'
 }
 
 type ML5Model = {
