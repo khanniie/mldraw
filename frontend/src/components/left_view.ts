@@ -5,30 +5,35 @@ import { State, AppState, Emit } from './../types'
 import html from 'choo/html'
 import {drawView} from './drawing_component'
 
-const cat = require('./../assets/cat.png')
+const logo = require('./../assets/logo.png')
 const toolbar = require('./../assets/toolbar-naked.png')
-const render = require('./../assets/render.png')
 const paintbucket = require('./../assets/paintbucket.png')
 const eraser = require('./../assets/eraser.png')
 const pencil = require('./../assets/pencil.png')
+const undo = require('./../assets/undo.png')
 const transform = require('./../assets/transform.png')
 const trash = require('./../assets/trash.png')
+const close = require('./../assets/close.svg')
 
 function topBar(state: AppState, emit: Emit) {
     return html`
     <div id="bar">
         <div id="toolbar">
-        <img src=${toolbar}/>
+        <div id="bar-info-container">
+        <div id="bar-info" class="cutebox_info">
+            <img src=${close}/>
+            tools
+        </div></div>
         <div id="icons">
             <img onclick=${() => emit('switchTool', 'draw')} src="${pencil}">
             <img src="${eraser}">
             <img onclick=${() => state.paintbucket.active ? emit('paintbucketclicked') : void''} 
                 src="${paintbucket}" style=${state.paintbucket.active ? '""' : "opacity:50%"}>
+            <img src="${undo}">
             <img onclick=${() => emit('switchTool', 'drag')} src="${transform}">
             <img onclick=${() => emit('clear')} src="${trash}">
         </div>
         </div>
-        <div id="render">${renderButton(emit)}</div>
     </div>`
 }
 
@@ -51,13 +56,6 @@ function topBar(state: AppState, emit: Emit) {
 //     `
 // }
 
-function renderButton(emit: Emit) {
-    const onclick = () => emit('mlrender')
-    return html`
-        <img id="render-img" src=${render} onclick=${onclick}/>
-    `
-}
-
 function clearButton(emit: Emit) {
     const onclick = () => emit('clear')
     return html`
@@ -65,11 +63,10 @@ function clearButton(emit: Emit) {
     `
 }
 
-
 export function leftView(state: choo.IState, emit: Emit) {
     return html`
     <div id="left">
-        <img id="cat" src=${cat}/>
+        <img id="cat" src=${logo}/>
         ${drawView(state, emit)}
         ${topBar(state.app, emit)}
     </div>`

@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 ul {
     padding: 0;
 }
@@ -170,4 +171,270 @@ canvas{
   display: inline-block;
   height: 5em;
   max-width: 10%;
+=======
+ul {
+    padding: 0;
+}
+
+.menu-item {
+    list-style-type: none;
+    padding: 0.5em;
+    display: inline-block;
+}
+
+.layer{
+  width: 87%;
+  margin-left: 5%;
+  height: 2em;
+  line-height: 2em;
+  padding-left: 0.5em;
+  border-top: solid 2px #e0afdb;
+}
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+  background-color: #e0afdb;
+  border-radius: 2px;
+  padding-left: 0.3em;
+  padding-right: 0.3em;
+  margin-left: 0.3em;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #f1f1f1;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+}
+
+.dropdown-content a {
+  color: black;
+  padding: 6px;
+  text-decoration: none;
+  display: block;
+}
+
+.dropdown-content a:hover {background-color: #ddd;}
+
+.dropdown:hover .dropdown-content {display: block;}
+
+.layer:nth-child(1){
+  border-top: solid 0px #e0afdb;
+}
+
+#layer-menu{
+  /* max-height: calc(85vh - 256px); */
+  /* overflow: scroll; */
+  width: 256px;
+  border: #6164bf 2px solid;
+  position: relative;
+  background-color: #f2d5E5;
+}
+
+#container{
+  float:left;
+  clear:left;
+}
+/* .border-horz{
+    background-image: linear-gradient(to right, rgba(0, 0, 0, 0.3) 50%, white 50%);
+    background-size: 25px 2px;
+    background-repeat: repeat-x;
+    /* border-color: red;
+    border-width: 2px;
+    border-style: dashed; 
+}
+
+.border-vert{
+  background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.3) 50%, white 50%);
+  background-size: 2px 25px;
+  background-repeat: repeat-y;
+
+} */
+
+#cat{
+  height: 4em;
+}
+
+.border{
+  display: inline-block;
+}
+
+/* .top{
+  background-position: top;
+}
+.left{
+  background-position: left;
+}
+.right{
+  background-position: right;
+}
+.bottom{
+  background-position: bottom;
+} */
+
+canvas{
+  display: inline-block;
+}
+
+html, body{
+  width: 100%;
+  height: 100%;
+  padding: 0px;
+  padding-top: 0.5em;
+  margin: 0px;
+  color:#6164bf;
+  font-family: 'Inconsolata', monospace;
+  background-color: #F5F5f1;
+}
+
+#left{
+  margin-left: 2em;
+  position: relative;
+  height: 100%;
+  left: 0px;
+  top: 0px;
+  width: 70vh;
+  float:left;
+}
+
+#right{
+  float: right;
+  padding-top: 3vh;
+  margin-left: 2em;
+  width:  calc(100% - 70vh - 4em);
+}
+
+#bar{
+  width: 100%;
+  height: auto;
+}
+
+#toolbar{
+  position: relative;
+  display: inline-block;
+  margin-top: 2vh;
+  height: 11vh;
+  min-height: 4em;
+  border: #6164bf 2px solid;
+  position: relative;
+  background-color: #f2d5E5;
+  background-image: url('assets/grid.png');
+  background-size: contain;
+}
+
+#bar-info-container{
+  width: 100%;
+  background-color: white;
+}
+
+#bar-info{
+  background-color: white;
+  height: 1.25em;
+  line-height: 1.25em;
+}
+
+#bar-info img{
+  margin-right: 1em;
+}
+
+@keyframes shake {
+  10%, 90% {
+    transform: translate3d(-1px, 0, 0);
+  }
+  
+  20%, 80% {
+    transform: translate3d(2px, 0, 0);
+  }
+
+  30%, 50%, 70% {
+    transform: translate3d(-4px, 0, 0);
+  }
+
+  40%, 60% {
+    transform: translate3d(4px, 0, 0);
+  }
+}
+
+#icons{
+  height: 100%;
+  vertical-align: middle;
+  width: 65vh;
+}
+
+#icons img{
+  width: 10%;
+  margin: 3.2%;
+  margin-top: 1%;
+}
+
+#icons img:hover{
+  animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+#mirror{
+  width: 256px;
+  height: 256px;
+  padding: 0px;
+  
+}
+
+.cutebox{
+  border: #6164bf 2px solid;
+  border-radius: 8px;
+  background-color: white;
+  overflow: hidden;
+  width: 65vh;
+  min-width: 256px;
+  /* box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.2); */
+}
+.cutebox_info{
+  width: 94%;
+  margin-left: 3%;
+  height: 2em;
+  line-height: 2em;
+  border-bottom: double #6164bf 4px;
+}
+
+.layer_info{
+  height: auto;
+  background-color:white;
+}
+
+#paper{
+  position: relative;
+}
+
+.cutebox_info img{
+  height: 40%;
+  margin-right: 1em;
+}
+
+#paper-canvas{
+  width: 65vh;
+  height: 65vh;
+  min-width: 256px;
+  min-height: 256px;
+  padding: 0px;
+  position: relative;
+}
+
+canvas{
+  width: 100% !important;
+  height: 100% !important;
+}
+
+#render-img{
+  height: 100%;
+}
+
+#render{
+  position: absolute;
+  height: 4em;
+  max-width: 8%;
+  bottom: 0.3em;
+  right: 3.8em;
+>>>>>>> Stashed changes
 }
