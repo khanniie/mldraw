@@ -23,10 +23,12 @@ export function paintBucketStore(state: State, emitter: Emitter) {
     emitter.on('changeLayer', (layerIdx) => {
         const activeLayer = state.app.layers[layerIdx]
         if(activeLayer.model in modelPalettes) {
-            state.app.paintbucket.active = true;
-            state.app.paintbucket.palette = modelPalettes[activeLayer.model];
+            const palette = modelPalettes[activeLayer.model]
+            state.app.paintbucket.active = true
+            state.app.paintbucket.palette = palette
             state.app.paintbucket.colorIdx = 0
             state.app.paintbucket.colorName = Object.keys(modelPalettes[activeLayer.model])[0]
+            emitter.emit('setFill', palette[state.app.paintbucket.colorIdx])
         } else {
             state.app.paintbucket.active = false;
             emitter.emit('setFill', false)
