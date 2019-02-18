@@ -202,7 +202,7 @@ html, body{
 
 #mirror{
   width: 256px;
-  height: 256px;
+  height: autos;
   padding: 0px;
   
 }
@@ -262,4 +262,9 @@ canvas{
   max-width: 8%;
   bottom: 0.3em;
   right: 3.8em;
+}
+
+#mirror-info{
+  height: 1.5em;
+  line-height: 1.5em;
 }

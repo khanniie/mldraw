@@ -185,10 +185,10 @@ const make_paper = (component: PaperCanvasComponent,
         return [raster.getImageData(new paper.Rectangle(pt_topleft, pt_bottomright)), scaledClippingGroup]
     }
 
-    const renderCanvas = doNothingIfRunning(async function () {
+    const renderCanvas = doNothingIfRunning(async function (model) {
         console.log("edges2shoes requested")
         try {
-            await executeOp(Operation.edges2shoes_pretrained)
+            await executeOp(model as any)
             console.log("edges2shoes executed")
         } catch (e) {
             console.error('edges2shoes failed', e)
@@ -283,6 +283,8 @@ const make_paper = (component: PaperCanvasComponent,
         }
     }
 
+
+
     component.sketch = {
         renderCanvas,
         clear,
@@ -359,7 +361,9 @@ export function paperStore(state: State, emitter: Emitter) {
 
     emitter.on('mlrender', () => {
         // hacky
-        state.cache(PaperCanvasComponent, 'paper-canvas').sketch.renderCanvas()
+        const model = state.app.layers[state.app.activeLayer - 1].model
+        console.log(model);
+        state.cache(PaperCanvasComponent, 'paper-canvas').sketch.renderCanvas(model)
     })
 
     emitter.on('clear', () => {
@@ -393,6 +397,11 @@ export function paperStore(state: State, emitter: Emitter) {
 
     emitter.on('setFill', (color) => {
         state.cache(PaperCanvasComponent, 'paper-canvas').sketch.setFill(color)
+    })
+
+    emitter.on('setModelForLayer', (layerIdx, model) => {
+        state.cache(PaperCanvasComponent, 'paper-canvas').sketch.setModelForLayer(layerIdx, model)
+
     })
 
 }
