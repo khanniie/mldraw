@@ -8,7 +8,7 @@ import { leftView } from './components/left_view'
 import { rightView } from './components/right_view'
 import { localModelsStore } from './local-models'
 import {mirrorView} from './components/mirror_component'
-
+import {paintBucketStore} from './model-palettes'
 const app = new (choo as any).default()
 
 app.use(devTools())
@@ -16,6 +16,7 @@ app.use(initialState)
 app.use(paperStore)
 app.use(mirrorStore)
 app.use(localModelsStore)
+app.use(paintBucketStore)
 app.route('/', mainView)
 app.mount('body')
 
@@ -28,7 +29,13 @@ function initialState(state: choo.IState, emit: Emit) {
             },
             activeLayer: 1, 
             layers: [],
-            localModels: {}
+            localModels: {},
+            paintbucket: {
+                active: false,
+                colorIdx: 0,
+                colorName: '',
+                palette: {}
+            }
         }
     })
 }

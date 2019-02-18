@@ -31,10 +31,13 @@ const make_paper = (component: PaperCanvasComponent,
     path_rec.fillColor = '#ffffff'
     project.addLayer(background)
     
+    let fill = false;
+    let fillColor: string;
     let smoothing = false;
     let autoclose = true;
     let dragTool = new paper.Tool();
     let drawTool = new paper.Tool();
+    let fillTool = new paper.Tool();
     drawTool.activate();
 
     console.log(paper)
@@ -60,7 +63,6 @@ const make_paper = (component: PaperCanvasComponent,
         if(event.point.y < 0) event.point.y = 0
         if(event.point.x >= viewWidth) event.point.x = Math.floor(viewWidth)
         if(event.point.y >= viewHeight) event.point.y = Math.floor(viewHeight)
-        console.log(event.point)
         pathBeingDrawn.add(event.point)
     }
 
@@ -155,6 +157,13 @@ const make_paper = (component: PaperCanvasComponent,
     	}
     }
 
+    fillTool.onMouseDown = function(event: paper.ToolEvent) {
+        if(fill) {
+            event.item.fillColor = fillColor
+            event.item.strokeColor = "#00000000"
+        }
+    }
+
     function rasterize():  [ImageData, paper.Group] {
         project.activate()
         const bgRect = new paper.Path.Rectangle(new paper.Rectangle(0, 0, paper.project.view.bounds.width, paper.project.view.bounds.height))
@@ -179,7 +188,7 @@ const make_paper = (component: PaperCanvasComponent,
     const renderCanvas = doNothingIfRunning(async function () {
         console.log("edges2shoes requested")
         try {
-            await executeOp('edges2cat' as any)
+            await executeOp(Operation.edges2shoes_pretrained)
             console.log("edges2shoes executed")
         } catch (e) {
             console.error('edges2shoes failed', e)
@@ -254,9 +263,22 @@ const make_paper = (component: PaperCanvasComponent,
             case 'draw':
                 drawTool.activate();
                 break;
+            case 'fill':
+                fillTool.activate();
+                break;
             default:
                 //donothing
                 break;
+        }
+    }
+
+    function setFill(color: string | boolean) {
+        if(color == false) {
+            fill = false;
+        } else if (color == true) {
+            throw new Error('invalid argument!')
+        } else {
+            fillColor = color
         }
     }
 
@@ -268,7 +290,8 @@ const make_paper = (component: PaperCanvasComponent,
         addLayer,
         setSmoothing,
         setClosed,
-        switchTool
+        switchTool,
+        setFill
     }
 }
 
@@ -280,7 +303,8 @@ type SketchMethods = {
     addLayer: () => void,
     setSmoothing: (smooth: boolean) => void,
     setClosed: (closed: boolean) => void,
-    switchTool: (tool: string) => void
+    switchTool: (tool: string) => void,
+    setFill: (color: string | boolean) => void // false = don't fill
 }
 
 export class PaperCanvasComponent extends Component {
@@ -363,7 +387,11 @@ export function paperStore(state: State, emitter: Emitter) {
     })
 
     emitter.on('switchTool', (tool) => {
-        console.log(state.cache(PaperCanvasComponent, 'paper-canvas').sketch)
         state.cache(PaperCanvasComponent, 'paper-canvas').sketch.switchTool(tool)
     })
+
+    emitter.on('setFill', (color) => {
+        state.cache(PaperCanvasComponent, 'paper-canvas').sketch.setFill(color)
+    })
+
 }

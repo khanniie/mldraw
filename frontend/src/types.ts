@@ -17,7 +17,13 @@ export interface AppState {
     },
     activeLayer: number,
     layers: Layer[],
-    localModels: {[key:string]: string}
+    localModels: {[key:string]: string},
+    paintbucket: {
+        active: boolean,
+        colorIdx: number,
+        colorName: string,
+        palette: {[key:string] : string}
+    }
 }
 
 /**
@@ -41,7 +47,9 @@ export interface Events {
     setClosed: boolean,
     switchTool: string,
     loadmodel: string,
-    loadedmodel: string
+    loadedmodel: string,
+    setFill: string | boolean,
+    paintbucketclicked: string
 }
 
 // type magic ~
