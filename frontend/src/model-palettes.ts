@@ -21,7 +21,7 @@ export const modelPalettes = {
 
 export function paintBucketStore(state: State, emitter: Emitter) {
     emitter.on('changeLayer', (layerIdx) => {
-        const activeLayer = state.app.layers[layerIdx]
+        const activeLayer = state.app.layers[layerIdx - 1]
         if(activeLayer.model in modelPalettes) {
             const palette = modelPalettes[activeLayer.model]
             state.app.paintbucket.active = true
