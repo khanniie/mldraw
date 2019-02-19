@@ -166,22 +166,22 @@ const make_paper = (component: PaperCanvasComponent,
 
     function rasterize():  [ImageData, paper.Group] {
         project.activate()
-        const bgRect = new paper.Path.Rectangle(new paper.Rectangle(0, 0, paper.project.view.bounds.width, paper.project.view.bounds.height))
+        const {x: unscaledX, y: unscaledY, width, height} = paper.project.activeLayer.bounds // how far "off the page" the top left corner is
+        const {width: viewWidth, height: viewHeight} = paper.project.view.bounds
+        const bgRect = new paper.Path.Rectangle(new paper.Rectangle(Math.min(0, unscaledX), Math.min(unscaledY, 0), 
+            Math.max(width, viewWidth), Math.max(height, viewHeight)))
         bgRect.fillColor = "#ffffff"
         bgRect.sendToBack()
-        const {width, height} = paper.project.activeLayer.bounds
-
-        paper.project.activeLayer.scale(255/width, 255/height, new paper.Point(0, 0))
+        paper.project.activeLayer.scale(255/viewWidth, 255/viewHeight, new paper.Point(0, 0))
+        const {x, y} = paper.project.activeLayer.bounds // how far "off the page" the top left corner is
         const scaledClippingGroup: paper.Group = paper.project.activeLayer.children['clippingGroup'].clone()
         scaledClippingGroup.remove()
         const raster = paper.project.activeLayer.rasterize(72, false)
 
-        const pt_topleft = new paper.Point(0, 0)
-        const pt_bottomright = new paper.Point(raster.width, raster.height)
-
+        const pt_topleft = new paper.Point(Math.ceil(-x), Math.ceil(-y))
+        const pt_bottomright = new paper.Size(256, 256)
         bgRect.remove()
-        paper.project.activeLayer.scale(width/255, height/255, new paper.Point(0, 0))
-        if (raster.width > 256 || raster.height > 256) throw new Error(`Raster too big! ${raster.width} =< 256 && ${raster.height} =< 256`)
+        paper.project.activeLayer.scale(viewWidth/255, viewHeight/255, new paper.Point(0, 0))
         return [raster.getImageData(new paper.Rectangle(pt_topleft, pt_bottomright)), scaledClippingGroup]
     }
 
