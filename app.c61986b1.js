@@ -116,157 +116,7 @@ function scrollToAnchor (anchor, options) {
   }
 }
 
-},{}],"../node_modules/document-ready/index.js":[function(require,module,exports) {
-'use strict'
-
-module.exports = ready
-
-function ready (callback) {
-  if (typeof document === 'undefined') {
-    throw new Error('document-ready only runs in the browser')
-  }
-  var state = document.readyState
-  if (state === 'complete' || state === 'interactive') {
-    return setTimeout(callback, 0)
-  }
-
-  document.addEventListener('DOMContentLoaded', function onLoad () {
-    callback()
-  })
-}
-
-},{}],"../node_modules/nanoassert/index.js":[function(require,module,exports) {
-assert.notEqual = notEqual
-assert.notOk = notOk
-assert.equal = equal
-assert.ok = assert
-
-module.exports = assert
-
-function equal (a, b, m) {
-  assert(a == b, m) // eslint-disable-line eqeqeq
-}
-
-function notEqual (a, b, m) {
-  assert(a != b, m) // eslint-disable-line eqeqeq
-}
-
-function notOk (t, m) {
-  assert(!t, m)
-}
-
-function assert (t, m) {
-  if (!t) throw new Error(m || 'AssertionError')
-}
-
-},{}],"../node_modules/nanoscheduler/index.js":[function(require,module,exports) {
-var assert = require('assert')
-
-var hasWindow = typeof window !== 'undefined'
-
-function createScheduler () {
-  var scheduler
-  if (hasWindow) {
-    if (!window._nanoScheduler) window._nanoScheduler = new NanoScheduler(true)
-    scheduler = window._nanoScheduler
-  } else {
-    scheduler = new NanoScheduler()
-  }
-  return scheduler
-}
-
-function NanoScheduler (hasWindow) {
-  this.hasWindow = hasWindow
-  this.hasIdle = this.hasWindow && window.requestIdleCallback
-  this.method = this.hasIdle ? window.requestIdleCallback.bind(window) : this.setTimeout
-  this.scheduled = false
-  this.queue = []
-}
-
-NanoScheduler.prototype.push = function (cb) {
-  assert.equal(typeof cb, 'function', 'nanoscheduler.push: cb should be type function')
-
-  this.queue.push(cb)
-  this.schedule()
-}
-
-NanoScheduler.prototype.schedule = function () {
-  if (this.scheduled) return
-
-  this.scheduled = true
-  var self = this
-  this.method(function (idleDeadline) {
-    var cb
-    while (self.queue.length && idleDeadline.timeRemaining() > 0) {
-      cb = self.queue.shift()
-      cb(idleDeadline)
-    }
-    self.scheduled = false
-    if (self.queue.length) self.schedule()
-  })
-}
-
-NanoScheduler.prototype.setTimeout = function (cb) {
-  setTimeout(cb, 0, {
-    timeRemaining: function () {
-      return 1
-    }
-  })
-}
-
-module.exports = createScheduler
-
-},{"assert":"../node_modules/nanoassert/index.js"}],"../node_modules/nanotiming/browser.js":[function(require,module,exports) {
-var scheduler = require('nanoscheduler')()
-var assert = require('assert')
-
-var perf
-nanotiming.disabled = true
-try {
-  perf = window.performance
-  nanotiming.disabled = window.localStorage.DISABLE_NANOTIMING === 'true' || !perf.mark
-} catch (e) { }
-
-module.exports = nanotiming
-
-function nanotiming (name) {
-  assert.equal(typeof name, 'string', 'nanotiming: name should be type string')
-
-  if (nanotiming.disabled) return noop
-
-  var uuid = (perf.now() * 10000).toFixed() % Number.MAX_SAFE_INTEGER
-  var startName = 'start-' + uuid + '-' + name
-  perf.mark(startName)
-
-  function end (cb) {
-    var endName = 'end-' + uuid + '-' + name
-    perf.mark(endName)
-
-    scheduler.push(function () {
-      var err = null
-      try {
-        var measureName = name + ' [' + uuid + ']'
-        perf.measure(measureName, startName, endName)
-        perf.clearMarks(startName)
-        perf.clearMarks(endName)
-      } catch (e) { err = e }
-      if (cb) cb(err, name)
-    })
-  }
-
-  end.uuid = uuid
-  return end
-}
-
-function noop (cb) {
-  if (cb) {
-    scheduler.push(function () {
-      cb(new Error('nanotiming: performance API unavailable'))
-    })
-  }
-}
-
-},{"nanoscheduler":"../node_modules/nanoscheduler/index.js","assert":"../node_modules/nanoassert/index.js"}],"../node_modules/assert/node_modules/util/support/isBufferBrowser.js":[function(require,module,exports) {
+},{}],"../node_modules/assert/node_modules/util/support/isBufferBrowser.js":[function(require,module,exports) {
 module.exports = function isBuffer(arg) {
   return arg && typeof arg === 'object'
     && typeof arg.copy === 'function'
@@ -1593,7 +1443,157 @@ var objectKeys = Object.keys || function (obj) {
   return keys;
 };
 
-},{"util/":"../node_modules/assert/node_modules/util/util.js"}],"../node_modules/xtend/mutable.js":[function(require,module,exports) {
+},{"util/":"../node_modules/assert/node_modules/util/util.js"}],"../node_modules/document-ready/index.js":[function(require,module,exports) {
+'use strict'
+
+var assert = require('assert')
+
+module.exports = ready
+
+function ready (callback) {
+  assert.notEqual(typeof document, 'undefined', 'document-ready only runs in the browser')
+  var state = document.readyState
+  if (state === 'complete' || state === 'interactive') {
+    return setTimeout(callback, 0)
+  }
+
+  document.addEventListener('DOMContentLoaded', function onLoad () {
+    callback()
+  })
+}
+
+},{"assert":"../node_modules/assert/assert.js"}],"../node_modules/nanoassert/index.js":[function(require,module,exports) {
+assert.notEqual = notEqual
+assert.notOk = notOk
+assert.equal = equal
+assert.ok = assert
+
+module.exports = assert
+
+function equal (a, b, m) {
+  assert(a == b, m) // eslint-disable-line eqeqeq
+}
+
+function notEqual (a, b, m) {
+  assert(a != b, m) // eslint-disable-line eqeqeq
+}
+
+function notOk (t, m) {
+  assert(!t, m)
+}
+
+function assert (t, m) {
+  if (!t) throw new Error(m || 'AssertionError')
+}
+
+},{}],"../node_modules/nanoscheduler/index.js":[function(require,module,exports) {
+var assert = require('assert')
+
+var hasWindow = typeof window !== 'undefined'
+
+function createScheduler () {
+  var scheduler
+  if (hasWindow) {
+    if (!window._nanoScheduler) window._nanoScheduler = new NanoScheduler(true)
+    scheduler = window._nanoScheduler
+  } else {
+    scheduler = new NanoScheduler()
+  }
+  return scheduler
+}
+
+function NanoScheduler (hasWindow) {
+  this.hasWindow = hasWindow
+  this.hasIdle = this.hasWindow && window.requestIdleCallback
+  this.method = this.hasIdle ? window.requestIdleCallback.bind(window) : this.setTimeout
+  this.scheduled = false
+  this.queue = []
+}
+
+NanoScheduler.prototype.push = function (cb) {
+  assert.equal(typeof cb, 'function', 'nanoscheduler.push: cb should be type function')
+
+  this.queue.push(cb)
+  this.schedule()
+}
+
+NanoScheduler.prototype.schedule = function () {
+  if (this.scheduled) return
+
+  this.scheduled = true
+  var self = this
+  this.method(function (idleDeadline) {
+    var cb
+    while (self.queue.length && idleDeadline.timeRemaining() > 0) {
+      cb = self.queue.shift()
+      cb(idleDeadline)
+    }
+    self.scheduled = false
+    if (self.queue.length) self.schedule()
+  })
+}
+
+NanoScheduler.prototype.setTimeout = function (cb) {
+  setTimeout(cb, 0, {
+    timeRemaining: function () {
+      return 1
+    }
+  })
+}
+
+module.exports = createScheduler
+
+},{"assert":"../node_modules/nanoassert/index.js"}],"../node_modules/nanotiming/browser.js":[function(require,module,exports) {
+var scheduler = require('nanoscheduler')()
+var assert = require('assert')
+
+var perf
+nanotiming.disabled = true
+try {
+  perf = window.performance
+  nanotiming.disabled = window.localStorage.DISABLE_NANOTIMING === 'true' || !perf.mark
+} catch (e) { }
+
+module.exports = nanotiming
+
+function nanotiming (name) {
+  assert.equal(typeof name, 'string', 'nanotiming: name should be type string')
+
+  if (nanotiming.disabled) return noop
+
+  var uuid = (perf.now() * 10000).toFixed() % Number.MAX_SAFE_INTEGER
+  var startName = 'start-' + uuid + '-' + name
+  perf.mark(startName)
+
+  function end (cb) {
+    var endName = 'end-' + uuid + '-' + name
+    perf.mark(endName)
+
+    scheduler.push(function () {
+      var err = null
+      try {
+        var measureName = name + ' [' + uuid + ']'
+        perf.measure(measureName, startName, endName)
+        perf.clearMarks(startName)
+        perf.clearMarks(endName)
+      } catch (e) { err = e }
+      if (cb) cb(err, name)
+    })
+  }
+
+  end.uuid = uuid
+  return end
+}
+
+function noop (cb) {
+  if (cb) {
+    scheduler.push(function () {
+      cb(new Error('nanotiming: performance API unavailable'))
+    })
+  }
+}
+
+},{"nanoscheduler":"../node_modules/nanoscheduler/index.js","assert":"../node_modules/nanoassert/index.js"}],"../node_modules/xtend/mutable.js":[function(require,module,exports) {
 module.exports = extend;
 var hasOwnProperty = Object.prototype.hasOwnProperty;
 
@@ -2113,7 +2113,7 @@ function updateAttribute (newNode, oldNode, name) {
 }
 
 },{"./events":"../node_modules/nanomorph/lib/events.js"}],"../node_modules/nanomorph/index.js":[function(require,module,exports) {
-var assert = require('nanoassert')
+var assert = require('assert')
 var morph = require('./lib/morph')
 
 var TEXT_NODE = 3
@@ -2134,7 +2134,7 @@ module.exports = nanomorph
 //   -> diff nodes and apply patch to old node
 // nodes are the same
 //   -> walk all child nodes and append to old node
-function nanomorph (oldTree, newTree, options) {
+function nanomorph (oldTree, newTree) {
   // if (DEBUG) {
   //   console.log(
   //   'nanomorph\nold\n  %s\nnew\n  %s',
@@ -2144,18 +2144,9 @@ function nanomorph (oldTree, newTree, options) {
   // }
   assert.equal(typeof oldTree, 'object', 'nanomorph: oldTree should be an object')
   assert.equal(typeof newTree, 'object', 'nanomorph: newTree should be an object')
-  assert.notEqual(
-    newTree.nodeType,
-    11,
-    'nanomorph: newTree should have one root node (which is not a DocumentFragment)'
-  )
-
-  if (options && options.childrenOnly) {
-    updateChildren(newTree, oldTree)
-    return oldTree
-  }
-
-  return walk(newTree, oldTree)
+  var tree = walk(newTree, oldTree)
+  // if (DEBUG) console.log('=> morphed\n  %s', tree.outerHTML)
+  return tree
 }
 
 // Walk and morph a dom tree
@@ -2272,7 +2263,7 @@ function same (a, b) {
   return false
 }
 
-},{"nanoassert":"../node_modules/nanoassert/index.js","./lib/morph":"../node_modules/nanomorph/lib/morph.js"}],"../node_modules/nanoquery/browser.js":[function(require,module,exports) {
+},{"assert":"../node_modules/nanoassert/index.js","./lib/morph":"../node_modules/nanomorph/lib/morph.js"}],"../node_modules/nanoquery/browser.js":[function(require,module,exports) {
 var reg = /([^?=&]+)(=([^&]*))?/g
 var assert = require('assert')
 
@@ -2382,7 +2373,8 @@ function nanoraf (render, raf) {
  * @param {number} startIdx The index to begin removing from (inclusive)
  * @param {number} removeCount How many items to remove
  */
-module.exports = function removeItems (arr, startIdx, removeCount) {
+module.exports = function removeItems(arr, startIdx, removeCount)
+{
   var i, length = arr.length
 
   if (startIdx >= length || removeCount === 0) {
@@ -2416,14 +2408,14 @@ function Nanobus (name) {
 }
 
 Nanobus.prototype.emit = function (eventName) {
-  assert.ok(typeof eventName === 'string' || typeof eventName === 'symbol', 'nanobus.emit: eventName should be type string or symbol')
+  assert.equal(typeof eventName, 'string', 'nanobus.emit: eventName should be type string')
 
   var data = []
   for (var i = 1, len = arguments.length; i < len; i++) {
     data.push(arguments[i])
   }
 
-  var emitTiming = nanotiming(this._name + "('" + eventName.toString() + "')")
+  var emitTiming = nanotiming(this._name + "('" + eventName + "')")
   var listeners = this._listeners[eventName]
   if (listeners && listeners.length > 0) {
     this._emit(this._listeners[eventName], data)
@@ -2438,7 +2430,7 @@ Nanobus.prototype.emit = function (eventName) {
 }
 
 Nanobus.prototype.on = Nanobus.prototype.addListener = function (eventName, listener) {
-  assert.ok(typeof eventName === 'string' || typeof eventName === 'symbol', 'nanobus.on: eventName should be type string or symbol')
+  assert.equal(typeof eventName, 'string', 'nanobus.on: eventName should be type string')
   assert.equal(typeof listener, 'function', 'nanobus.on: listener should be type function')
 
   if (eventName === '*') {
@@ -2451,7 +2443,7 @@ Nanobus.prototype.on = Nanobus.prototype.addListener = function (eventName, list
 }
 
 Nanobus.prototype.prependListener = function (eventName, listener) {
-  assert.ok(typeof eventName === 'string' || typeof eventName === 'symbol', 'nanobus.prependListener: eventName should be type string or symbol')
+  assert.equal(typeof eventName, 'string', 'nanobus.prependListener: eventName should be type string')
   assert.equal(typeof listener, 'function', 'nanobus.prependListener: listener should be type function')
 
   if (eventName === '*') {
@@ -2464,7 +2456,7 @@ Nanobus.prototype.prependListener = function (eventName, listener) {
 }
 
 Nanobus.prototype.once = function (eventName, listener) {
-  assert.ok(typeof eventName === 'string' || typeof eventName === 'symbol', 'nanobus.once: eventName should be type string or symbol')
+  assert.equal(typeof eventName, 'string', 'nanobus.once: eventName should be type string')
   assert.equal(typeof listener, 'function', 'nanobus.once: listener should be type function')
 
   var self = this
@@ -2477,7 +2469,7 @@ Nanobus.prototype.once = function (eventName, listener) {
 }
 
 Nanobus.prototype.prependOnceListener = function (eventName, listener) {
-  assert.ok(typeof eventName === 'string' || typeof eventName === 'symbol', 'nanobus.prependOnceListener: eventName should be type string or symbol')
+  assert.equal(typeof eventName, 'string', 'nanobus.prependOnceListener: eventName should be type string')
   assert.equal(typeof listener, 'function', 'nanobus.prependOnceListener: listener should be type function')
 
   var self = this
@@ -2490,7 +2482,7 @@ Nanobus.prototype.prependOnceListener = function (eventName, listener) {
 }
 
 Nanobus.prototype.removeListener = function (eventName, listener) {
-  assert.ok(typeof eventName === 'string' || typeof eventName === 'symbol', 'nanobus.removeListener: eventName should be type string or symbol')
+  assert.equal(typeof eventName, 'string', 'nanobus.removeListener: eventName should be type string')
   assert.equal(typeof listener, 'function', 'nanobus.removeListener: listener should be type function')
 
   if (eventName === '*') {
@@ -3080,9 +3072,7 @@ module.exports = function (h, opts) {
           } else {
             p.push([ OPEN, arg ])
           }
-        } else if (xstate === COMMENT && opts.comments) {
-          reg += String(arg)
-        } else if (xstate !== COMMENT) {
+        } else {
           p.push([ VAR, xstate, arg ])
         }
         parts.push.apply(parts, p)
@@ -3182,7 +3172,6 @@ module.exports = function (h, opts) {
 
     if (tree[2].length > 2
     || (tree[2].length === 2 && /\S/.test(tree[2][1]))) {
-      if (opts.createFragment) return opts.createFragment(tree[2])
       throw new Error(
         'multiple root elements must be wrapped in an enclosing tag'
       )
@@ -3215,7 +3204,7 @@ module.exports = function (h, opts) {
           state = TEXT
         } else if (state === COMMENT && /-$/.test(reg) && c === '-') {
           if (opts.comments) {
-            res.push([ATTR_VALUE,reg.substr(0, reg.length - 1)])
+            res.push([ATTR_VALUE,reg.substr(0, reg.length - 1)],[CLOSE])
           }
           reg = ''
           state = TEXT
@@ -3310,7 +3299,6 @@ module.exports = function (h, opts) {
     if (typeof x === 'function') return x
     else if (typeof x === 'string') return x
     else if (x && typeof x === 'object') return x
-    else if (x === null || x === undefined) return x
     else return concat('', x)
   }
 }
@@ -3318,6 +3306,9 @@ module.exports = function (h, opts) {
 function quot (state) {
   return state === ATTR_VALUE_SQ || state === ATTR_VALUE_DQ
 }
+
+var hasOwn = Object.prototype.hasOwnProperty
+function has (obj, key) { return hasOwn.call(obj, key) }
 
 var closeRE = RegExp('^(' + [
   'area', 'base', 'basefont', 'bgsound', 'br', 'col', 'command', 'embed',
@@ -3529,24 +3520,11 @@ function nanoHtmlCreateElement (tag, props, children) {
     delete props.namespace
   }
 
-  // If we are extending a builtin element
-  var isCustomElement = false
-  if (props.is) {
-    isCustomElement = props.is
-    delete props.is
-  }
-
   // Create the element
   if (ns) {
-    if (isCustomElement) {
-      el = document.createElementNS(ns, tag, { is: isCustomElement })
-    } else {
-      el = document.createElementNS(ns, tag)
-    }
+    el = document.createElementNS(ns, tag)
   } else if (tag === COMMENT_TAG) {
     return document.createComment(props.comment)
-  } else if (isCustomElement) {
-    el = document.createElement(tag, { is: isCustomElement })
   } else {
     el = document.createElement(tag)
   }
@@ -3593,19 +3571,7 @@ function nanoHtmlCreateElement (tag, props, children) {
   return el
 }
 
-function createFragment (nodes) {
-  var fragment = document.createDocumentFragment()
-  for (var i = 0; i < nodes.length; i++) {
-    if (typeof nodes[i] === 'string') nodes[i] = document.createTextNode(nodes[i])
-    fragment.appendChild(nodes[i])
-  }
-  return fragment
-}
-
-module.exports = hyperx(nanoHtmlCreateElement, {
-  comments: true,
-  createFragment: createFragment
-})
+module.exports = hyperx(nanoHtmlCreateElement, {comments: true})
 module.exports.default = module.exports
 module.exports.createElement = nanoHtmlCreateElement
 
@@ -30509,7 +30475,234 @@ function url (uri, loc) {
   return obj;
 }
 
-},{"parseuri":"../node_modules/parseuri/index.js","debug":"../node_modules/socket.io-client/node_modules/debug/src/browser.js"}],"../node_modules/socket.io-parser/node_modules/debug/src/browser.js":[function(require,module,exports) {
+},{"parseuri":"../node_modules/parseuri/index.js","debug":"../node_modules/socket.io-client/node_modules/debug/src/browser.js"}],"../node_modules/socket.io-parser/node_modules/debug/src/debug.js":[function(require,module,exports) {
+
+/**
+ * This is the common logic for both the Node.js and web browser
+ * implementations of `debug()`.
+ *
+ * Expose `debug()` as the module.
+ */
+
+exports = module.exports = createDebug.debug = createDebug['default'] = createDebug;
+exports.coerce = coerce;
+exports.disable = disable;
+exports.enable = enable;
+exports.enabled = enabled;
+exports.humanize = require('ms');
+
+/**
+ * Active `debug` instances.
+ */
+exports.instances = [];
+
+/**
+ * The currently active debug mode names, and names to skip.
+ */
+
+exports.names = [];
+exports.skips = [];
+
+/**
+ * Map of special "%n" handling functions, for the debug "format" argument.
+ *
+ * Valid key names are a single, lower or upper-case letter, i.e. "n" and "N".
+ */
+
+exports.formatters = {};
+
+/**
+ * Select a color.
+ * @param {String} namespace
+ * @return {Number}
+ * @api private
+ */
+
+function selectColor(namespace) {
+  var hash = 0, i;
+
+  for (i in namespace) {
+    hash  = ((hash << 5) - hash) + namespace.charCodeAt(i);
+    hash |= 0; // Convert to 32bit integer
+  }
+
+  return exports.colors[Math.abs(hash) % exports.colors.length];
+}
+
+/**
+ * Create a debugger with the given `namespace`.
+ *
+ * @param {String} namespace
+ * @return {Function}
+ * @api public
+ */
+
+function createDebug(namespace) {
+
+  var prevTime;
+
+  function debug() {
+    // disabled?
+    if (!debug.enabled) return;
+
+    var self = debug;
+
+    // set `diff` timestamp
+    var curr = +new Date();
+    var ms = curr - (prevTime || curr);
+    self.diff = ms;
+    self.prev = prevTime;
+    self.curr = curr;
+    prevTime = curr;
+
+    // turn the `arguments` into a proper Array
+    var args = new Array(arguments.length);
+    for (var i = 0; i < args.length; i++) {
+      args[i] = arguments[i];
+    }
+
+    args[0] = exports.coerce(args[0]);
+
+    if ('string' !== typeof args[0]) {
+      // anything else let's inspect with %O
+      args.unshift('%O');
+    }
+
+    // apply any `formatters` transformations
+    var index = 0;
+    args[0] = args[0].replace(/%([a-zA-Z%])/g, function(match, format) {
+      // if we encounter an escaped % then don't increase the array index
+      if (match === '%%') return match;
+      index++;
+      var formatter = exports.formatters[format];
+      if ('function' === typeof formatter) {
+        var val = args[index];
+        match = formatter.call(self, val);
+
+        // now we need to remove `args[index]` since it's inlined in the `format`
+        args.splice(index, 1);
+        index--;
+      }
+      return match;
+    });
+
+    // apply env-specific formatting (colors, etc.)
+    exports.formatArgs.call(self, args);
+
+    var logFn = debug.log || exports.log || console.log.bind(console);
+    logFn.apply(self, args);
+  }
+
+  debug.namespace = namespace;
+  debug.enabled = exports.enabled(namespace);
+  debug.useColors = exports.useColors();
+  debug.color = selectColor(namespace);
+  debug.destroy = destroy;
+
+  // env-specific initialization logic for debug instances
+  if ('function' === typeof exports.init) {
+    exports.init(debug);
+  }
+
+  exports.instances.push(debug);
+
+  return debug;
+}
+
+function destroy () {
+  var index = exports.instances.indexOf(this);
+  if (index !== -1) {
+    exports.instances.splice(index, 1);
+    return true;
+  } else {
+    return false;
+  }
+}
+
+/**
+ * Enables a debug mode by namespaces. This can include modes
+ * separated by a colon and wildcards.
+ *
+ * @param {String} namespaces
+ * @api public
+ */
+
+function enable(namespaces) {
+  exports.save(namespaces);
+
+  exports.names = [];
+  exports.skips = [];
+
+  var i;
+  var split = (typeof namespaces === 'string' ? namespaces : '').split(/[\s,]+/);
+  var len = split.length;
+
+  for (i = 0; i < len; i++) {
+    if (!split[i]) continue; // ignore empty strings
+    namespaces = split[i].replace(/\*/g, '.*?');
+    if (namespaces[0] === '-') {
+      exports.skips.push(new RegExp('^' + namespaces.substr(1) + '$'));
+    } else {
+      exports.names.push(new RegExp('^' + namespaces + '$'));
+    }
+  }
+
+  for (i = 0; i < exports.instances.length; i++) {
+    var instance = exports.instances[i];
+    instance.enabled = exports.enabled(instance.namespace);
+  }
+}
+
+/**
+ * Disable debug output.
+ *
+ * @api public
+ */
+
+function disable() {
+  exports.enable('');
+}
+
+/**
+ * Returns true if the given mode name is enabled, false otherwise.
+ *
+ * @param {String} name
+ * @return {Boolean}
+ * @api public
+ */
+
+function enabled(name) {
+  if (name[name.length - 1] === '*') {
+    return true;
+  }
+  var i, len;
+  for (i = 0, len = exports.skips.length; i < len; i++) {
+    if (exports.skips[i].test(name)) {
+      return false;
+    }
+  }
+  for (i = 0, len = exports.names.length; i < len; i++) {
+    if (exports.names[i].test(name)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * Coerce `val`.
+ *
+ * @param {Mixed} val
+ * @return {Mixed}
+ * @api private
+ */
+
+function coerce(val) {
+  if (val instanceof Error) return val.stack || val.message;
+  return val;
+}
+
+},{"ms":"../node_modules/ms/index.js"}],"../node_modules/socket.io-parser/node_modules/debug/src/browser.js":[function(require,module,exports) {
 var process = require("process");
 /**
  * This is the web browser implementation of `debug()`.
@@ -30673,7 +30866,7 @@ function localstorage() {
     return window.localStorage;
   } catch (e) {}
 }
-},{"./debug":"../node_modules/socket.io-client/node_modules/debug/src/debug.js","process":"../node_modules/process/browser.js"}],"../node_modules/component-emitter/index.js":[function(require,module,exports) {
+},{"./debug":"../node_modules/socket.io-parser/node_modules/debug/src/debug.js","process":"../node_modules/process/browser.js"}],"../node_modules/component-emitter/index.js":[function(require,module,exports) {
 
 /**
  * Expose `Emitter`.
@@ -30836,6 +31029,13 @@ Emitter.prototype.listeners = function(event){
 
 Emitter.prototype.hasListeners = function(event){
   return !! this.listeners(event).length;
+};
+
+},{}],"../node_modules/socket.io-parser/node_modules/isarray/index.js":[function(require,module,exports) {
+var toString = {}.toString;
+
+module.exports = Array.isArray || function (arr) {
+  return toString.call(arr) == '[object Array]';
 };
 
 },{}],"../node_modules/socket.io-parser/is-buffer.js":[function(require,module,exports) {
@@ -31009,7 +31209,7 @@ exports.removeBlobs = function(data, callback) {
   }
 };
 
-},{"isarray":"../node_modules/isarray/index.js","./is-buffer":"../node_modules/socket.io-parser/is-buffer.js"}],"../node_modules/socket.io-parser/index.js":[function(require,module,exports) {
+},{"isarray":"../node_modules/socket.io-parser/node_modules/isarray/index.js","./is-buffer":"../node_modules/socket.io-parser/is-buffer.js"}],"../node_modules/socket.io-parser/index.js":[function(require,module,exports) {
 
 /**
  * Module dependencies.
@@ -31428,7 +31628,7 @@ function error(msg) {
   };
 }
 
-},{"debug":"../node_modules/socket.io-parser/node_modules/debug/src/browser.js","component-emitter":"../node_modules/component-emitter/index.js","./binary":"../node_modules/socket.io-parser/binary.js","isarray":"../node_modules/isarray/index.js","./is-buffer":"../node_modules/socket.io-parser/is-buffer.js"}],"../node_modules/has-cors/index.js":[function(require,module,exports) {
+},{"debug":"../node_modules/socket.io-parser/node_modules/debug/src/browser.js","component-emitter":"../node_modules/component-emitter/index.js","./binary":"../node_modules/socket.io-parser/binary.js","isarray":"../node_modules/socket.io-parser/node_modules/isarray/index.js","./is-buffer":"../node_modules/socket.io-parser/is-buffer.js"}],"../node_modules/has-cors/index.js":[function(require,module,exports) {
 
 /**
  * Module exports.
@@ -31508,6 +31708,13 @@ module.exports = Object.keys || function keys (obj){
   return arr;
 };
 
+},{}],"../node_modules/has-binary2/node_modules/isarray/index.js":[function(require,module,exports) {
+var toString = {}.toString;
+
+module.exports = Array.isArray || function (arr) {
+  return toString.call(arr) == '[object Array]';
+};
+
 },{}],"../node_modules/has-binary2/index.js":[function(require,module,exports) {
 var Buffer = require("buffer").Buffer;
 /* global Blob File */
@@ -31575,7 +31782,7 @@ function hasBinary (obj) {
   return false;
 }
 
-},{"isarray":"../node_modules/isarray/index.js","buffer":"../node_modules/buffer/index.js"}],"../node_modules/arraybuffer.slice/index.js":[function(require,module,exports) {
+},{"isarray":"../node_modules/has-binary2/node_modules/isarray/index.js","buffer":"../node_modules/buffer/index.js"}],"../node_modules/arraybuffer.slice/index.js":[function(require,module,exports) {
 /**
  * An abstraction for slicing an arraybuffer even when
  * ArrayBuffer.prototype.slice is not supported
@@ -31637,216 +31844,263 @@ function after(count, callback, err_cb) {
 function noop() {}
 
 },{}],"../node_modules/engine.io-parser/lib/utf8.js":[function(require,module,exports) {
+var global = arguments[3];
+var define;
 /*! https://mths.be/utf8js v2.1.2 by @mathias */
+;(function(root) {
 
-var stringFromCharCode = String.fromCharCode;
+	// Detect free variables `exports`
+	var freeExports = typeof exports == 'object' && exports;
 
-// Taken from https://mths.be/punycode
-function ucs2decode(string) {
-	var output = [];
-	var counter = 0;
-	var length = string.length;
-	var value;
-	var extra;
-	while (counter < length) {
-		value = string.charCodeAt(counter++);
-		if (value >= 0xD800 && value <= 0xDBFF && counter < length) {
-			// high surrogate, and there is a next character
-			extra = string.charCodeAt(counter++);
-			if ((extra & 0xFC00) == 0xDC00) { // low surrogate
-				output.push(((value & 0x3FF) << 10) + (extra & 0x3FF) + 0x10000);
+	// Detect free variable `module`
+	var freeModule = typeof module == 'object' && module &&
+		module.exports == freeExports && module;
+
+	// Detect free variable `global`, from Node.js or Browserified code,
+	// and use it as `root`
+	var freeGlobal = typeof global == 'object' && global;
+	if (freeGlobal.global === freeGlobal || freeGlobal.window === freeGlobal) {
+		root = freeGlobal;
+	}
+
+	/*--------------------------------------------------------------------------*/
+
+	var stringFromCharCode = String.fromCharCode;
+
+	// Taken from https://mths.be/punycode
+	function ucs2decode(string) {
+		var output = [];
+		var counter = 0;
+		var length = string.length;
+		var value;
+		var extra;
+		while (counter < length) {
+			value = string.charCodeAt(counter++);
+			if (value >= 0xD800 && value <= 0xDBFF && counter < length) {
+				// high surrogate, and there is a next character
+				extra = string.charCodeAt(counter++);
+				if ((extra & 0xFC00) == 0xDC00) { // low surrogate
+					output.push(((value & 0x3FF) << 10) + (extra & 0x3FF) + 0x10000);
+				} else {
+					// unmatched surrogate; only append this code unit, in case the next
+					// code unit is the high surrogate of a surrogate pair
+					output.push(value);
+					counter--;
+				}
 			} else {
-				// unmatched surrogate; only append this code unit, in case the next
-				// code unit is the high surrogate of a surrogate pair
 				output.push(value);
-				counter--;
 			}
-		} else {
-			output.push(value);
 		}
+		return output;
 	}
-	return output;
-}
 
-// Taken from https://mths.be/punycode
-function ucs2encode(array) {
-	var length = array.length;
-	var index = -1;
-	var value;
-	var output = '';
-	while (++index < length) {
-		value = array[index];
-		if (value > 0xFFFF) {
-			value -= 0x10000;
-			output += stringFromCharCode(value >>> 10 & 0x3FF | 0xD800);
-			value = 0xDC00 | value & 0x3FF;
+	// Taken from https://mths.be/punycode
+	function ucs2encode(array) {
+		var length = array.length;
+		var index = -1;
+		var value;
+		var output = '';
+		while (++index < length) {
+			value = array[index];
+			if (value > 0xFFFF) {
+				value -= 0x10000;
+				output += stringFromCharCode(value >>> 10 & 0x3FF | 0xD800);
+				value = 0xDC00 | value & 0x3FF;
+			}
+			output += stringFromCharCode(value);
 		}
-		output += stringFromCharCode(value);
+		return output;
 	}
-	return output;
-}
 
-function checkScalarValue(codePoint, strict) {
-	if (codePoint >= 0xD800 && codePoint <= 0xDFFF) {
-		if (strict) {
-			throw Error(
-				'Lone surrogate U+' + codePoint.toString(16).toUpperCase() +
-				' is not a scalar value'
-			);
+	function checkScalarValue(codePoint, strict) {
+		if (codePoint >= 0xD800 && codePoint <= 0xDFFF) {
+			if (strict) {
+				throw Error(
+					'Lone surrogate U+' + codePoint.toString(16).toUpperCase() +
+					' is not a scalar value'
+				);
+			}
+			return false;
 		}
-		return false;
+		return true;
 	}
-	return true;
-}
-/*--------------------------------------------------------------------------*/
+	/*--------------------------------------------------------------------------*/
 
-function createByte(codePoint, shift) {
-	return stringFromCharCode(((codePoint >> shift) & 0x3F) | 0x80);
-}
+	function createByte(codePoint, shift) {
+		return stringFromCharCode(((codePoint >> shift) & 0x3F) | 0x80);
+	}
 
-function encodeCodePoint(codePoint, strict) {
-	if ((codePoint & 0xFFFFFF80) == 0) { // 1-byte sequence
-		return stringFromCharCode(codePoint);
-	}
-	var symbol = '';
-	if ((codePoint & 0xFFFFF800) == 0) { // 2-byte sequence
-		symbol = stringFromCharCode(((codePoint >> 6) & 0x1F) | 0xC0);
-	}
-	else if ((codePoint & 0xFFFF0000) == 0) { // 3-byte sequence
-		if (!checkScalarValue(codePoint, strict)) {
-			codePoint = 0xFFFD;
+	function encodeCodePoint(codePoint, strict) {
+		if ((codePoint & 0xFFFFFF80) == 0) { // 1-byte sequence
+			return stringFromCharCode(codePoint);
 		}
-		symbol = stringFromCharCode(((codePoint >> 12) & 0x0F) | 0xE0);
-		symbol += createByte(codePoint, 6);
-	}
-	else if ((codePoint & 0xFFE00000) == 0) { // 4-byte sequence
-		symbol = stringFromCharCode(((codePoint >> 18) & 0x07) | 0xF0);
-		symbol += createByte(codePoint, 12);
-		symbol += createByte(codePoint, 6);
-	}
-	symbol += stringFromCharCode((codePoint & 0x3F) | 0x80);
-	return symbol;
-}
-
-function utf8encode(string, opts) {
-	opts = opts || {};
-	var strict = false !== opts.strict;
-
-	var codePoints = ucs2decode(string);
-	var length = codePoints.length;
-	var index = -1;
-	var codePoint;
-	var byteString = '';
-	while (++index < length) {
-		codePoint = codePoints[index];
-		byteString += encodeCodePoint(codePoint, strict);
-	}
-	return byteString;
-}
-
-/*--------------------------------------------------------------------------*/
-
-function readContinuationByte() {
-	if (byteIndex >= byteCount) {
-		throw Error('Invalid byte index');
-	}
-
-	var continuationByte = byteArray[byteIndex] & 0xFF;
-	byteIndex++;
-
-	if ((continuationByte & 0xC0) == 0x80) {
-		return continuationByte & 0x3F;
-	}
-
-	// If we end up here, it’s not a continuation byte
-	throw Error('Invalid continuation byte');
-}
-
-function decodeSymbol(strict) {
-	var byte1;
-	var byte2;
-	var byte3;
-	var byte4;
-	var codePoint;
-
-	if (byteIndex > byteCount) {
-		throw Error('Invalid byte index');
-	}
-
-	if (byteIndex == byteCount) {
-		return false;
-	}
-
-	// Read first byte
-	byte1 = byteArray[byteIndex] & 0xFF;
-	byteIndex++;
-
-	// 1-byte sequence (no continuation bytes)
-	if ((byte1 & 0x80) == 0) {
-		return byte1;
-	}
-
-	// 2-byte sequence
-	if ((byte1 & 0xE0) == 0xC0) {
-		byte2 = readContinuationByte();
-		codePoint = ((byte1 & 0x1F) << 6) | byte2;
-		if (codePoint >= 0x80) {
-			return codePoint;
-		} else {
-			throw Error('Invalid continuation byte');
+		var symbol = '';
+		if ((codePoint & 0xFFFFF800) == 0) { // 2-byte sequence
+			symbol = stringFromCharCode(((codePoint >> 6) & 0x1F) | 0xC0);
 		}
-	}
-
-	// 3-byte sequence (may include unpaired surrogates)
-	if ((byte1 & 0xF0) == 0xE0) {
-		byte2 = readContinuationByte();
-		byte3 = readContinuationByte();
-		codePoint = ((byte1 & 0x0F) << 12) | (byte2 << 6) | byte3;
-		if (codePoint >= 0x0800) {
-			return checkScalarValue(codePoint, strict) ? codePoint : 0xFFFD;
-		} else {
-			throw Error('Invalid continuation byte');
+		else if ((codePoint & 0xFFFF0000) == 0) { // 3-byte sequence
+			if (!checkScalarValue(codePoint, strict)) {
+				codePoint = 0xFFFD;
+			}
+			symbol = stringFromCharCode(((codePoint >> 12) & 0x0F) | 0xE0);
+			symbol += createByte(codePoint, 6);
 		}
-	}
-
-	// 4-byte sequence
-	if ((byte1 & 0xF8) == 0xF0) {
-		byte2 = readContinuationByte();
-		byte3 = readContinuationByte();
-		byte4 = readContinuationByte();
-		codePoint = ((byte1 & 0x07) << 0x12) | (byte2 << 0x0C) |
-			(byte3 << 0x06) | byte4;
-		if (codePoint >= 0x010000 && codePoint <= 0x10FFFF) {
-			return codePoint;
+		else if ((codePoint & 0xFFE00000) == 0) { // 4-byte sequence
+			symbol = stringFromCharCode(((codePoint >> 18) & 0x07) | 0xF0);
+			symbol += createByte(codePoint, 12);
+			symbol += createByte(codePoint, 6);
 		}
+		symbol += stringFromCharCode((codePoint & 0x3F) | 0x80);
+		return symbol;
 	}
 
-	throw Error('Invalid UTF-8 detected');
-}
+	function utf8encode(string, opts) {
+		opts = opts || {};
+		var strict = false !== opts.strict;
 
-var byteArray;
-var byteCount;
-var byteIndex;
-function utf8decode(byteString, opts) {
-	opts = opts || {};
-	var strict = false !== opts.strict;
-
-	byteArray = ucs2decode(byteString);
-	byteCount = byteArray.length;
-	byteIndex = 0;
-	var codePoints = [];
-	var tmp;
-	while ((tmp = decodeSymbol(strict)) !== false) {
-		codePoints.push(tmp);
+		var codePoints = ucs2decode(string);
+		var length = codePoints.length;
+		var index = -1;
+		var codePoint;
+		var byteString = '';
+		while (++index < length) {
+			codePoint = codePoints[index];
+			byteString += encodeCodePoint(codePoint, strict);
+		}
+		return byteString;
 	}
-	return ucs2encode(codePoints);
-}
 
-module.exports = {
-	version: '2.1.2',
-	encode: utf8encode,
-	decode: utf8decode
-};
+	/*--------------------------------------------------------------------------*/
+
+	function readContinuationByte() {
+		if (byteIndex >= byteCount) {
+			throw Error('Invalid byte index');
+		}
+
+		var continuationByte = byteArray[byteIndex] & 0xFF;
+		byteIndex++;
+
+		if ((continuationByte & 0xC0) == 0x80) {
+			return continuationByte & 0x3F;
+		}
+
+		// If we end up here, it’s not a continuation byte
+		throw Error('Invalid continuation byte');
+	}
+
+	function decodeSymbol(strict) {
+		var byte1;
+		var byte2;
+		var byte3;
+		var byte4;
+		var codePoint;
+
+		if (byteIndex > byteCount) {
+			throw Error('Invalid byte index');
+		}
+
+		if (byteIndex == byteCount) {
+			return false;
+		}
+
+		// Read first byte
+		byte1 = byteArray[byteIndex] & 0xFF;
+		byteIndex++;
+
+		// 1-byte sequence (no continuation bytes)
+		if ((byte1 & 0x80) == 0) {
+			return byte1;
+		}
+
+		// 2-byte sequence
+		if ((byte1 & 0xE0) == 0xC0) {
+			byte2 = readContinuationByte();
+			codePoint = ((byte1 & 0x1F) << 6) | byte2;
+			if (codePoint >= 0x80) {
+				return codePoint;
+			} else {
+				throw Error('Invalid continuation byte');
+			}
+		}
+
+		// 3-byte sequence (may include unpaired surrogates)
+		if ((byte1 & 0xF0) == 0xE0) {
+			byte2 = readContinuationByte();
+			byte3 = readContinuationByte();
+			codePoint = ((byte1 & 0x0F) << 12) | (byte2 << 6) | byte3;
+			if (codePoint >= 0x0800) {
+				return checkScalarValue(codePoint, strict) ? codePoint : 0xFFFD;
+			} else {
+				throw Error('Invalid continuation byte');
+			}
+		}
+
+		// 4-byte sequence
+		if ((byte1 & 0xF8) == 0xF0) {
+			byte2 = readContinuationByte();
+			byte3 = readContinuationByte();
+			byte4 = readContinuationByte();
+			codePoint = ((byte1 & 0x07) << 0x12) | (byte2 << 0x0C) |
+				(byte3 << 0x06) | byte4;
+			if (codePoint >= 0x010000 && codePoint <= 0x10FFFF) {
+				return codePoint;
+			}
+		}
+
+		throw Error('Invalid UTF-8 detected');
+	}
+
+	var byteArray;
+	var byteCount;
+	var byteIndex;
+	function utf8decode(byteString, opts) {
+		opts = opts || {};
+		var strict = false !== opts.strict;
+
+		byteArray = ucs2decode(byteString);
+		byteCount = byteArray.length;
+		byteIndex = 0;
+		var codePoints = [];
+		var tmp;
+		while ((tmp = decodeSymbol(strict)) !== false) {
+			codePoints.push(tmp);
+		}
+		return ucs2encode(codePoints);
+	}
+
+	/*--------------------------------------------------------------------------*/
+
+	var utf8 = {
+		'version': '2.1.2',
+		'encode': utf8encode,
+		'decode': utf8decode
+	};
+
+	// Some AMD build optimizers, like r.js, check for specific condition patterns
+	// like the following:
+	if (
+		typeof define == 'function' &&
+		typeof define.amd == 'object' &&
+		define.amd
+	) {
+		define(function() {
+			return utf8;
+		});
+	}	else if (freeExports && !freeExports.nodeType) {
+		if (freeModule) { // in Node.js or RingoJS v0.8.0+
+			freeModule.exports = utf8;
+		} else { // in Narwhal or RingoJS v0.7.0-
+			var object = {};
+			var hasOwnProperty = object.hasOwnProperty;
+			for (var key in utf8) {
+				hasOwnProperty.call(utf8, key) && (freeExports[key] = utf8[key]);
+			}
+		}
+	} else { // in Rhino or a web browser
+		root.utf8 = utf8;
+	}
+
+}(this));
 
 },{}],"../node_modules/base64-arraybuffer/lib/base64-arraybuffer.js":[function(require,module,exports) {
 /*
@@ -31924,15 +32178,15 @@ module.exports = {
   };
 })();
 },{}],"../node_modules/blob/index.js":[function(require,module,exports) {
+var global = arguments[3];
 /**
  * Create a blob builder even when vendor prefixes exist
  */
 
-var BlobBuilder = typeof BlobBuilder !== 'undefined' ? BlobBuilder :
-  typeof WebKitBlobBuilder !== 'undefined' ? WebKitBlobBuilder :
-  typeof MSBlobBuilder !== 'undefined' ? MSBlobBuilder :
-  typeof MozBlobBuilder !== 'undefined' ? MozBlobBuilder : 
-  false;
+var BlobBuilder = global.BlobBuilder
+  || global.WebKitBlobBuilder
+  || global.MSBlobBuilder
+  || global.MozBlobBuilder;
 
 /**
  * Check if Blob constructor is supported
@@ -31976,7 +32230,8 @@ var blobBuilderSupported = BlobBuilder
  */
 
 function mapArrayBufferViews(ary) {
-  return ary.map(function(chunk) {
+  for (var i = 0; i < ary.length; i++) {
+    var chunk = ary[i];
     if (chunk.buffer instanceof ArrayBuffer) {
       var buf = chunk.buffer;
 
@@ -31988,36 +32243,32 @@ function mapArrayBufferViews(ary) {
         buf = copy.buffer;
       }
 
-      return buf;
+      ary[i] = buf;
     }
-
-    return chunk;
-  });
+  }
 }
 
 function BlobBuilderConstructor(ary, options) {
   options = options || {};
 
   var bb = new BlobBuilder();
-  mapArrayBufferViews(ary).forEach(function(part) {
-    bb.append(part);
-  });
+  mapArrayBufferViews(ary);
+
+  for (var i = 0; i < ary.length; i++) {
+    bb.append(ary[i]);
+  }
 
   return (options.type) ? bb.getBlob(options.type) : bb.getBlob();
 };
 
 function BlobConstructor(ary, options) {
-  return new Blob(mapArrayBufferViews(ary), options || {});
+  mapArrayBufferViews(ary);
+  return new Blob(ary, options || {});
 };
-
-if (typeof Blob !== 'undefined') {
-  BlobBuilderConstructor.prototype = Blob.prototype;
-  BlobConstructor.prototype = Blob.prototype;
-}
 
 module.exports = (function() {
   if (blobSupported) {
-    return blobSupportsArrayBufferView ? Blob : BlobConstructor;
+    return blobSupportsArrayBufferView ? global.Blob : BlobConstructor;
   } else if (blobBuilderSupported) {
     return BlobBuilderConstructor;
   } else {
@@ -32026,6 +32277,7 @@ module.exports = (function() {
 })();
 
 },{}],"../node_modules/engine.io-parser/lib/browser.js":[function(require,module,exports) {
+var global = arguments[3];
 /**
  * Module dependencies.
  */
@@ -32037,7 +32289,7 @@ var after = require('after');
 var utf8 = require('./utf8');
 
 var base64encoder;
-if (typeof ArrayBuffer !== 'undefined') {
+if (global && global.ArrayBuffer) {
   base64encoder = require('base64-arraybuffer');
 }
 
@@ -32129,9 +32381,9 @@ exports.encodePacket = function (packet, supportsBinary, utf8encode, callback) {
     ? undefined
     : packet.data.buffer || packet.data;
 
-  if (typeof ArrayBuffer !== 'undefined' && data instanceof ArrayBuffer) {
+  if (global.ArrayBuffer && data instanceof ArrayBuffer) {
     return encodeArrayBuffer(packet, supportsBinary, callback);
-  } else if (typeof Blob !== 'undefined' && data instanceof Blob) {
+  } else if (Blob && data instanceof global.Blob) {
     return encodeBlob(packet, supportsBinary, callback);
   }
 
@@ -32186,7 +32438,8 @@ function encodeBlobAsArrayBuffer(packet, supportsBinary, callback) {
 
   var fr = new FileReader();
   fr.onload = function() {
-    exports.encodePacket({ type: packet.type, data: fr.result }, supportsBinary, true, callback);
+    packet.data = fr.result;
+    exports.encodePacket(packet, supportsBinary, true, callback);
   };
   return fr.readAsArrayBuffer(packet.data);
 }
@@ -32216,7 +32469,7 @@ function encodeBlob(packet, supportsBinary, callback) {
 
 exports.encodeBase64Packet = function(packet, callback) {
   var message = 'b' + exports.packets[packet.type];
-  if (typeof Blob !== 'undefined' && packet.data instanceof Blob) {
+  if (Blob && packet.data instanceof global.Blob) {
     var fr = new FileReader();
     fr.onload = function() {
       var b64 = fr.result.split(',')[1];
@@ -32237,7 +32490,7 @@ exports.encodeBase64Packet = function(packet, callback) {
     }
     b64data = String.fromCharCode.apply(null, basic);
   }
-  message += btoa(b64data);
+  message += global.btoa(b64data);
   return callback(message);
 };
 
@@ -32908,7 +33161,234 @@ yeast.encode = encode;
 yeast.decode = decode;
 module.exports = yeast;
 
-},{}],"../node_modules/engine.io-client/node_modules/debug/src/browser.js":[function(require,module,exports) {
+},{}],"../node_modules/engine.io-client/node_modules/debug/src/debug.js":[function(require,module,exports) {
+
+/**
+ * This is the common logic for both the Node.js and web browser
+ * implementations of `debug()`.
+ *
+ * Expose `debug()` as the module.
+ */
+
+exports = module.exports = createDebug.debug = createDebug['default'] = createDebug;
+exports.coerce = coerce;
+exports.disable = disable;
+exports.enable = enable;
+exports.enabled = enabled;
+exports.humanize = require('ms');
+
+/**
+ * Active `debug` instances.
+ */
+exports.instances = [];
+
+/**
+ * The currently active debug mode names, and names to skip.
+ */
+
+exports.names = [];
+exports.skips = [];
+
+/**
+ * Map of special "%n" handling functions, for the debug "format" argument.
+ *
+ * Valid key names are a single, lower or upper-case letter, i.e. "n" and "N".
+ */
+
+exports.formatters = {};
+
+/**
+ * Select a color.
+ * @param {String} namespace
+ * @return {Number}
+ * @api private
+ */
+
+function selectColor(namespace) {
+  var hash = 0, i;
+
+  for (i in namespace) {
+    hash  = ((hash << 5) - hash) + namespace.charCodeAt(i);
+    hash |= 0; // Convert to 32bit integer
+  }
+
+  return exports.colors[Math.abs(hash) % exports.colors.length];
+}
+
+/**
+ * Create a debugger with the given `namespace`.
+ *
+ * @param {String} namespace
+ * @return {Function}
+ * @api public
+ */
+
+function createDebug(namespace) {
+
+  var prevTime;
+
+  function debug() {
+    // disabled?
+    if (!debug.enabled) return;
+
+    var self = debug;
+
+    // set `diff` timestamp
+    var curr = +new Date();
+    var ms = curr - (prevTime || curr);
+    self.diff = ms;
+    self.prev = prevTime;
+    self.curr = curr;
+    prevTime = curr;
+
+    // turn the `arguments` into a proper Array
+    var args = new Array(arguments.length);
+    for (var i = 0; i < args.length; i++) {
+      args[i] = arguments[i];
+    }
+
+    args[0] = exports.coerce(args[0]);
+
+    if ('string' !== typeof args[0]) {
+      // anything else let's inspect with %O
+      args.unshift('%O');
+    }
+
+    // apply any `formatters` transformations
+    var index = 0;
+    args[0] = args[0].replace(/%([a-zA-Z%])/g, function(match, format) {
+      // if we encounter an escaped % then don't increase the array index
+      if (match === '%%') return match;
+      index++;
+      var formatter = exports.formatters[format];
+      if ('function' === typeof formatter) {
+        var val = args[index];
+        match = formatter.call(self, val);
+
+        // now we need to remove `args[index]` since it's inlined in the `format`
+        args.splice(index, 1);
+        index--;
+      }
+      return match;
+    });
+
+    // apply env-specific formatting (colors, etc.)
+    exports.formatArgs.call(self, args);
+
+    var logFn = debug.log || exports.log || console.log.bind(console);
+    logFn.apply(self, args);
+  }
+
+  debug.namespace = namespace;
+  debug.enabled = exports.enabled(namespace);
+  debug.useColors = exports.useColors();
+  debug.color = selectColor(namespace);
+  debug.destroy = destroy;
+
+  // env-specific initialization logic for debug instances
+  if ('function' === typeof exports.init) {
+    exports.init(debug);
+  }
+
+  exports.instances.push(debug);
+
+  return debug;
+}
+
+function destroy () {
+  var index = exports.instances.indexOf(this);
+  if (index !== -1) {
+    exports.instances.splice(index, 1);
+    return true;
+  } else {
+    return false;
+  }
+}
+
+/**
+ * Enables a debug mode by namespaces. This can include modes
+ * separated by a colon and wildcards.
+ *
+ * @param {String} namespaces
+ * @api public
+ */
+
+function enable(namespaces) {
+  exports.save(namespaces);
+
+  exports.names = [];
+  exports.skips = [];
+
+  var i;
+  var split = (typeof namespaces === 'string' ? namespaces : '').split(/[\s,]+/);
+  var len = split.length;
+
+  for (i = 0; i < len; i++) {
+    if (!split[i]) continue; // ignore empty strings
+    namespaces = split[i].replace(/\*/g, '.*?');
+    if (namespaces[0] === '-') {
+      exports.skips.push(new RegExp('^' + namespaces.substr(1) + '$'));
+    } else {
+      exports.names.push(new RegExp('^' + namespaces + '$'));
+    }
+  }
+
+  for (i = 0; i < exports.instances.length; i++) {
+    var instance = exports.instances[i];
+    instance.enabled = exports.enabled(instance.namespace);
+  }
+}
+
+/**
+ * Disable debug output.
+ *
+ * @api public
+ */
+
+function disable() {
+  exports.enable('');
+}
+
+/**
+ * Returns true if the given mode name is enabled, false otherwise.
+ *
+ * @param {String} name
+ * @return {Boolean}
+ * @api public
+ */
+
+function enabled(name) {
+  if (name[name.length - 1] === '*') {
+    return true;
+  }
+  var i, len;
+  for (i = 0, len = exports.skips.length; i < len; i++) {
+    if (exports.skips[i].test(name)) {
+      return false;
+    }
+  }
+  for (i = 0, len = exports.names.length; i < len; i++) {
+    if (exports.names[i].test(name)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * Coerce `val`.
+ *
+ * @param {Mixed} val
+ * @return {Mixed}
+ * @api private
+ */
+
+function coerce(val) {
+  if (val instanceof Error) return val.stack || val.message;
+  return val;
+}
+
+},{"ms":"../node_modules/ms/index.js"}],"../node_modules/engine.io-client/node_modules/debug/src/browser.js":[function(require,module,exports) {
 var process = require("process");
 /**
  * This is the web browser implementation of `debug()`.
@@ -33072,7 +33552,7 @@ function localstorage() {
     return window.localStorage;
   } catch (e) {}
 }
-},{"./debug":"../node_modules/socket.io-client/node_modules/debug/src/debug.js","process":"../node_modules/process/browser.js"}],"../node_modules/engine.io-client/lib/transports/polling.js":[function(require,module,exports) {
+},{"./debug":"../node_modules/engine.io-client/node_modules/debug/src/debug.js","process":"../node_modules/process/browser.js"}],"../node_modules/engine.io-client/lib/transports/polling.js":[function(require,module,exports) {
 /**
  * Module dependencies.
  */
@@ -36521,12 +37001,10 @@ const objMap = (obj, fn) => {
 class LocalModels {
   constructor() {
     this.models = objMap(modelUrls, url => ml5.pix2pix(url));
-    console.log(this.models);
   }
 
   loadModel(modelName) {
     return __awaiter(this, void 0, void 0, function* () {
-      if (this.models[modelName].ready) console.log('loading model ' + modelName);
       return yield this.models[modelName];
     });
   }
@@ -36553,6 +37031,7 @@ exports.localModels = new LocalModels();
 function localModelsStore(state, emitter) {
   state.app.localModels = objMap(modelUrls, name => 'notLoaded');
   emitter.on('loadmodel', name => __awaiter(this, void 0, void 0, function* () {
+    if (state.app.localModels[name] == 'loaded') return;
     state.app.localModels[name] = 'loading';
     yield exports.localModels.loadModel(name);
     emitter.emit('loadedmodel', name);
@@ -36699,6 +37178,10 @@ class Comm {
 
   available_models() {
     return Object.keys(this.model2url).concat(local_models_1.localModels.available_models());
+  }
+
+  is_local_model(name) {
+    return local_models_1.localModels.available_models().indexOf(name) != -1;
   }
 
   send(tag, data) {
@@ -36976,9 +37459,36 @@ const make_paper = (component, canvas, element, comm, emit) => {
   };
 
   fillTool.onMouseDown = function (event) {
+    project.activate();
+
     if (fill) {
-      event.item.fillColor = fillColor;
-      event.item.strokeColor = "#00000000";
+      if (event.item instanceof paperfix_1.paper.Path) {
+        let path = event.item;
+        path.fillColor = fillColor;
+        path.strokeColor = "#00000000";
+      } else if (event.item != null) {
+        const group = event.item;
+        let hitInfos = group.hitTestAll(event.point);
+        hitInfos = hitInfos.filter(hi => hi.item && hi.item instanceof paperfix_1.paper.Path);
+        if (hitInfos.length == 0) return;
+        const smallest = hitInfos[0];
+        let path = smallest.item ? smallest.item : smallest;
+        path.fillColor = fillColor;
+        path.strokeColor = "#00000000";
+      }
+    }
+  };
+
+  fillTool.onMouseMove = function (event) {
+    project.activate();
+    project.activeLayer.selected = false;
+    let hitResult = project.activeLayer.hitTestAll(event.point);
+
+    if (hitResult[0] != undefined && hitResult[0].item) {
+      hitResult[0].item.selected = true;
+      selectedObject = hitResult[0];
+    } else {
+      selectedObject = null;
     }
   };
 
@@ -37157,6 +37667,11 @@ class PaperCanvasComponent extends component_1.default {
       make_paper(this, newcanvas, element, this.comm, this.emit);
       setTimeout(() => this.emit('isConnected'), 1);
       setTimeout(() => this.emit('addLayer'), 20);
+      setTimeout(() => {
+        for (const modelName of this.comm.available_models()) {
+          this.emit('addModel', modelName);
+        }
+      });
     });
   }
 
@@ -37214,9 +37729,10 @@ function paperStore(state, emitter) {
   });
   emitter.on('setFill', color => {
     state.cache(PaperCanvasComponent, 'paper-canvas').sketch.setFill(color);
-  });
-  emitter.on('setModelForLayer', (layerIdx, model) => {
-    state.cache(PaperCanvasComponent, 'paper-canvas').sketch.setModelForLayer(layerIdx, model);
+  }); // TODO: make a comm reducer
+
+  emitter.on('addModel', modelName => {
+    state.app.availableModels.push(modelName);
   });
 }
 
@@ -37386,9 +37902,9 @@ function mirrorStore(state, emitter) {
 
 exports.mirrorStore = mirrorStore;
 },{"choo/html":"../node_modules/choo/html/index.js","choo/component":"../node_modules/choo/component/index.js","../paperfix":"paperfix.ts"}],"assets/heart.svg":[function(require,module,exports) {
-module.exports = "/heart.7b7c65cd.svg";
+module.exports = "heart.7b7c65cd.svg";
 },{}],"assets/render.png":[function(require,module,exports) {
-module.exports = "/render.4dc221d6.png";
+module.exports = "render.4dc221d6.png";
 },{}],"components/drawing_component.ts":[function(require,module,exports) {
 "use strict";
 
@@ -37431,25 +37947,25 @@ function renderButton(emit) {
     `;
 }
 },{"./paper_canvas":"components/paper_canvas.ts","choo/html":"../node_modules/choo/html/index.js","./../assets/heart.svg":"assets/heart.svg","./../assets/render.png":"assets/render.png"}],"assets/logo.png":[function(require,module,exports) {
-module.exports = "/logo.e9a9c890.png";
+module.exports = "logo.e9a9c890.png";
 },{}],"assets/toolbar-naked.png":[function(require,module,exports) {
-module.exports = "/toolbar-naked.4dcfa482.png";
+module.exports = "toolbar-naked.4dcfa482.png";
 },{}],"assets/paintbucket.png":[function(require,module,exports) {
-module.exports = "/paintbucket.15067ddf.png";
+module.exports = "paintbucket.15067ddf.png";
 },{}],"assets/eraser.png":[function(require,module,exports) {
-module.exports = "/eraser.b1af06ee.png";
+module.exports = "eraser.b1af06ee.png";
 },{}],"assets/pencil.png":[function(require,module,exports) {
-module.exports = "/pencil.78cb9ffc.png";
+module.exports = "pencil.78cb9ffc.png";
 },{}],"assets/undo.png":[function(require,module,exports) {
-module.exports = "/undo.35314a16.png";
+module.exports = "undo.35314a16.png";
 },{}],"assets/transform.png":[function(require,module,exports) {
-module.exports = "/transform.377f7918.png";
+module.exports = "transform.377f7918.png";
 },{}],"assets/trash.png":[function(require,module,exports) {
-module.exports = "/trash.fff166ad.png";
+module.exports = "trash.fff166ad.png";
 },{}],"assets/close.svg":[function(require,module,exports) {
-module.exports = "/close.bff3a284.svg";
+module.exports = "close.bff3a284.svg";
 },{}],"assets/settings-work-tool.svg":[function(require,module,exports) {
-module.exports = "/settings-work-tool.f8a1f90d.svg";
+module.exports = "settings-work-tool.f8a1f90d.svg";
 },{}],"components/left_view.ts":[function(require,module,exports) {
 "use strict";
 
@@ -37546,7 +38062,7 @@ function leftView(state, emit) {
 
 exports.leftView = leftView;
 },{"choo/html":"../node_modules/choo/html/index.js","./drawing_component":"components/drawing_component.ts","./../assets/logo.png":"assets/logo.png","./../assets/toolbar-naked.png":"assets/toolbar-naked.png","./../assets/paintbucket.png":"assets/paintbucket.png","./../assets/eraser.png":"assets/eraser.png","./../assets/pencil.png":"assets/pencil.png","./../assets/undo.png":"assets/undo.png","./../assets/transform.png":"assets/transform.png","./../assets/trash.png":"assets/trash.png","./../assets/close.svg":"assets/close.svg","./../assets/settings-work-tool.svg":"assets/settings-work-tool.svg"}],"assets/star.svg":[function(require,module,exports) {
-module.exports = "/star.7e46d871.svg";
+module.exports = "star.7e46d871.svg";
 },{}],"components/mirror_component.ts":[function(require,module,exports) {
 "use strict";
 
@@ -37577,7 +38093,7 @@ function mirrorView(state, emit) {
 
 exports.mirrorView = mirrorView;
 },{"./mirror":"components/mirror.ts","choo/html":"../node_modules/choo/html/index.js","./../assets/star.svg":"assets/star.svg"}],"assets/pawprint.svg":[function(require,module,exports) {
-module.exports = "/pawprint.ffd285ae.svg";
+module.exports = "pawprint.ffd285ae.svg";
 },{}],"components/right_view.ts":[function(require,module,exports) {
 "use strict";
 
@@ -37599,11 +38115,7 @@ const pawprint = require('./../assets/pawprint.svg');
 
 function dropdownContent(emit, layer, i, state) {
   return html_1.default`<div class="dropdown-content">
-     <a href="#" onclick=${() => changeModel(state, i, 'edges2cat')}>Cat</a>
-     <a href="#" onclick=${() => changeModel(state, i, 'edges2handbag')}>Handbag</a>
-     <a href="#" onclick=${() => changeModel(state, i, 'edges2shoes_pretrained')}>Shoe</a>
-     <a href="#" onclick=${() => changeModel(state, i, 'map2sat_pretrained')}>Map</a>
-     <a href="#" onclick=${() => changeModel(state, i, 'edges2pikachu')}>Pikachu</a>
+      ${state.availableModels.map(modelName => html_1.default`<a href="#" onclick=${() => changeModel(state, i, modelName)}>${getName(modelName)}</a>`)}
    </div>`;
 }
 
@@ -37635,39 +38147,39 @@ function layerBuilder(state, emit) {
         </div>
         </ul>
     </div>`;
-} //should probably find a nicer way to map mdoel names to their backend namespace later
+} //should probably find a nicer way to map model names to their backend namespace later
 
 
 function getName(model) {
-  console.log(model);
   let name = "error";
 
   switch (model) {
     case 'edges2cat':
-      name = "cat";
+      name = "Cat";
       break;
 
     case 'edges2handbag':
-      name = "bag";
+      name = "Bag";
       break;
 
     case 'edges2shoes_pretrained':
-      name = "shoes";
+      name = "Shoes";
       break;
 
     case 'map2sat_pretrained':
-      name = "map";
+      name = "Map";
       break;
 
     case 'edges2pikachu':
-      name = "pikachu";
+      name = "Pikachu";
       break;
 
     default:
-      name = "error";
+      name = model.charAt(0).toUpperCase() + model.slice(1);
       break;
   }
 
+  console.log(getName);
   return name;
 } // <li class="menu-item"><p>${state.activeLayer}</p></li>
 //         <li class="menu-item"><button onclick=${() => emit('addLayer')}>+</button></li>
@@ -37731,7 +38243,7 @@ exports.modelPalettes = {
 
 function paintBucketStore(state, emitter) {
   emitter.on('changeLayer', layerIdx => {
-    const activeLayer = state.app.layers[layerIdx];
+    const activeLayer = state.app.layers[layerIdx - 1];
 
     if (activeLayer != null && activeLayer.model in exports.modelPalettes) {
       const palette = exports.modelPalettes[activeLayer.model];
@@ -37757,6 +38269,7 @@ function paintBucketStore(state, emitter) {
       const totalColors = Object.keys(palette);
       state.app.paintbucket.colorIdx = (state.app.paintbucket.colorIdx + 1) % totalColors.length;
       state.app.paintbucket.colorName = totalColors[state.app.paintbucket.colorIdx];
+      emitter.emit('switchTool', 'fill');
       emitter.emit('setFill', palette[state.app.paintbucket.colorName]);
     }
   });
@@ -37821,6 +38334,7 @@ function initialState(state, emit) {
       },
       activeLayer: 1,
       layers: [],
+      availableModels: [],
       localModels: {},
       paintbucket: {
         active: true,
@@ -37842,5 +38356,174 @@ function mainView(state, emit) {
             ${right_view_1.rightView(state, emit)}
         </body>`;
 }
-},{"choo":"../node_modules/choo/index.js","choo/html":"../node_modules/choo/html/index.js","choo-devtools":"../node_modules/choo-devtools/index.js","./components/paper_canvas":"components/paper_canvas.ts","./components/mirror":"components/mirror.ts","./components/left_view":"components/left_view.ts","./components/right_view":"components/right_view.ts","./local-models":"local-models.ts","./model-palettes":"model-palettes.ts"}]},{},["app.ts"], null)
-//# sourceMappingURL=/app.c61986b1.map
+},{"choo":"../node_modules/choo/index.js","choo/html":"../node_modules/choo/html/index.js","choo-devtools":"../node_modules/choo-devtools/index.js","./components/paper_canvas":"components/paper_canvas.ts","./components/mirror":"components/mirror.ts","./components/left_view":"components/left_view.ts","./components/right_view":"components/right_view.ts","./local-models":"local-models.ts","./model-palettes":"model-palettes.ts"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+var global = arguments[3];
+var OVERLAY_ID = '__parcel__error__overlay__';
+var OldModule = module.bundle.Module;
+
+function Module(moduleName) {
+  OldModule.call(this, moduleName);
+  this.hot = {
+    data: module.bundle.hotData,
+    _acceptCallbacks: [],
+    _disposeCallbacks: [],
+    accept: function (fn) {
+      this._acceptCallbacks.push(fn || function () {});
+    },
+    dispose: function (fn) {
+      this._disposeCallbacks.push(fn);
+    }
+  };
+  module.bundle.hotData = null;
+}
+
+module.bundle.Module = Module;
+var parent = module.bundle.parent;
+
+if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
+  var hostname = "" || location.hostname;
+  var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "50793" + '/');
+
+  ws.onmessage = function (event) {
+    var data = JSON.parse(event.data);
+
+    if (data.type === 'update') {
+      console.clear();
+      data.assets.forEach(function (asset) {
+        hmrApply(global.parcelRequire, asset);
+      });
+      data.assets.forEach(function (asset) {
+        if (!asset.isNew) {
+          hmrAccept(global.parcelRequire, asset.id);
+        }
+      });
+    }
+
+    if (data.type === 'reload') {
+      ws.close();
+
+      ws.onclose = function () {
+        location.reload();
+      };
+    }
+
+    if (data.type === 'error-resolved') {
+      console.log('[parcel] ✨ Error resolved');
+      removeErrorOverlay();
+    }
+
+    if (data.type === 'error') {
+      console.error('[parcel] 🚨  ' + data.error.message + '\n' + data.error.stack);
+      removeErrorOverlay();
+      var overlay = createErrorOverlay(data);
+      document.body.appendChild(overlay);
+    }
+  };
+}
+
+function removeErrorOverlay() {
+  var overlay = document.getElementById(OVERLAY_ID);
+
+  if (overlay) {
+    overlay.remove();
+  }
+}
+
+function createErrorOverlay(data) {
+  var overlay = document.createElement('div');
+  overlay.id = OVERLAY_ID; // html encode message and stack trace
+
+  var message = document.createElement('div');
+  var stackTrace = document.createElement('pre');
+  message.innerText = data.error.message;
+  stackTrace.innerText = data.error.stack;
+  overlay.innerHTML = '<div style="background: black; font-size: 16px; color: white; position: fixed; height: 100%; width: 100%; top: 0px; left: 0px; padding: 30px; opacity: 0.85; font-family: Menlo, Consolas, monospace; z-index: 9999;">' + '<span style="background: red; padding: 2px 4px; border-radius: 2px;">ERROR</span>' + '<span style="top: 2px; margin-left: 5px; position: relative;">🚨</span>' + '<div style="font-size: 18px; font-weight: bold; margin-top: 20px;">' + message.innerHTML + '</div>' + '<pre>' + stackTrace.innerHTML + '</pre>' + '</div>';
+  return overlay;
+}
+
+function getParents(bundle, id) {
+  var modules = bundle.modules;
+
+  if (!modules) {
+    return [];
+  }
+
+  var parents = [];
+  var k, d, dep;
+
+  for (k in modules) {
+    for (d in modules[k][1]) {
+      dep = modules[k][1][d];
+
+      if (dep === id || Array.isArray(dep) && dep[dep.length - 1] === id) {
+        parents.push(k);
+      }
+    }
+  }
+
+  if (bundle.parent) {
+    parents = parents.concat(getParents(bundle.parent, id));
+  }
+
+  return parents;
+}
+
+function hmrApply(bundle, asset) {
+  var modules = bundle.modules;
+
+  if (!modules) {
+    return;
+  }
+
+  if (modules[asset.id] || !bundle.parent) {
+    var fn = new Function('require', 'module', 'exports', asset.generated.js);
+    asset.isNew = !modules[asset.id];
+    modules[asset.id] = [fn, asset.deps];
+  } else if (bundle.parent) {
+    hmrApply(bundle.parent, asset);
+  }
+}
+
+function hmrAccept(bundle, id) {
+  var modules = bundle.modules;
+
+  if (!modules) {
+    return;
+  }
+
+  if (!modules[id] && bundle.parent) {
+    return hmrAccept(bundle.parent, id);
+  }
+
+  var cached = bundle.cache[id];
+  bundle.hotData = {};
+
+  if (cached) {
+    cached.hot.data = bundle.hotData;
+  }
+
+  if (cached && cached.hot && cached.hot._disposeCallbacks.length) {
+    cached.hot._disposeCallbacks.forEach(function (cb) {
+      cb(bundle.hotData);
+    });
+  }
+
+  delete bundle.cache[id];
+  bundle(id);
+  cached = bundle.cache[id];
+
+  if (cached && cached.hot && cached.hot._acceptCallbacks.length) {
+    cached.hot._acceptCallbacks.forEach(function (cb) {
+      cb();
+    });
+
+    return true;
+  }
+
+  return getParents(global.parcelRequire, id).some(function (id) {
+    return hmrAccept(global.parcelRequire, id);
+  });
+}
+},{}]},{},["../node_modules/parcel-bundler/src/builtins/hmr-runtime.js","app.ts"], null)
+//# sourceMappingURL=app.c61986b1.map
