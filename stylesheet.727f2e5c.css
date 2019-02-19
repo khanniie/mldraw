@@ -1,0 +1,301 @@
+ul {
+    padding: 0;
+}
+
+.menu-item {
+    list-style-type: none;
+    padding: 0.5em;
+    display: inline-block;
+}
+
+.layer{
+  width: 90%;
+  position: relative;
+  margin-left: 3%;
+  height: 2em;
+  line-height: 2em;
+  padding-left: 0.5em;
+  border-top: solid 2px #e0afdb;
+}
+
+.layer-container{
+  background :#f2d5E5;
+  width: 100%;
+}
+
+.layer_info_container{
+  width: 100%;
+  background-color: white;
+}
+
+.dropdown {
+  position: absolute;
+  right: 0.1em;
+  display: inline-block;
+  background-color: #e0afdb;
+  border-radius: 2px;
+  padding-left: 0.3em;
+  padding-right: 0.3em;
+  color: white;
+  height: 1.8em;
+  width: 3.5em;
+  text-align: center;
+  top: 0.3em;
+  line-height: 1.8em;
+  font-size: 0.8em;
+  font-weight: 600;
+}
+
+.selected{
+  border: 2px solid #6164bf;
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.dropdown-content {
+  text-align: left;
+  display: none;
+  position: absolute;
+  margin-left: 3.25em;
+  margin-top: -20vh;
+  min-width: 160px;
+  border: #6164bf 2px solid;
+  border-radius: 4px;
+  z-index: 1;
+
+  background-color:white;
+
+}
+
+
+
+.dropdown-content a {
+  padding: 6px;
+  color: #6164bf;
+  font-size: 1.2em;
+  text-decoration: none;
+  display: block;
+}
+
+.dropdown-content a:hover {
+  background-color: #e0afdb;
+  color: white;
+}
+
+.dropdown:hover {
+  background-color: #6164bf;
+  color: white;
+}
+
+.dropdown:hover .dropdown-content {display: block;}
+
+.layer:nth-child(1){
+  border-top: solid 0px #e0afdb;
+}
+
+#layer-menu{
+  width: 256px;
+  border: #6164bf 2px solid;
+  position: relative;
+  background-color: white;
+}
+
+#container{
+  float:left;
+  clear:left;
+}
+
+#cat{
+  height: 4em;
+}
+
+.border{
+  display: inline-block;
+}
+
+canvas{
+  display: inline-block;
+}
+
+html, body{
+  width: 100%;
+  height: 100%;
+  padding: 0px;
+  padding-top: 0.5em;
+  margin: 0px;
+  color:#6164bf;
+  overflow: scroll;
+  font-family: 'Inconsolata', monospace;
+  background-color: #F5F5f1;
+}
+
+#left{
+  margin-left: 2em;
+  position: relative;
+  height: 100%;
+  left: 0px;
+  top: 0px;
+  width: 70vh;
+  float:left;
+}
+
+#right{
+  float: right;
+  padding-top: 3vh;
+  margin-left: 2em;
+  width:  calc(100% - 70vh - 4em);
+}
+
+#bar{
+  width: 100%;
+  height: auto;
+}
+
+#toolbar{
+  position: relative;
+  display: inline-block;
+  margin-top: 2vh;
+  height: 11vh;
+  min-height: 4em;
+  border: #6164bf 2px solid;
+  position: relative;
+  background-color: #f2d5E5;
+  background-image: url('grid.1dcebfdb.png');
+  background-size: contain;
+}
+
+#bar-info-container{
+  width: 100%;
+  background-color: white;
+}
+
+#bar-info{
+  background-color: white;
+  height: 1.25em;
+  line-height: 1.25em;
+}
+
+#bar-info img{
+  margin-right: 1em;
+}
+
+@keyframes shake {
+  10%, 90% {
+    transform: translate3d(-1px, 0, 0);
+  }
+
+  20%, 80% {
+    transform: translate3d(2px, 0, 0);
+  }
+
+  30%, 50%, 70% {
+    transform: translate3d(-4px, 0, 0);
+  }
+
+  40%, 60% {
+    transform: translate3d(4px, 0, 0);
+  }
+}
+
+#icons{
+  height: 100%;
+  vertical-align: middle;
+  width: 65vh;
+}
+
+#icons img{
+  width: 10%;
+  margin: 2%;
+  margin-top: 1%;
+}
+
+#icons img:hover{
+  animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+#mirror{
+  width: 256px;
+  height: autos;
+  padding: 0px;
+
+}
+
+.cutebox{
+  border: #6164bf 2px solid;
+  border-radius: 8px;
+  background-color: white;
+  overflow: hidden;
+  width: 65vh;
+  min-width: 256px;
+  /* box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.2); */
+}
+.cutebox_info{
+  width: 94%;
+  margin-left: 3%;
+  height: 2em;
+  line-height: 2em;
+  border-bottom: double #6164bf 4px;
+}
+
+.layer_info{
+  height: 2em;
+  background-color:white;
+  line-height: 2em;
+}
+
+#add{
+  color: #6164bf;
+  position: absolute;
+  right: 3%;
+  top: 0.35em;
+  padding: 5px;
+  padding-top: 3px;
+  padding-bottom: 3px;
+  border: solid #6164bf 2px;
+}
+#add:hover{
+  background-color: #f2d5E5;
+}
+
+#paper{
+  position: relative;
+}
+
+.cutebox_info img{
+  height: 40%;
+  margin-right: 1em;
+}
+
+.layer_info img{
+  height: 40%;
+}
+
+#paper-canvas{
+  width: 65vh;
+  height: 65vh;
+  min-width: 256px;
+  min-height: 256px;
+  padding: 0px;
+  position: relative;
+}
+
+canvas{
+  width: 100% !important;
+  height: 100% !important;
+}
+
+#render-img{
+  height: 100%;
+}
+
+#render{
+  position: absolute;
+  height: 4em;
+  max-width: 8%;
+  bottom: 0.3em;
+  right: 3.8em;
+}
+
+#mirror-info{
+  height: 1.5em;
+  line-height: 1.5em;
+}
