@@ -17,6 +17,7 @@ export interface AppState {
     },
     activeLayer: number,
     layers: Layer[],
+    availableModels: string[],
     localModels: {[key:string]: string},
     paintbucket: {
         active: boolean,
@@ -49,7 +50,8 @@ export interface Events {
     loadmodel: string,
     loadedmodel: string,
     setFill: string | boolean,
-    paintbucketclicked: string
+    paintbucketclicked: string,
+    addModel: string
 }
 
 // type magic ~

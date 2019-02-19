@@ -22,14 +22,11 @@ const objMap = (obj, fn) => {
 
 class LocalModels {
     models: {[key: string]: Promise<ML5Model>}
-    
     constructor() {
         this.models = objMap(modelUrls, url => ml5.pix2pix(url))
-        console.log(this.models)
     }
 
     async loadModel(modelName: string) {
-        if(this.models[modelName].ready) console.log('loading model ' + modelName)
         return await this.models[modelName]
     }
 
@@ -50,6 +47,7 @@ export const localModels = new LocalModels()
 export function localModelsStore(state: State, emitter: Emitter) {
     state.app.localModels = objMap(modelUrls, name => 'notLoaded')
     emitter.on('loadmodel', async (name) => {
+        if(state.app.localModels[name] == 'loaded') return
         state.app.localModels[name] = 'loading'
         await localModels.loadModel(name)
         emitter.emit('loadedmodel', name)

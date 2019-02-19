@@ -7,21 +7,19 @@ import {mirrorView} from './mirror_component'
 
 const pawprint = require('./../assets/pawprint.svg')
 
-function dropdownContent(emit:Emit, layer, i:number, state){
+function dropdownContent(emit:Emit, layer, i:number, state: AppState){
     return html`<div class="dropdown-content">
-     <a href="#" onclick=${() => changeModel(state, i, 'edges2cat')}>Cat</a>
-     <a href="#" onclick=${() => changeModel(state, i, 'edges2handbag')}>Handbag</a>
-     <a href="#" onclick=${() => changeModel(state, i, 'edges2shoes_pretrained')}>Shoe</a>
-     <a href="#" onclick=${() => changeModel(state, i, 'map2sat_pretrained')}>Map</a>
-     <a href="#" onclick=${() => changeModel(state, i, 'edges2pikachu')}>Pikachu</a>
+      ${state.availableModels.map(modelName => 
+        html`<a href="#" onclick=${() => changeModel(state, i, modelName)}>${getName(modelName)}</a>`
+      )}
    </div>`;
   }
 
-  function changeModel(appState:AppState, idx, model){
-    appState.layers[idx].model = model;
-    console.log("model changed idx: ", idx);
-    console.log('current state', appState);
-  }
+function changeModel(appState:AppState, idx, model){
+  appState.layers[idx].model = model;
+  console.log("model changed idx: ", idx);
+  console.log('current state', appState);
+}
 
 function showDropdown(event){
   var targetElement = event.target || event.srcElement;
@@ -47,31 +45,30 @@ function layerBuilder(state: AppState, emit: Emit) {
     </div>`
 }
 
-//should probably find a nicer way to map mdoel names to their backend namespace later
-
+//should probably find a nicer way to map model names to their backend namespace later
 function getName( model : string){
-  console.log(model);
   let name = "error";
   switch (model){
     case ('edges2cat'):
-      name = "cat"
+      name = "Cat"
       break
     case ('edges2handbag'):
-      name = "bag"
+      name = "Bag"
       break
     case ('edges2shoes_pretrained'):
-      name = "shoes"
+      name = "Shoes"
       break
     case ('map2sat_pretrained'):
-      name = "map"
+      name = "Map"
       break
     case ('edges2pikachu'):
-      name = "pikachu"
+      name = "Pikachu"
       break
     default:
-      name = "error"
+      name = model.charAt(0).toUpperCase() + model.slice(1)
       break;
   }
+  console.log(getName)
   return name
 }
 

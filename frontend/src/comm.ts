@@ -101,6 +101,10 @@ export class Comm {
         return Object.keys(this.model2url).concat(localModels.available_models())
     }
 
+    is_local_model(name: string) {
+        return localModels.available_models().indexOf(name) != -1
+    }
+
     async send(tag: Operation, data: ImageData): Promise<ReplyMessage | ErrorMessage> {
         if(localModels.available_models().includes(tag)) return localModels.execute(tag, data)
         if(!(tag in this.model2url)) throw new Error(`No model connected with name ${tag}, available: ${this.available_models()}`)
