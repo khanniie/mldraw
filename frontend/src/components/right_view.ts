@@ -6,10 +6,11 @@ import html from 'choo/html'
 import {mirrorView} from './mirror_component'
 
 const pawprint = require('./../assets/pawprint.svg')
+const arrow = require('./../assets/arrow.png')
 
 function dropdownContent(emit:Emit, layer, i:number, state: AppState){
     return html`<div class="dropdown-content">
-      ${state.availableModels.map(modelName => 
+      ${state.availableModels.map(modelName =>
         html`<a href="#" onclick=${() => changeModel(state, i, modelName)}>${getName(modelName)}</a>`
       )}
    </div>`;
@@ -58,7 +59,7 @@ function getName( model : string){
     case ('edges2shoes_pretrained'):
       name = "Shoes"
       break
-    case ('map2sat_pretrained'):
+    case ('sat2map_pretrained'):
       name = "Map"
       break
     case ('edges2pikachu'):
@@ -71,15 +72,6 @@ function getName( model : string){
   console.log(getName)
   return name
 }
-
-// <li class="menu-item"><p>${state.activeLayer}</p></li>
-//         <li class="menu-item"><button onclick=${() => emit('addLayer')}>+</button></li>
-//         <li class="menu-item"><input type="checkbox" onclick=${({srcElement}) => emit('setSmoothness', srcElement.checked)} name="smooth">
-//         <label for="smooth">smooth</label>
-//         </li>
-//         <li class="menu-item"><input type="checkbox" onclick=${({srcElement}) => emit('setClosed', srcElement.checked)} name="closed" checked>
-//         <label for="closed">closed</label>
-//         </li>
 
 function layer(state: AppState, l: Layer, emit: Emit, i, selected:boolean){
     console.log(l);
@@ -100,8 +92,14 @@ function layer(state: AppState, l: Layer, emit: Emit, i, selected:boolean){
 
 export function rightView(state: choo.IState, emit: Emit) {
     return html`
-    <div id="right">
-        ${mirrorView(state, emit)}
+<div id="rest">
+
+        <div id="right">
         ${layerBuilder(state.app, emit)}
+    </div>
+    <div id="middle">
+      ${mirrorView(state, emit)}
+      <img id="arrow" src=${arrow}>
+    </div>
     </div>`
 }
