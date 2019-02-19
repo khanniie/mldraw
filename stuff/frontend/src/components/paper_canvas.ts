@@ -158,11 +158,40 @@ const make_paper = (component: PaperCanvasComponent,
     }
 
     fillTool.onMouseDown = function(event: paper.ToolEvent) {
+        project.activate()
         if(fill) {
-            event.item.fillColor = fillColor
-            event.item.strokeColor = "#00000000"
+            if(event.item instanceof paper.Path) {
+                let path = event.item
+                path.fillColor = fillColor
+                path.strokeColor = "#00000000"
+    
+            } else if(event.item != null) {
+                const group = event.item
+                let hitInfos = group.hitTestAll(event.point)
+                hitInfos = hitInfos.filter(hi => hi.item && hi.item instanceof paper.Path)
+                if(hitInfos.length == 0) return
+                const smallest = hitInfos[0]
+                let path = (smallest.item ? smallest.item : smallest) as paper.Path
+                path.fillColor = fillColor
+                path.strokeColor = "#00000000"    
+            }
         }
     }
+
+    fillTool.onMouseMove = function(event) {
+        project.activate()
+        project.activeLayer.selected = false;
+
+        let hitResult = project.activeLayer.hitTestAll(event.point);
+        if(hitResult[0] != undefined && hitResult[0].item) {
+          hitResult[0].item.selected = true
+          selectedObject = hitResult[0]
+        } else {
+          selectedObject = null
+        }
+    }
+
+
 
     function rasterize():  [ImageData, paper.Group] {
         project.activate()
@@ -337,6 +366,11 @@ export class PaperCanvasComponent extends Component {
         make_paper(this, newcanvas, element, this.comm, this.emit)
         setTimeout(() => this.emit('isConnected'), 1)
         setTimeout(() => this.emit('addLayer'), 20)
+        setTimeout(() => {
+            for(const modelName of this.comm.available_models()) {
+                this.emit('addModel', modelName)
+            }
+        })
     }
 
     update(state: AppState) {
@@ -399,9 +433,9 @@ export function paperStore(state: State, emitter: Emitter) {
         state.cache(PaperCanvasComponent, 'paper-canvas').sketch.setFill(color)
     })
 
-    emitter.on('setModelForLayer', (layerIdx, model) => {
-        state.cache(PaperCanvasComponent, 'paper-canvas').sketch.setModelForLayer(layerIdx, model)
-
+    // TODO: make a comm reducer
+    emitter.on('addModel', (modelName) => {
+        state.app.availableModels.push(modelName)
     })
 
 }

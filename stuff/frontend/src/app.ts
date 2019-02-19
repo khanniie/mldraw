@@ -29,6 +29,7 @@ function initialState(state: choo.IState, emit: Emit) {
             },
             activeLayer: 1, 
             layers: [],
+            availableModels: [],
             localModels: {},
             paintbucket: {
                 active: true,
