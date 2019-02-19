@@ -7,8 +7,8 @@
  * UI Types
  */
 
-type Layer = {  layer: paper.Layer, group: paper.Group, model: string }
- 
+export type Layer = {  layer: paper.Layer, group: paper.Group, model: string }
+
 // Our application's state
 export interface AppState {
     server: {
