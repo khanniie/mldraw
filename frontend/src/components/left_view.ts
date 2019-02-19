@@ -14,7 +14,7 @@ const undo = require('./../assets/undo.png')
 const transform = require('./../assets/transform.png')
 const trash = require('./../assets/trash.png')
 const close = require('./../assets/close.svg')
-const more = require('./../assets/settings-work-tool.svg')
+const more = require('./../assets/more.png')
 
 function topBar(state: AppState, emit: Emit) {
     return html`
@@ -26,14 +26,24 @@ function topBar(state: AppState, emit: Emit) {
             tools
         </div></div>
         <div id="icons">
-            <img onclick=${() => emit('switchTool', 'draw')} src="${pencil}">
-            <img src="${eraser}">
-            <img onclick=${() => state.paintbucket.active ? emit('paintbucketclicked') : void''} 
+            <img class="icon" onclick=${() => emit('switchTool', 'draw')} src="${pencil}">
+            <img class="icon" src="${eraser}">
+            <img class="icon" onclick=${() => state.paintbucket.active ? emit('paintbucketclicked') : void''}
                 src="${paintbucket}" style=${state.paintbucket.active ? '""' : "opacity:50%"}>
-            <img src="${undo}">
-            <img onclick=${() => emit('switchTool', 'drag')} src="${transform}">
-            <img onclick=${() => emit('clear')} src="${trash}">
-            <img src="${more}">
+            <img class="icon" src="${undo}">
+            <img class="icon" onclick=${() => emit('switchTool', 'drag')} src="${transform}">
+            <img class="icon" onclick=${() => emit('clear')} src="${trash}">
+            <div class="icon" id="dropdown-s"><img src="${more}">
+            <div class="dropdown-content-settings">
+            <ul>
+                     <li class="menu-item"><input type="checkbox" onclick=${({srcElement}) => emit('setSmoothness', srcElement.checked)} name="smooth">
+                     <label for="smooth">smooth</label>
+                     </li>
+                     <li class="menu-item"><input type="checkbox" onclick=${({srcElement}) => emit('setClosed', srcElement.checked)} name="closed" checked>
+                     <label for="closed">closed</label>
+                     </li>
+            </ul>
+            </div></div>
         </div>
         </div>
     </div>`

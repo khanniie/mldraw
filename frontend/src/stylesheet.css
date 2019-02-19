@@ -8,6 +8,11 @@ ul {
     display: inline-block;
 }
 
+#arrow{
+  margin: 20px;
+  width: 160px;
+}
+
 .layer{
   width: 90%;
   position: relative;
@@ -61,12 +66,8 @@ ul {
   border: #6164bf 2px solid;
   border-radius: 4px;
   z-index: 1;
-
   background-color:white;
-
 }
-
-
 
 .dropdown-content a {
   padding: 6px;
@@ -88,11 +89,33 @@ ul {
 
 .dropdown:hover .dropdown-content {display: block;}
 
+
+#dropdown-s {
+  display: inline-block;
+}
+
+.dropdown-content-settings {
+  text-align: left;
+  display: none;
+  position: absolute;
+  bottom:0px;
+  left: 3em;
+  min-width: 160px;
+  border: #6164bf 2px solid;
+  border-radius: 4px;
+  z-index: 1;
+  background-color:white;
+}
+
+#dropdown-s:hover .dropdown-content-settings {display: block;}
+
+
 .layer:nth-child(1){
   border-top: solid 0px #e0afdb;
 }
 
 #layer-menu{
+  margin: 0px;
   width: 256px;
   border: #6164bf 2px solid;
   position: relative;
@@ -138,11 +161,28 @@ html, body{
   float:left;
 }
 
-#right{
+#rest{
+  float: left;
+}
+
+#middle{
+  padding-right: 2em;
+  height: 100%;
   float: right;
-  padding-top: 3vh;
-  margin-left: 2em;
-  width:  calc(100% - 70vh - 4em);
+  width: auto;
+}
+
+#right{
+  height: 100%;
+  float: right;
+}
+
+#dropdown-s{
+  margin: 0px;
+}
+
+#dropdown-s img{
+  width:100%;
 }
 
 #bar{
@@ -178,6 +218,8 @@ html, body{
   margin-right: 1em;
 }
 
+
+
 @keyframes shake {
   10%, 90% {
     transform: translate3d(-1px, 0, 0);
@@ -202,14 +244,15 @@ html, body{
   width: 65vh;
 }
 
-#icons img{
+.icon{
   width: 10%;
   margin: 2%;
   margin-top: 1%;
 }
 
-#icons img:hover{
+.icon:hover{
   animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both;
+  transform: translate3d(0, 0, 0);
 }
 
 #mirror{
