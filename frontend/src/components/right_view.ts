@@ -69,7 +69,6 @@ function getName( model : string){
       name = model.charAt(0).toUpperCase() + model.slice(1)
       break;
   }
-  console.log(getName)
   return name
 }
 

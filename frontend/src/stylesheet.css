@@ -87,7 +87,10 @@ ul {
   color: white;
 }
 
-.dropdown:hover .dropdown-content {display: block;}
+.dropdown:hover .dropdown-content {
+  display: block;
+  margin-top: 0.0em;
+}
 
 
 #dropdown-s {
@@ -341,4 +344,10 @@ canvas{
 #mirror-info{
   height: 1.5em;
   line-height: 1.5em;
+}
+
+#paintbucketInfo {
+  position: absolute;
+  padding-left: 5%;
+  text-align: center;
 }

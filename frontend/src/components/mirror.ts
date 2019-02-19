@@ -41,7 +41,6 @@ const make_mirror = (component: MirrorComponent,
             image.src = 'data:image/png;base64,' + bytes
             image.width = 256
             image.height = 256
-            document.body.appendChild(image)
         }
         const raster = new paper.Raster(image, new paper.Point(128, 128))
         clippingPath.visible = true
