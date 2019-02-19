@@ -14,6 +14,7 @@ const undo = require('./../assets/undo.png')
 const transform = require('./../assets/transform.png')
 const trash = require('./../assets/trash.png')
 const close = require('./../assets/close.svg')
+const more = require('./../assets/settings-work-tool.svg')
 
 function topBar(state: AppState, emit: Emit) {
     return html`
@@ -32,6 +33,7 @@ function topBar(state: AppState, emit: Emit) {
             <img src="${undo}">
             <img onclick=${() => emit('switchTool', 'drag')} src="${transform}">
             <img onclick=${() => emit('clear')} src="${trash}">
+            <img src="${more}">
         </div>
         </div>
     </div>`

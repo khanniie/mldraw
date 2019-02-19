@@ -15,14 +15,14 @@ export const modelPalettes = {
         cornice: "#ff4401",
         column: "#f60001",
         entrance: "#00c9ff",
-  
+
     }
 }
 
 export function paintBucketStore(state: State, emitter: Emitter) {
     emitter.on('changeLayer', (layerIdx) => {
-        const activeLayer = state.app.layers[layerIdx - 1]
-        if(activeLayer.model in modelPalettes) {
+        const activeLayer = state.app.layers[layerIdx]
+        if(activeLayer != null && activeLayer.model in modelPalettes) {
             const palette = modelPalettes[activeLayer.model]
             state.app.paintbucket.active = true
             state.app.paintbucket.palette = palette
