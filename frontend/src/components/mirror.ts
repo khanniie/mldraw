@@ -26,7 +26,14 @@ const make_mirror = (component: MirrorComponent,
                     emit: Emit) => {
     // Create an empty project and a view for the canvas:
     const project = new paper.Project(canvas)
-    console.log('mirror', project)
+    let background = new paper.Layer(); //background
+    background.activate()
+    background.name = 'background'
+    const {width: viewWidth, height: viewHeight} = paper.project.view.bounds
+    let rec = new paper.Rectangle(0, 0, background.bounds.width, background.bounds.height)
+    let path_rec = new paper.Path.Rectangle(rec)
+    path_rec.fillColor = '#ffffff'
+    project.addLayer(background)
     //new paper.View()
     let appState
 
@@ -60,14 +67,14 @@ const make_mirror = (component: MirrorComponent,
 
     function switchLayer(idx: number) {
         project.activate()
-        console.log(idx, project.layers)
+        console.log("switch layer", idx, project.layers);
         project.layers[idx].activate()
     }
 
     function clear() {
         project.activeLayer.removeChildren()
     }
-    
+
     component.sketch = {
         drawOutput, clear, switchLayer, addLayer
     }

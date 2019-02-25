@@ -42,7 +42,7 @@ const make_paper = (component: PaperCanvasComponent,
 
     console.log(paper)
     var pathBeingDrawn: paper.Path
-    addLayer()
+
 
     drawTool.onMouseDown = function (event) {
         project.activate()
@@ -289,17 +289,22 @@ const make_paper = (component: PaperCanvasComponent,
     function addLayer() {
         project.activate()
         const layer = new paper.Layer()
+        let idx = layer.index;
         const clippingGroup = new paper.Group()
         const mirrorLayer = null
         clippingGroup.name = 'clippingGroup'
         project.addLayer(layer)
-        return {
+        console.log("lmao", project.activeLayer, project.layers);
+        return [project.activeLayer.index, {
             layer, clippingGroup, model: 'edges2shoes_pretrained', mirrorLayer
-        }
+        }];
     }
 
     function switchLayer(idx: number) {
         project.activate()
+        //blunt force solution - optimize later to just be current layer toggle
+        project.layers.map((lyr:paper.Layer) => (lyr.opacity = 0.2));
+        project.layers[idx].opacity = 1
         project.layers[idx].activate()
         console.log("active layer:", project.activeLayer);
     }
@@ -451,7 +456,9 @@ export function paperStore(state: State, emitter: Emitter) {
     })
 
     emitter.on('addLayer', () => {
-        state.app.layers.push(state.cache(PaperCanvasComponent, 'paper-canvas').sketch.addLayer())
+        let res = state.cache(PaperCanvasComponent, 'paper-canvas').sketch.addLayer()
+        state.app.layers.push(res[1]);
+        emitter.emit('changeLayer', res[0] + 1);
         emitter.emit('render')
     })
 
