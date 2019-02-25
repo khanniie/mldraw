@@ -21,7 +21,6 @@ const make_paper = (component: PaperCanvasComponent,
     canvas: HTMLCanvasElement, element, comm: Comm,
     emit: Emit) => {
     const project = new paper.Project(canvas)
-    console.log('papercanvas', project)
     let background = new paper.Layer(); //background
     background.activate()
     background.name = 'background'
@@ -30,7 +29,7 @@ const make_paper = (component: PaperCanvasComponent,
     let path_rec = new paper.Path.Rectangle(rec)
     path_rec.fillColor = '#ffffff'
     project.addLayer(background)
-    
+
     let fill = false;
     let fillColor: string;
     let smoothing = false;
@@ -38,6 +37,7 @@ const make_paper = (component: PaperCanvasComponent,
     let dragTool = new paper.Tool();
     let drawTool = new paper.Tool();
     let fillTool = new paper.Tool();
+    let cutTool = new paper.Tool();
     drawTool.activate();
 
     console.log(paper)
@@ -54,7 +54,6 @@ const make_paper = (component: PaperCanvasComponent,
             name: 'temp'
         })
         pathBeingDrawn.closed = autoclose
-
     }
 
     drawTool.onMouseDrag = function (event) {
@@ -74,7 +73,6 @@ const make_paper = (component: PaperCanvasComponent,
         pathBeingDrawn.selected = false
         pathBeingDrawn.fillColor = "#FF000001"
         if(smoothing) pathBeingDrawn.simplify(10);
-        //console.log(project.activeLayer.name, project.layers)
         if(project.activeLayer.children['clippingGroup']){
           project.activeLayer.children['clippingGroup'].addChild(pathBeingDrawn)
         } else {
@@ -83,7 +81,6 @@ const make_paper = (component: PaperCanvasComponent,
           clippingGroup.name = 'clippingGroup'
           project.activeLayer.children['clippingGroup'].addChild(pathBeingDrawn)
         }
-
         if (pathBeingDrawn) {
             pathBeingDrawn.selected = false
         }
@@ -157,6 +154,46 @@ const make_paper = (component: PaperCanvasComponent,
     	}
     }
 
+
+    cutTool.onMouseMove = function(event) {
+        let hitOptions = {
+            segments: true,
+            stroke: true,
+            fill: true,
+            tolerance: 2
+        };
+        project.activeLayer.selected = false;
+
+        let hitResult = project.activeLayer.hitTestAll(event.point, hitOptions);
+        if(hitResult[0] != undefined && hitResult[0].item) {
+          hitResult[0].item.selected = true
+          selectedObject = hitResult[0]
+        } else {
+          selectedObject = null
+        }
+    }
+
+
+    cutTool.onMouseDown = function(event: paper.ToolEvent) {
+        project.activate()
+        console.log(event.item);
+        let item = event.item;
+        if(item instanceof paper.Path) {
+            item.remove();
+
+        } else if(event.item != null) {
+            const group = event.item
+            let hitInfos = group.hitTestAll(event.point)
+            // hitInfos = hitInfos.filter(hi => hi.item && hi.item instanceof paper.Path)
+            // if(hitInfos.length == 0) return
+            const smallest = hitInfos[0]
+            let path = (smallest.item ? smallest.item : smallest) as paper.Path
+            path.remove();
+        }
+    }
+
+
+
     fillTool.onMouseDown = function(event: paper.ToolEvent) {
         project.activate()
         if(fill) {
@@ -164,7 +201,7 @@ const make_paper = (component: PaperCanvasComponent,
                 let path = event.item
                 path.fillColor = fillColor
                 path.strokeColor = "#00000000"
-    
+
             } else if(event.item != null) {
                 const group = event.item
                 let hitInfos = group.hitTestAll(event.point)
@@ -173,7 +210,7 @@ const make_paper = (component: PaperCanvasComponent,
                 const smallest = hitInfos[0]
                 let path = (smallest.item ? smallest.item : smallest) as paper.Path
                 path.fillColor = fillColor
-                path.strokeColor = "#00000000"    
+                path.strokeColor = "#00000000"
             }
         }
     }
@@ -191,13 +228,11 @@ const make_paper = (component: PaperCanvasComponent,
         }
     }
 
-
-
     function rasterize():  [ImageData, paper.Group] {
         project.activate()
         const {x: unscaledX, y: unscaledY, width, height} = paper.project.activeLayer.bounds // how far "off the page" the top left corner is
         const {width: viewWidth, height: viewHeight} = paper.project.view.bounds
-        const bgRect = new paper.Path.Rectangle(new paper.Rectangle(Math.min(0, unscaledX), Math.min(unscaledY, 0), 
+        const bgRect = new paper.Path.Rectangle(new paper.Rectangle(Math.min(0, unscaledX), Math.min(unscaledY, 0),
             Math.max(width, viewWidth), Math.max(height, viewHeight)))
         bgRect.fillColor = "#ffffff"
         bgRect.sendToBack()
@@ -286,6 +321,9 @@ const make_paper = (component: PaperCanvasComponent,
 
     function switchTool(tool){
         switch (tool) {
+            case 'cut':
+                cutTool.activate();
+                break;
             case 'drag':
                 dragTool.activate();
                 break;
