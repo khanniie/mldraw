@@ -78,7 +78,6 @@ function clearButton(emit: Emit) {
 export function leftView(state: choo.IState, emit: Emit) {
     return html`
     <div id="left">
-        <img id="cat" src=${logo}/>
         ${drawView(state, emit)}
         ${topBar(state.app, emit)}
     </div>`
