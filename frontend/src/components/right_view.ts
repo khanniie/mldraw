@@ -74,7 +74,6 @@ function getName( model : string){
 }
 
 function layer(state: AppState, l: Layer, emit: Emit, i, selected:boolean){
-    console.log(l);
     let modelname = getName(l.model);
     return html`
       <div class="layer ${selected ? 'selected' : ''}" onclick=${() => emit('changeLayer', i + 1)}>${"layer " + (i + 1)}
