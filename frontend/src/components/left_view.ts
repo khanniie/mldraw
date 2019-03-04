@@ -20,7 +20,7 @@ function topBar(state: AppState, emit: Emit) {
     return html`
     <div id="bar">
         <div id="toolbar">
-        <div id="bar-info-container">
+        <div id="bar-info">
         <div id="bar-info" class="cutebox_info">
             <img src=${close}/>
             tools
@@ -77,7 +77,7 @@ function clearButton(emit: Emit) {
 
 export function leftView(state: choo.IState, emit: Emit) {
     return html`
-    <div id="left">
+    <div id="left" class="column">
         ${drawView(state, emit)}
         ${topBar(state.app, emit)}
     </div>`

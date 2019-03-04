@@ -93,10 +93,10 @@ export function rightView(state: choo.IState, emit: Emit) {
     return html`
 <div id="rest">
 
-        <div id="right">
+        <div id="middle" class="column">
         ${layerBuilder(state.app, emit)}
     </div>
-    <div id="middle">
+    <div id="right" class="column">
       ${mirrorView(state, emit)}
     </div>
     </div>`
