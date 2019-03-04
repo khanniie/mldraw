@@ -30475,234 +30475,7 @@ function url (uri, loc) {
   return obj;
 }
 
-},{"parseuri":"../node_modules/parseuri/index.js","debug":"../node_modules/socket.io-client/node_modules/debug/src/browser.js"}],"../node_modules/socket.io-parser/node_modules/debug/src/debug.js":[function(require,module,exports) {
-
-/**
- * This is the common logic for both the Node.js and web browser
- * implementations of `debug()`.
- *
- * Expose `debug()` as the module.
- */
-
-exports = module.exports = createDebug.debug = createDebug['default'] = createDebug;
-exports.coerce = coerce;
-exports.disable = disable;
-exports.enable = enable;
-exports.enabled = enabled;
-exports.humanize = require('ms');
-
-/**
- * Active `debug` instances.
- */
-exports.instances = [];
-
-/**
- * The currently active debug mode names, and names to skip.
- */
-
-exports.names = [];
-exports.skips = [];
-
-/**
- * Map of special "%n" handling functions, for the debug "format" argument.
- *
- * Valid key names are a single, lower or upper-case letter, i.e. "n" and "N".
- */
-
-exports.formatters = {};
-
-/**
- * Select a color.
- * @param {String} namespace
- * @return {Number}
- * @api private
- */
-
-function selectColor(namespace) {
-  var hash = 0, i;
-
-  for (i in namespace) {
-    hash  = ((hash << 5) - hash) + namespace.charCodeAt(i);
-    hash |= 0; // Convert to 32bit integer
-  }
-
-  return exports.colors[Math.abs(hash) % exports.colors.length];
-}
-
-/**
- * Create a debugger with the given `namespace`.
- *
- * @param {String} namespace
- * @return {Function}
- * @api public
- */
-
-function createDebug(namespace) {
-
-  var prevTime;
-
-  function debug() {
-    // disabled?
-    if (!debug.enabled) return;
-
-    var self = debug;
-
-    // set `diff` timestamp
-    var curr = +new Date();
-    var ms = curr - (prevTime || curr);
-    self.diff = ms;
-    self.prev = prevTime;
-    self.curr = curr;
-    prevTime = curr;
-
-    // turn the `arguments` into a proper Array
-    var args = new Array(arguments.length);
-    for (var i = 0; i < args.length; i++) {
-      args[i] = arguments[i];
-    }
-
-    args[0] = exports.coerce(args[0]);
-
-    if ('string' !== typeof args[0]) {
-      // anything else let's inspect with %O
-      args.unshift('%O');
-    }
-
-    // apply any `formatters` transformations
-    var index = 0;
-    args[0] = args[0].replace(/%([a-zA-Z%])/g, function(match, format) {
-      // if we encounter an escaped % then don't increase the array index
-      if (match === '%%') return match;
-      index++;
-      var formatter = exports.formatters[format];
-      if ('function' === typeof formatter) {
-        var val = args[index];
-        match = formatter.call(self, val);
-
-        // now we need to remove `args[index]` since it's inlined in the `format`
-        args.splice(index, 1);
-        index--;
-      }
-      return match;
-    });
-
-    // apply env-specific formatting (colors, etc.)
-    exports.formatArgs.call(self, args);
-
-    var logFn = debug.log || exports.log || console.log.bind(console);
-    logFn.apply(self, args);
-  }
-
-  debug.namespace = namespace;
-  debug.enabled = exports.enabled(namespace);
-  debug.useColors = exports.useColors();
-  debug.color = selectColor(namespace);
-  debug.destroy = destroy;
-
-  // env-specific initialization logic for debug instances
-  if ('function' === typeof exports.init) {
-    exports.init(debug);
-  }
-
-  exports.instances.push(debug);
-
-  return debug;
-}
-
-function destroy () {
-  var index = exports.instances.indexOf(this);
-  if (index !== -1) {
-    exports.instances.splice(index, 1);
-    return true;
-  } else {
-    return false;
-  }
-}
-
-/**
- * Enables a debug mode by namespaces. This can include modes
- * separated by a colon and wildcards.
- *
- * @param {String} namespaces
- * @api public
- */
-
-function enable(namespaces) {
-  exports.save(namespaces);
-
-  exports.names = [];
-  exports.skips = [];
-
-  var i;
-  var split = (typeof namespaces === 'string' ? namespaces : '').split(/[\s,]+/);
-  var len = split.length;
-
-  for (i = 0; i < len; i++) {
-    if (!split[i]) continue; // ignore empty strings
-    namespaces = split[i].replace(/\*/g, '.*?');
-    if (namespaces[0] === '-') {
-      exports.skips.push(new RegExp('^' + namespaces.substr(1) + '$'));
-    } else {
-      exports.names.push(new RegExp('^' + namespaces + '$'));
-    }
-  }
-
-  for (i = 0; i < exports.instances.length; i++) {
-    var instance = exports.instances[i];
-    instance.enabled = exports.enabled(instance.namespace);
-  }
-}
-
-/**
- * Disable debug output.
- *
- * @api public
- */
-
-function disable() {
-  exports.enable('');
-}
-
-/**
- * Returns true if the given mode name is enabled, false otherwise.
- *
- * @param {String} name
- * @return {Boolean}
- * @api public
- */
-
-function enabled(name) {
-  if (name[name.length - 1] === '*') {
-    return true;
-  }
-  var i, len;
-  for (i = 0, len = exports.skips.length; i < len; i++) {
-    if (exports.skips[i].test(name)) {
-      return false;
-    }
-  }
-  for (i = 0, len = exports.names.length; i < len; i++) {
-    if (exports.names[i].test(name)) {
-      return true;
-    }
-  }
-  return false;
-}
-
-/**
- * Coerce `val`.
- *
- * @param {Mixed} val
- * @return {Mixed}
- * @api private
- */
-
-function coerce(val) {
-  if (val instanceof Error) return val.stack || val.message;
-  return val;
-}
-
-},{"ms":"../node_modules/ms/index.js"}],"../node_modules/socket.io-parser/node_modules/debug/src/browser.js":[function(require,module,exports) {
+},{"parseuri":"../node_modules/parseuri/index.js","debug":"../node_modules/socket.io-client/node_modules/debug/src/browser.js"}],"../node_modules/socket.io-parser/node_modules/debug/src/browser.js":[function(require,module,exports) {
 var process = require("process");
 /**
  * This is the web browser implementation of `debug()`.
@@ -30866,7 +30639,7 @@ function localstorage() {
     return window.localStorage;
   } catch (e) {}
 }
-},{"./debug":"../node_modules/socket.io-parser/node_modules/debug/src/debug.js","process":"../node_modules/process/browser.js"}],"../node_modules/component-emitter/index.js":[function(require,module,exports) {
+},{"./debug":"../node_modules/socket.io-client/node_modules/debug/src/debug.js","process":"../node_modules/process/browser.js"}],"../node_modules/component-emitter/index.js":[function(require,module,exports) {
 
 /**
  * Expose `Emitter`.
@@ -31029,13 +30802,6 @@ Emitter.prototype.listeners = function(event){
 
 Emitter.prototype.hasListeners = function(event){
   return !! this.listeners(event).length;
-};
-
-},{}],"../node_modules/socket.io-parser/node_modules/isarray/index.js":[function(require,module,exports) {
-var toString = {}.toString;
-
-module.exports = Array.isArray || function (arr) {
-  return toString.call(arr) == '[object Array]';
 };
 
 },{}],"../node_modules/socket.io-parser/is-buffer.js":[function(require,module,exports) {
@@ -31209,7 +30975,7 @@ exports.removeBlobs = function(data, callback) {
   }
 };
 
-},{"isarray":"../node_modules/socket.io-parser/node_modules/isarray/index.js","./is-buffer":"../node_modules/socket.io-parser/is-buffer.js"}],"../node_modules/socket.io-parser/index.js":[function(require,module,exports) {
+},{"isarray":"../node_modules/isarray/index.js","./is-buffer":"../node_modules/socket.io-parser/is-buffer.js"}],"../node_modules/socket.io-parser/index.js":[function(require,module,exports) {
 
 /**
  * Module dependencies.
@@ -31628,7 +31394,7 @@ function error(msg) {
   };
 }
 
-},{"debug":"../node_modules/socket.io-parser/node_modules/debug/src/browser.js","component-emitter":"../node_modules/component-emitter/index.js","./binary":"../node_modules/socket.io-parser/binary.js","isarray":"../node_modules/socket.io-parser/node_modules/isarray/index.js","./is-buffer":"../node_modules/socket.io-parser/is-buffer.js"}],"../node_modules/has-cors/index.js":[function(require,module,exports) {
+},{"debug":"../node_modules/socket.io-parser/node_modules/debug/src/browser.js","component-emitter":"../node_modules/component-emitter/index.js","./binary":"../node_modules/socket.io-parser/binary.js","isarray":"../node_modules/isarray/index.js","./is-buffer":"../node_modules/socket.io-parser/is-buffer.js"}],"../node_modules/has-cors/index.js":[function(require,module,exports) {
 
 /**
  * Module exports.
@@ -31708,13 +31474,6 @@ module.exports = Object.keys || function keys (obj){
   return arr;
 };
 
-},{}],"../node_modules/has-binary2/node_modules/isarray/index.js":[function(require,module,exports) {
-var toString = {}.toString;
-
-module.exports = Array.isArray || function (arr) {
-  return toString.call(arr) == '[object Array]';
-};
-
 },{}],"../node_modules/has-binary2/index.js":[function(require,module,exports) {
 var Buffer = require("buffer").Buffer;
 /* global Blob File */
@@ -31782,7 +31541,7 @@ function hasBinary (obj) {
   return false;
 }
 
-},{"isarray":"../node_modules/has-binary2/node_modules/isarray/index.js","buffer":"../node_modules/buffer/index.js"}],"../node_modules/arraybuffer.slice/index.js":[function(require,module,exports) {
+},{"isarray":"../node_modules/isarray/index.js","buffer":"../node_modules/buffer/index.js"}],"../node_modules/arraybuffer.slice/index.js":[function(require,module,exports) {
 /**
  * An abstraction for slicing an arraybuffer even when
  * ArrayBuffer.prototype.slice is not supported
@@ -33161,234 +32920,7 @@ yeast.encode = encode;
 yeast.decode = decode;
 module.exports = yeast;
 
-},{}],"../node_modules/engine.io-client/node_modules/debug/src/debug.js":[function(require,module,exports) {
-
-/**
- * This is the common logic for both the Node.js and web browser
- * implementations of `debug()`.
- *
- * Expose `debug()` as the module.
- */
-
-exports = module.exports = createDebug.debug = createDebug['default'] = createDebug;
-exports.coerce = coerce;
-exports.disable = disable;
-exports.enable = enable;
-exports.enabled = enabled;
-exports.humanize = require('ms');
-
-/**
- * Active `debug` instances.
- */
-exports.instances = [];
-
-/**
- * The currently active debug mode names, and names to skip.
- */
-
-exports.names = [];
-exports.skips = [];
-
-/**
- * Map of special "%n" handling functions, for the debug "format" argument.
- *
- * Valid key names are a single, lower or upper-case letter, i.e. "n" and "N".
- */
-
-exports.formatters = {};
-
-/**
- * Select a color.
- * @param {String} namespace
- * @return {Number}
- * @api private
- */
-
-function selectColor(namespace) {
-  var hash = 0, i;
-
-  for (i in namespace) {
-    hash  = ((hash << 5) - hash) + namespace.charCodeAt(i);
-    hash |= 0; // Convert to 32bit integer
-  }
-
-  return exports.colors[Math.abs(hash) % exports.colors.length];
-}
-
-/**
- * Create a debugger with the given `namespace`.
- *
- * @param {String} namespace
- * @return {Function}
- * @api public
- */
-
-function createDebug(namespace) {
-
-  var prevTime;
-
-  function debug() {
-    // disabled?
-    if (!debug.enabled) return;
-
-    var self = debug;
-
-    // set `diff` timestamp
-    var curr = +new Date();
-    var ms = curr - (prevTime || curr);
-    self.diff = ms;
-    self.prev = prevTime;
-    self.curr = curr;
-    prevTime = curr;
-
-    // turn the `arguments` into a proper Array
-    var args = new Array(arguments.length);
-    for (var i = 0; i < args.length; i++) {
-      args[i] = arguments[i];
-    }
-
-    args[0] = exports.coerce(args[0]);
-
-    if ('string' !== typeof args[0]) {
-      // anything else let's inspect with %O
-      args.unshift('%O');
-    }
-
-    // apply any `formatters` transformations
-    var index = 0;
-    args[0] = args[0].replace(/%([a-zA-Z%])/g, function(match, format) {
-      // if we encounter an escaped % then don't increase the array index
-      if (match === '%%') return match;
-      index++;
-      var formatter = exports.formatters[format];
-      if ('function' === typeof formatter) {
-        var val = args[index];
-        match = formatter.call(self, val);
-
-        // now we need to remove `args[index]` since it's inlined in the `format`
-        args.splice(index, 1);
-        index--;
-      }
-      return match;
-    });
-
-    // apply env-specific formatting (colors, etc.)
-    exports.formatArgs.call(self, args);
-
-    var logFn = debug.log || exports.log || console.log.bind(console);
-    logFn.apply(self, args);
-  }
-
-  debug.namespace = namespace;
-  debug.enabled = exports.enabled(namespace);
-  debug.useColors = exports.useColors();
-  debug.color = selectColor(namespace);
-  debug.destroy = destroy;
-
-  // env-specific initialization logic for debug instances
-  if ('function' === typeof exports.init) {
-    exports.init(debug);
-  }
-
-  exports.instances.push(debug);
-
-  return debug;
-}
-
-function destroy () {
-  var index = exports.instances.indexOf(this);
-  if (index !== -1) {
-    exports.instances.splice(index, 1);
-    return true;
-  } else {
-    return false;
-  }
-}
-
-/**
- * Enables a debug mode by namespaces. This can include modes
- * separated by a colon and wildcards.
- *
- * @param {String} namespaces
- * @api public
- */
-
-function enable(namespaces) {
-  exports.save(namespaces);
-
-  exports.names = [];
-  exports.skips = [];
-
-  var i;
-  var split = (typeof namespaces === 'string' ? namespaces : '').split(/[\s,]+/);
-  var len = split.length;
-
-  for (i = 0; i < len; i++) {
-    if (!split[i]) continue; // ignore empty strings
-    namespaces = split[i].replace(/\*/g, '.*?');
-    if (namespaces[0] === '-') {
-      exports.skips.push(new RegExp('^' + namespaces.substr(1) + '$'));
-    } else {
-      exports.names.push(new RegExp('^' + namespaces + '$'));
-    }
-  }
-
-  for (i = 0; i < exports.instances.length; i++) {
-    var instance = exports.instances[i];
-    instance.enabled = exports.enabled(instance.namespace);
-  }
-}
-
-/**
- * Disable debug output.
- *
- * @api public
- */
-
-function disable() {
-  exports.enable('');
-}
-
-/**
- * Returns true if the given mode name is enabled, false otherwise.
- *
- * @param {String} name
- * @return {Boolean}
- * @api public
- */
-
-function enabled(name) {
-  if (name[name.length - 1] === '*') {
-    return true;
-  }
-  var i, len;
-  for (i = 0, len = exports.skips.length; i < len; i++) {
-    if (exports.skips[i].test(name)) {
-      return false;
-    }
-  }
-  for (i = 0, len = exports.names.length; i < len; i++) {
-    if (exports.names[i].test(name)) {
-      return true;
-    }
-  }
-  return false;
-}
-
-/**
- * Coerce `val`.
- *
- * @param {Mixed} val
- * @return {Mixed}
- * @api private
- */
-
-function coerce(val) {
-  if (val instanceof Error) return val.stack || val.message;
-  return val;
-}
-
-},{"ms":"../node_modules/ms/index.js"}],"../node_modules/engine.io-client/node_modules/debug/src/browser.js":[function(require,module,exports) {
+},{}],"../node_modules/engine.io-client/node_modules/debug/src/browser.js":[function(require,module,exports) {
 var process = require("process");
 /**
  * This is the web browser implementation of `debug()`.
@@ -33552,7 +33084,7 @@ function localstorage() {
     return window.localStorage;
   } catch (e) {}
 }
-},{"./debug":"../node_modules/engine.io-client/node_modules/debug/src/debug.js","process":"../node_modules/process/browser.js"}],"../node_modules/engine.io-client/lib/transports/polling.js":[function(require,module,exports) {
+},{"./debug":"../node_modules/socket.io-client/node_modules/debug/src/debug.js","process":"../node_modules/process/browser.js"}],"../node_modules/engine.io-client/lib/transports/polling.js":[function(require,module,exports) {
 /**
  * Module dependencies.
  */
@@ -37322,7 +36854,6 @@ let debugcanvas;
 
 const make_paper = (component, canvas, element, comm, emit) => {
   const project = new paperfix_1.paper.Project(canvas);
-  console.log('papercanvas', project);
   let background = new paperfix_1.paper.Layer(); //background
 
   background.activate();
@@ -37342,10 +36873,10 @@ const make_paper = (component, canvas, element, comm, emit) => {
   let dragTool = new paperfix_1.paper.Tool();
   let drawTool = new paperfix_1.paper.Tool();
   let fillTool = new paperfix_1.paper.Tool();
+  let cutTool = new paperfix_1.paper.Tool();
   drawTool.activate();
   console.log(paperfix_1.paper);
   var pathBeingDrawn;
-  addLayer();
 
   drawTool.onMouseDown = function (event) {
     project.activate();
@@ -37377,7 +36908,7 @@ const make_paper = (component, canvas, element, comm, emit) => {
 
     pathBeingDrawn.selected = false;
     pathBeingDrawn.fillColor = "#FF000001";
-    if (smoothing) pathBeingDrawn.simplify(10); //console.log(project.activeLayer.name, project.layers)
+    if (smoothing) pathBeingDrawn.simplify(10);
 
     if (project.activeLayer.children['clippingGroup']) {
       project.activeLayer.children['clippingGroup'].addChild(pathBeingDrawn);
@@ -37455,6 +36986,42 @@ const make_paper = (component, canvas, element, comm, emit) => {
       path.position.x += event.delta.x;
       path.position.y += event.delta.y;
       console.log("shifting position, pos after", path.position);
+    }
+  };
+
+  cutTool.onMouseMove = function (event) {
+    let hitOptions = {
+      segments: true,
+      stroke: true,
+      fill: true,
+      tolerance: 2
+    };
+    project.activeLayer.selected = false;
+    let hitResult = project.activeLayer.hitTestAll(event.point, hitOptions);
+
+    if (hitResult[0] != undefined && hitResult[0].item) {
+      hitResult[0].item.selected = true;
+      selectedObject = hitResult[0];
+    } else {
+      selectedObject = null;
+    }
+  };
+
+  cutTool.onMouseDown = function (event) {
+    project.activate();
+    console.log(event.item);
+    let item = event.item;
+
+    if (item instanceof paperfix_1.paper.Path) {
+      item.remove();
+    } else if (event.item != null) {
+      const group = event.item;
+      let hitInfos = group.hitTestAll(event.point); // hitInfos = hitInfos.filter(hi => hi.item && hi.item instanceof paper.Path)
+      // if(hitInfos.length == 0) return
+
+      const smallest = hitInfos[0];
+      let path = smallest.item ? smallest.item : smallest;
+      path.remove();
     }
   };
 
@@ -37569,20 +37136,25 @@ const make_paper = (component, canvas, element, comm, emit) => {
   function addLayer() {
     project.activate();
     const layer = new paperfix_1.paper.Layer();
+    let idx = layer.index;
     const clippingGroup = new paperfix_1.paper.Group();
     const mirrorLayer = null;
     clippingGroup.name = 'clippingGroup';
     project.addLayer(layer);
-    return {
+    console.log("lmao", project.activeLayer, project.layers);
+    return [project.activeLayer.index, {
       layer,
       clippingGroup,
       model: 'edges2shoes_pretrained',
       mirrorLayer
-    };
+    }];
   }
 
   function switchLayer(idx) {
-    project.activate();
+    project.activate(); //blunt force solution - optimize later to just be current layer toggle
+
+    project.layers.map(lyr => lyr.opacity = 0.2);
+    project.layers[idx].opacity = 1;
     project.layers[idx].activate();
     console.log("active layer:", project.activeLayer);
   }
@@ -37604,6 +37176,10 @@ const make_paper = (component, canvas, element, comm, emit) => {
 
   function switchTool(tool) {
     switch (tool) {
+      case 'cut':
+        cutTool.activate();
+        break;
+
       case 'drag':
         dragTool.activate();
         break;
@@ -37715,7 +37291,9 @@ function paperStore(state, emitter) {
     emitter.emit('render');
   });
   emitter.on('addLayer', () => {
-    state.app.layers.push(state.cache(PaperCanvasComponent, 'paper-canvas').sketch.addLayer());
+    let res = state.cache(PaperCanvasComponent, 'paper-canvas').sketch.addLayer();
+    state.app.layers.push(res[1]);
+    emitter.emit('changeLayer', res[0] + 1);
     emitter.emit('render');
   });
   emitter.on('setSmoothness', smooth => {
@@ -37798,7 +37376,18 @@ function copy(fromArr, toArr) {
 const make_mirror = (component, canvas, element, emit) => {
   // Create an empty project and a view for the canvas:
   const project = new paperfix_1.paper.Project(canvas);
-  console.log('mirror', project); //new paper.View()
+  let background = new paperfix_1.paper.Layer(); //background
+
+  background.activate();
+  background.name = 'background';
+  const {
+    width: viewWidth,
+    height: viewHeight
+  } = paperfix_1.paper.project.view.bounds;
+  let rec = new paperfix_1.paper.Rectangle(0, 0, background.bounds.width, background.bounds.height);
+  let path_rec = new paperfix_1.paper.Path.Rectangle(rec);
+  path_rec.fillColor = '#ffffff';
+  project.addLayer(background); //new paper.View()
 
   let appState;
 
@@ -37814,7 +37403,6 @@ const make_mirror = (component, canvas, element, emit) => {
       image.src = 'data:image/png;base64,' + bytes;
       image.width = 256;
       image.height = 256;
-      document.body.appendChild(image);
     }
 
     const raster = new paperfix_1.paper.Raster(image, new paperfix_1.paper.Point(128, 128));
@@ -37835,7 +37423,7 @@ const make_mirror = (component, canvas, element, emit) => {
 
   function switchLayer(idx) {
     project.activate();
-    console.log(idx, project.layers);
+    console.log("switch layer", idx, project.layers);
     project.layers[idx].activate();
   }
 
@@ -37902,9 +37490,9 @@ function mirrorStore(state, emitter) {
 
 exports.mirrorStore = mirrorStore;
 },{"choo/html":"../node_modules/choo/html/index.js","choo/component":"../node_modules/choo/component/index.js","../paperfix":"paperfix.ts"}],"assets/heart.svg":[function(require,module,exports) {
-module.exports = "heart.7b7c65cd.svg";
+module.exports = "/heart.7b7c65cd.svg";
 },{}],"assets/render.png":[function(require,module,exports) {
-module.exports = "render.4dc221d6.png";
+module.exports = "/render.4dc221d6.png";
 },{}],"components/drawing_component.ts":[function(require,module,exports) {
 "use strict";
 
@@ -37947,25 +37535,25 @@ function renderButton(emit) {
     `;
 }
 },{"./paper_canvas":"components/paper_canvas.ts","choo/html":"../node_modules/choo/html/index.js","./../assets/heart.svg":"assets/heart.svg","./../assets/render.png":"assets/render.png"}],"assets/logo.png":[function(require,module,exports) {
-module.exports = "logo.e9a9c890.png";
+module.exports = "/logo.e9a9c890.png";
 },{}],"assets/toolbar-naked.png":[function(require,module,exports) {
-module.exports = "toolbar-naked.4dcfa482.png";
+module.exports = "/toolbar-naked.4dcfa482.png";
 },{}],"assets/paintbucket.png":[function(require,module,exports) {
-module.exports = "paintbucket.15067ddf.png";
+module.exports = "/paintbucket.15067ddf.png";
 },{}],"assets/eraser.png":[function(require,module,exports) {
-module.exports = "eraser.b1af06ee.png";
+module.exports = "/eraser.b1af06ee.png";
 },{}],"assets/pencil.png":[function(require,module,exports) {
-module.exports = "pencil.78cb9ffc.png";
+module.exports = "/pencil.78cb9ffc.png";
 },{}],"assets/undo.png":[function(require,module,exports) {
-module.exports = "undo.35314a16.png";
+module.exports = "/undo.35314a16.png";
 },{}],"assets/transform.png":[function(require,module,exports) {
-module.exports = "transform.377f7918.png";
+module.exports = "/transform.377f7918.png";
 },{}],"assets/trash.png":[function(require,module,exports) {
-module.exports = "trash.fff166ad.png";
+module.exports = "/trash.fff166ad.png";
 },{}],"assets/close.svg":[function(require,module,exports) {
-module.exports = "close.bff3a284.svg";
-},{}],"assets/settings-work-tool.svg":[function(require,module,exports) {
-module.exports = "settings-work-tool.f8a1f90d.svg";
+module.exports = "/close.bff3a284.svg";
+},{}],"assets/more.png":[function(require,module,exports) {
+module.exports = "/more.334f2b5e.png";
 },{}],"components/left_view.ts":[function(require,module,exports) {
 "use strict";
 
@@ -38001,7 +37589,7 @@ const trash = require('./../assets/trash.png');
 
 const close = require('./../assets/close.svg');
 
-const more = require('./../assets/settings-work-tool.svg');
+const more = require('./../assets/more.png');
 
 function topBar(state, emit) {
   return html_1.default`
@@ -38013,14 +37601,28 @@ function topBar(state, emit) {
             tools
         </div></div>
         <div id="icons">
-            <img onclick=${() => emit('switchTool', 'draw')} src="${pencil}">
-            <img src="${eraser}">
-            <img onclick=${() => state.paintbucket.active ? emit('paintbucketclicked') : void ''} 
-                src="${paintbucket}" style=${state.paintbucket.active ? '""' : "opacity:50%"}>
-            <img src="${undo}">
-            <img onclick=${() => emit('switchTool', 'drag')} src="${transform}">
-            <img onclick=${() => emit('clear')} src="${trash}">
-            <img src="${more}">
+            <img class="icon" onclick=${() => emit('switchTool', 'draw')} src="${pencil}">
+            <img class="icon" src="${eraser}" onclick=${() => emit('switchTool', 'cut')}">
+            <span id="paintbucketInfo">${state.paintbucket.active ? state.paintbucket.colorName : ''}</span>
+            <img class="icon" onclick=${() => emit('paintbucketclicked')} src="${paintbucket}">
+            <img class="icon" src="${undo}">
+            <img class="icon" onclick=${() => emit('switchTool', 'drag')} src="${transform}">
+            <img class="icon" onclick=${() => emit('clear')} src="${trash}">
+            <div class="icon" id="dropdown-s"><img src="${more}">
+            <div class="dropdown-content-settings">
+            <ul>
+                     <li class="menu-item"><input type="checkbox" onclick=${({
+    srcElement
+  }) => emit('setSmoothness', srcElement.checked)} name="smooth">
+                     <label for="smooth">smooth</label>
+                     </li>
+                     <li class="menu-item"><input type="checkbox" onclick=${({
+    srcElement
+  }) => emit('setClosed', srcElement.checked)} name="closed" checked>
+                     <label for="closed">closed</label>
+                     </li>
+            </ul>
+            </div></div>
         </div>
         </div>
     </div>`;
@@ -38054,15 +37656,14 @@ function clearButton(emit) {
 function leftView(state, emit) {
   return html_1.default`
     <div id="left">
-        <img id="cat" src=${logo}/>
         ${drawing_component_1.drawView(state, emit)}
         ${topBar(state.app, emit)}
     </div>`;
 }
 
 exports.leftView = leftView;
-},{"choo/html":"../node_modules/choo/html/index.js","./drawing_component":"components/drawing_component.ts","./../assets/logo.png":"assets/logo.png","./../assets/toolbar-naked.png":"assets/toolbar-naked.png","./../assets/paintbucket.png":"assets/paintbucket.png","./../assets/eraser.png":"assets/eraser.png","./../assets/pencil.png":"assets/pencil.png","./../assets/undo.png":"assets/undo.png","./../assets/transform.png":"assets/transform.png","./../assets/trash.png":"assets/trash.png","./../assets/close.svg":"assets/close.svg","./../assets/settings-work-tool.svg":"assets/settings-work-tool.svg"}],"assets/star.svg":[function(require,module,exports) {
-module.exports = "star.7e46d871.svg";
+},{"choo/html":"../node_modules/choo/html/index.js","./drawing_component":"components/drawing_component.ts","./../assets/logo.png":"assets/logo.png","./../assets/toolbar-naked.png":"assets/toolbar-naked.png","./../assets/paintbucket.png":"assets/paintbucket.png","./../assets/eraser.png":"assets/eraser.png","./../assets/pencil.png":"assets/pencil.png","./../assets/undo.png":"assets/undo.png","./../assets/transform.png":"assets/transform.png","./../assets/trash.png":"assets/trash.png","./../assets/close.svg":"assets/close.svg","./../assets/more.png":"assets/more.png"}],"assets/star.svg":[function(require,module,exports) {
+module.exports = "/star.7e46d871.svg";
 },{}],"components/mirror_component.ts":[function(require,module,exports) {
 "use strict";
 
@@ -38085,15 +37686,18 @@ const star = require('./../assets/star.svg');
 function mirrorView(state, emit) {
   return html_1.default`
     <div id="mirror" class="cutebox">
+    <div id="loading">
     <div id="mirror-info" class="cutebox_info"> <img src=${star}/> rendered view </div>
         ${state.cache(mirror_1.MirrorComponent, 'mirror-canvas').render(state.app)}
-    </div>
+    </div></div>
     `;
 }
 
 exports.mirrorView = mirrorView;
 },{"./mirror":"components/mirror.ts","choo/html":"../node_modules/choo/html/index.js","./../assets/star.svg":"assets/star.svg"}],"assets/pawprint.svg":[function(require,module,exports) {
-module.exports = "pawprint.ffd285ae.svg";
+module.exports = "/pawprint.ffd285ae.svg";
+},{}],"assets/arrow.png":[function(require,module,exports) {
+module.exports = "/arrow.e7fcdb9b.png";
 },{}],"components/right_view.ts":[function(require,module,exports) {
 "use strict";
 
@@ -38112,6 +37716,8 @@ const html_1 = __importDefault(require("choo/html"));
 const mirror_component_1 = require("./mirror_component");
 
 const pawprint = require('./../assets/pawprint.svg');
+
+const arrow = require('./../assets/arrow.png');
 
 function dropdownContent(emit, layer, i, state) {
   return html_1.default`<div class="dropdown-content">
@@ -38166,7 +37772,7 @@ function getName(model) {
       name = "Shoes";
       break;
 
-    case 'map2sat_pretrained':
+    case 'sat2map_pretrained':
       name = "Map";
       break;
 
@@ -38179,17 +37785,8 @@ function getName(model) {
       break;
   }
 
-  console.log(getName);
   return name;
-} // <li class="menu-item"><p>${state.activeLayer}</p></li>
-//         <li class="menu-item"><button onclick=${() => emit('addLayer')}>+</button></li>
-//         <li class="menu-item"><input type="checkbox" onclick=${({srcElement}) => emit('setSmoothness', srcElement.checked)} name="smooth">
-//         <label for="smooth">smooth</label>
-//         </li>
-//         <li class="menu-item"><input type="checkbox" onclick=${({srcElement}) => emit('setClosed', srcElement.checked)} name="closed" checked>
-//         <label for="closed">closed</label>
-//         </li>
-
+}
 
 function layer(state, l, emit, i, selected) {
   console.log(l);
@@ -38210,14 +37807,48 @@ function layer(state, l, emit, i, selected) {
 
 function rightView(state, emit) {
   return html_1.default`
-    <div id="right">
-        ${mirror_component_1.mirrorView(state, emit)}
+<div id="rest">
+
+        <div id="right">
         ${layerBuilder(state.app, emit)}
+    </div>
+    <div id="middle">
+      ${mirror_component_1.mirrorView(state, emit)}
+    </div>
     </div>`;
 }
 
 exports.rightView = rightView;
-},{"choo/html":"../node_modules/choo/html/index.js","./mirror_component":"components/mirror_component.ts","./../assets/pawprint.svg":"assets/pawprint.svg"}],"model-palettes.ts":[function(require,module,exports) {
+},{"choo/html":"../node_modules/choo/html/index.js","./mirror_component":"components/mirror_component.ts","./../assets/pawprint.svg":"assets/pawprint.svg","./../assets/arrow.png":"assets/arrow.png"}],"assets/logo1.png":[function(require,module,exports) {
+module.exports = "/logo1.810337e5.png";
+},{}],"components/top_view.ts":[function(require,module,exports) {
+"use strict";
+
+var __importDefault = this && this.__importDefault || function (mod) {
+  return mod && mod.__esModule ? mod : {
+    "default": mod
+  };
+};
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+const html_1 = __importDefault(require("choo/html"));
+
+const logo = require('./../assets/logo1.png');
+
+function topView(state, emit) {
+  return html_1.default`
+    <div id="top-container">
+    <div id="top">
+
+        <div id="cat">Mldraw!</div>
+    </div></div>`;
+}
+
+exports.topView = topView; // <img id="cat" src=${logo}/>
+},{"choo/html":"../node_modules/choo/html/index.js","./../assets/logo1.png":"assets/logo1.png"}],"model-palettes.ts":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -38243,27 +37874,41 @@ exports.modelPalettes = {
 
 function paintBucketStore(state, emitter) {
   emitter.on('changeLayer', layerIdx => {
-    const activeLayer = state.app.layers[layerIdx - 1];
+    if (!state.app.paintbucket.active) return;
+    const activeLayer = state.app.layers[layerIdx - 1]; // switching to layer without palette
 
-    if (activeLayer != null && activeLayer.model in exports.modelPalettes) {
-      const palette = exports.modelPalettes[activeLayer.model];
-      state.app.paintbucket.active = true;
-      state.app.paintbucket.palette = palette;
-      state.app.paintbucket.colorIdx = 0;
-      state.app.paintbucket.colorName = Object.keys(exports.modelPalettes[activeLayer.model])[0];
-      emitter.emit('setFill', palette[state.app.paintbucket.colorIdx]);
-    } else {
-      state.app.paintbucket.active = false;
+    if (activeLayer != null && !(activeLayer.model in exports.modelPalettes)) {
       emitter.emit('setFill', false);
+      emitter.emit('switchTool', 'draw');
+      emitter.emit('render');
+    } else {
+      if (exports.modelPalettes[activeLayer.model] != state.app.paintbucket.palette) {
+        state.app.paintbucket.palette = exports.modelPalettes[activeLayer.model];
+        state.app.paintbucket.colorIdx = 0;
+        state.app.paintbucket.colorName = '';
+      }
     }
-
-    emitter.emit('render');
   });
   emitter.on('paintbucketclicked', () => {
+    // if not yet active, activate if palette, otherwise do nothing
     if (!state.app.paintbucket.active) {
-      console.error('paint bucket deactivated but still got click :/');
-    } else if (!(state.app.layers[state.app.activeLayer - 1].model in exports.modelPalettes)) {
-      console.error(`no palette for model ${state.app.layers[state.app.activeLayer - 1].model} known`);
+      const hasPalette = state.app.layers[state.app.activeLayer - 1].model in exports.modelPalettes;
+
+      if (hasPalette) {
+        state.app.paintbucket.active = true; // if palette changed
+
+        if (!(exports.modelPalettes[state.app.layers[state.app.activeLayer - 1].model] == state.app.paintbucket.palette)) {
+          state.app.paintbucket.palette = exports.modelPalettes[state.app.layers[state.app.activeLayer - 1].model];
+          state.app.paintbucket.colorIdx = 0;
+          state.app.paintbucket.colorName = Object.keys(state.app.paintbucket.palette)[0];
+        }
+
+        emitter.emit('switchTool', 'fill');
+        emitter.emit('setFill', state.app.paintbucket.palette[state.app.paintbucket.colorName]);
+        emitter.emit('render');
+      } else {
+        state.app.paintbucket.active = false;
+      }
     } else {
       const palette = state.app.paintbucket.palette;
       const totalColors = Object.keys(palette);
@@ -38271,6 +37916,14 @@ function paintBucketStore(state, emitter) {
       state.app.paintbucket.colorName = totalColors[state.app.paintbucket.colorIdx];
       emitter.emit('switchTool', 'fill');
       emitter.emit('setFill', palette[state.app.paintbucket.colorName]);
+      emitter.emit('render');
+    }
+  }); // if switching away from paintbucket, deactivate
+
+  emitter.on('switchTool', tool => {
+    if (tool != 'fill') {
+      state.app.paintbucket.active = false;
+      emitter.emit('render');
     }
   });
 }
@@ -38310,6 +37963,8 @@ const mirror_1 = require("./components/mirror");
 const left_view_1 = require("./components/left_view");
 
 const right_view_1 = require("./components/right_view");
+
+const top_view_1 = require("./components/top_view");
 
 const local_models_1 = require("./local-models");
 
@@ -38352,178 +38007,10 @@ function mainView(state, emit) {
   return html_1.default`
         <body>
         ${!state.app.server.isConnected ? html_1.default`<p>trying to connecte to server...</p>` : ''}
+            ${top_view_1.topView(state, emit)}
             ${left_view_1.leftView(state, emit)}
             ${right_view_1.rightView(state, emit)}
         </body>`;
 }
-},{"choo":"../node_modules/choo/index.js","choo/html":"../node_modules/choo/html/index.js","choo-devtools":"../node_modules/choo-devtools/index.js","./components/paper_canvas":"components/paper_canvas.ts","./components/mirror":"components/mirror.ts","./components/left_view":"components/left_view.ts","./components/right_view":"components/right_view.ts","./local-models":"local-models.ts","./model-palettes":"model-palettes.ts"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
-var global = arguments[3];
-var OVERLAY_ID = '__parcel__error__overlay__';
-var OldModule = module.bundle.Module;
-
-function Module(moduleName) {
-  OldModule.call(this, moduleName);
-  this.hot = {
-    data: module.bundle.hotData,
-    _acceptCallbacks: [],
-    _disposeCallbacks: [],
-    accept: function (fn) {
-      this._acceptCallbacks.push(fn || function () {});
-    },
-    dispose: function (fn) {
-      this._disposeCallbacks.push(fn);
-    }
-  };
-  module.bundle.hotData = null;
-}
-
-module.bundle.Module = Module;
-var parent = module.bundle.parent;
-
-if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
-  var hostname = "" || location.hostname;
-  var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "50793" + '/');
-
-  ws.onmessage = function (event) {
-    var data = JSON.parse(event.data);
-
-    if (data.type === 'update') {
-      console.clear();
-      data.assets.forEach(function (asset) {
-        hmrApply(global.parcelRequire, asset);
-      });
-      data.assets.forEach(function (asset) {
-        if (!asset.isNew) {
-          hmrAccept(global.parcelRequire, asset.id);
-        }
-      });
-    }
-
-    if (data.type === 'reload') {
-      ws.close();
-
-      ws.onclose = function () {
-        location.reload();
-      };
-    }
-
-    if (data.type === 'error-resolved') {
-      console.log('[parcel] ✨ Error resolved');
-      removeErrorOverlay();
-    }
-
-    if (data.type === 'error') {
-      console.error('[parcel] 🚨  ' + data.error.message + '\n' + data.error.stack);
-      removeErrorOverlay();
-      var overlay = createErrorOverlay(data);
-      document.body.appendChild(overlay);
-    }
-  };
-}
-
-function removeErrorOverlay() {
-  var overlay = document.getElementById(OVERLAY_ID);
-
-  if (overlay) {
-    overlay.remove();
-  }
-}
-
-function createErrorOverlay(data) {
-  var overlay = document.createElement('div');
-  overlay.id = OVERLAY_ID; // html encode message and stack trace
-
-  var message = document.createElement('div');
-  var stackTrace = document.createElement('pre');
-  message.innerText = data.error.message;
-  stackTrace.innerText = data.error.stack;
-  overlay.innerHTML = '<div style="background: black; font-size: 16px; color: white; position: fixed; height: 100%; width: 100%; top: 0px; left: 0px; padding: 30px; opacity: 0.85; font-family: Menlo, Consolas, monospace; z-index: 9999;">' + '<span style="background: red; padding: 2px 4px; border-radius: 2px;">ERROR</span>' + '<span style="top: 2px; margin-left: 5px; position: relative;">🚨</span>' + '<div style="font-size: 18px; font-weight: bold; margin-top: 20px;">' + message.innerHTML + '</div>' + '<pre>' + stackTrace.innerHTML + '</pre>' + '</div>';
-  return overlay;
-}
-
-function getParents(bundle, id) {
-  var modules = bundle.modules;
-
-  if (!modules) {
-    return [];
-  }
-
-  var parents = [];
-  var k, d, dep;
-
-  for (k in modules) {
-    for (d in modules[k][1]) {
-      dep = modules[k][1][d];
-
-      if (dep === id || Array.isArray(dep) && dep[dep.length - 1] === id) {
-        parents.push(k);
-      }
-    }
-  }
-
-  if (bundle.parent) {
-    parents = parents.concat(getParents(bundle.parent, id));
-  }
-
-  return parents;
-}
-
-function hmrApply(bundle, asset) {
-  var modules = bundle.modules;
-
-  if (!modules) {
-    return;
-  }
-
-  if (modules[asset.id] || !bundle.parent) {
-    var fn = new Function('require', 'module', 'exports', asset.generated.js);
-    asset.isNew = !modules[asset.id];
-    modules[asset.id] = [fn, asset.deps];
-  } else if (bundle.parent) {
-    hmrApply(bundle.parent, asset);
-  }
-}
-
-function hmrAccept(bundle, id) {
-  var modules = bundle.modules;
-
-  if (!modules) {
-    return;
-  }
-
-  if (!modules[id] && bundle.parent) {
-    return hmrAccept(bundle.parent, id);
-  }
-
-  var cached = bundle.cache[id];
-  bundle.hotData = {};
-
-  if (cached) {
-    cached.hot.data = bundle.hotData;
-  }
-
-  if (cached && cached.hot && cached.hot._disposeCallbacks.length) {
-    cached.hot._disposeCallbacks.forEach(function (cb) {
-      cb(bundle.hotData);
-    });
-  }
-
-  delete bundle.cache[id];
-  bundle(id);
-  cached = bundle.cache[id];
-
-  if (cached && cached.hot && cached.hot._acceptCallbacks.length) {
-    cached.hot._acceptCallbacks.forEach(function (cb) {
-      cb();
-    });
-
-    return true;
-  }
-
-  return getParents(global.parcelRequire, id).some(function (id) {
-    return hmrAccept(global.parcelRequire, id);
-  });
-}
-},{}]},{},["../node_modules/parcel-bundler/src/builtins/hmr-runtime.js","app.ts"], null)
-//# sourceMappingURL=app.c61986b1.map
+},{"choo":"../node_modules/choo/index.js","choo/html":"../node_modules/choo/html/index.js","choo-devtools":"../node_modules/choo-devtools/index.js","./components/paper_canvas":"components/paper_canvas.ts","./components/mirror":"components/mirror.ts","./components/left_view":"components/left_view.ts","./components/right_view":"components/right_view.ts","./components/top_view":"components/top_view.ts","./local-models":"local-models.ts","./model-palettes":"model-palettes.ts"}]},{},["app.ts"], null)
+//# sourceMappingURL=/app.c61986b1.map

@@ -98,7 +98,6 @@ export function rightView(state: choo.IState, emit: Emit) {
     </div>
     <div id="middle">
       ${mirrorView(state, emit)}
-      <img id="arrow" src=${arrow}>
     </div>
     </div>`
 }

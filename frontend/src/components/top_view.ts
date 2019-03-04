@@ -9,6 +9,9 @@ export function topView(state: choo.IState, emit: Emit) {
     return html`
     <div id="top-container">
     <div id="top">
-        <img id="cat" src=${logo}/>
+
+        <div id="cat">Mldraw!</div>
     </div></div>`
 }
+
+        // <img id="cat" src=${logo}/>
