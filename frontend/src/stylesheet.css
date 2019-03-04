@@ -111,10 +111,17 @@ canvas{
 
 #cat{
   font-weight: 400;
-  margin-left: 1em;
+  margin-left: 0.5em;
   padding-top: 0.25em;
   padding-bottom: 0.25em;
   font-size: 2em;
+  display: inline-block;
+}
+
+#made-by{
+  padding: 0.25em;
+  display: inline-block;
+  float: right;
 }
 
 /* --- this is for layers -----  */
