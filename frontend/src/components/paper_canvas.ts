@@ -5,11 +5,9 @@ import html from 'choo/html'
 import Component from 'choo/component'
 import { State, AppState, Emit, Emitter } from '../types'
 
-import { paper } from '../paperfix'
+import { paperLocal as paper } from '../paperfix'
 import { Comm, serialize, Operation } from '../comm'
 import { doNothingIfRunning } from '../util'
-
-let debugcanvas
 
 type Layer = {
     model: string
