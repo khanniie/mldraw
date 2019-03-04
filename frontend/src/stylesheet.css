@@ -1,14 +1,372 @@
+/* ---- general settings ---- */
+
+html, body{
+  width: 100%;
+  height: 100%;
+  padding: 0px;
+  padding-top: 0em;
+  margin: 0px;
+  color: #6164bf;
+  font-family: 'Inconsolata', monospace;
+  background-color: #F5F5f1;
+}
+
+canvas{
+  display: inline-block;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* -- general layout of columns --- */
+
+.column{
+  height: 100%;
+  padding-left: 1em;
+  float: left;
+}
+
+/* ---- cute box! --- */
+
+.cutebox{
+  border: #6164bf 2px solid;
+  border-radius: 8px;
+  background-color: white;
+  overflow: hidden;
+  width: 65vh;
+  min-width: 256px;
+  /* box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.2); */
+}
+
+.cutebox_info{
+  width: 94%;
+  margin-left: 3%;
+  height: 2em;
+  line-height: 2em;
+  border-bottom: double #6164bf 4px;
+}
+
+.cutebox_info img{
+  height: 40%;
+  margin-right: 1em;
+}
+
+/* --- rest is "right view" -- */
+
+#rest{
+  height: 100%;
+}
+
+#middle{
+}
+
+#right{
+}
+
+/* -- drawing view -- */
+
+#paper{
+  position: relative;
+}
+
+#paper-canvas{
+  width: 65vh;
+  height: 65vh;
+  min-width: 256px;
+  min-height: 256px;
+  padding: 0px;
+  position: relative;
+}
+
+#render-img{
+  height: 100%;
+}
+
+#render{
+  position: absolute;
+  height: 4em;
+  max-width: 8%;
+  bottom: 0.3em;
+  right: 3.8em;
+}
+
+/* -- rendered view -- */
+
+#mirror-canvas{
+  width: 65vh;
+  height: 65vh;
+  min-width: 256px;
+  min-height: 256px;
+  padding: 0px;
+  position: relative;
+}
+
+/* ---- this is the top bar ---- */
+
+#top{
+  border-bottom: #6164bf 2px solid;
+  box-shadow: 0px 2px #C793C4;
+  background-color: #efe0ea;
+  margin-bottom: 1em;
+}
+
+#cat{
+  font-weight: 400;
+  margin-left: 1em;
+  padding-top: 0.25em;
+  padding-bottom: 0.25em;
+  font-size: 2em;
+}
+
+/* --- this is for layers -----  */
+
+.layer{
+  width: 90%;
+  position: relative;
+  margin-left: 3%;
+  height: 2em;
+  line-height: 2em;
+  padding-left: 0.5em;
+  border-top: solid 2px #e0afdb;
+}
+
+.layer img{
+  margin-top: 0.5em;
+  margin-right: 0.25em;
+  float: right;
+  height: 1em;
+}
+
+.layer-container{
+  background :#f2d5E5;
+  width: 100%;
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+}
+
+.layer_info_container{
+  width: 100%;
+  background-color: white;
+}
+
+.layer_info{
+  height: 2em;
+  background-color: white;
+  line-height: 2em;
+}
+
+.layer_info img{
+  height: 40%;
+}
+
+#layer-menu{
+  margin: 0px;
+  width: 256px;
+  border: #6164bf 2px solid;
+  box-shadow: 3px 3px #C793C4;
+  position: relative;
+  background-color: white;
+}
+
+#add{
+  color: #6164bf;
+  position: absolute;
+  right: 3%;
+  top: 0.35em;
+  padding: 5px;
+  padding-top: 3px;
+  padding-bottom: 3px;
+  border: solid #6164bf 2px;
+}
+#add:hover{
+  background-color: #f2d5E5;
+}
+
+.selected{
+  border: 2px solid #6164bf;
+  padding: 0.25em;
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+/* --- layer dropdown --- */
+
+.dropdown {
+  float:right;
+  display: inline-block;
+  background-color: #e0afdb;
+  border-radius: 2px;
+  padding-left: 0.3em;
+  padding-right: 0.3em;
+  color: white;
+  height: 1.8em;
+  width: 3.5em;
+  text-align: center;
+  margin-top: 0.3em;
+  line-height: 1.8em;
+  font-size: 0.8em;
+  font-weight: 600;
+}
+
+.dropdown-content {
+  text-align: left;
+  display: none;
+  position: absolute;
+  margin-left: 3.25em;
+  margin-top: -20vh;
+  min-width: 160px;
+  border: #6164bf 2px solid;
+  border-radius: 4px;
+  z-index: 1;
+  background-color:white;
+}
+
+.dropdown-content a {
+  padding: 6px;
+  color: #6164bf;
+  font-size: 1.2em;
+  text-decoration: none;
+  display: block;
+}
+
+.dropdown-content a:hover {
+  background-color: #e0afdb;
+  color: white;
+}
+
+.dropdown:hover {
+  background-color: #6164bf;
+  color: white;
+}
+
+.dropdown:hover .dropdown-content {
+  display: block;
+  margin-top: 0.0em;
+}
+
+.layer:nth-child(1):not(.selected){
+  border-top: solid 0px #e0afdb;
+}
+
+/* -- toolbar -----*/
+
+#bar{
+  width: 100%;
+  height: auto;
+}
+
 ul {
     padding: 0;
 }
 
 .menu-item {
-    float: left;
     list-style-type: none;
     padding: 0.5em;
+    display: inline-block;
 }
 
-#container{
+#toolbar{
+  position: relative;
+  display: inline-block;
+  margin-top: 1em;
+  height: 5em;
+  border: #6164bf 2px solid;
+  box-shadow: 3px 3px #C793C4;
+  position: relative;
+  background-color: #f2d5E5;
+  background-image: url('assets/grid.png');
+  background-size: contain;
+}
+
+#bar-info-container{
+  width: 100%;
+  background-color: white;
+}
+
+#bar-info{
+  background-color: white;
+  height: 1.25em;
+  line-height: 1.25em;
+}
+
+#bar-info img{
+  margin-right: 1em;
+}
+
+@keyframes shake {
+  10%, 90% {
+    transform: translate3d(-1px, 0, 0);
+  }
+
+  20%, 80% {
+    transform: translate3d(2px, 0, 0);
+  }
+
+  30%, 50%, 70% {
+    transform: translate3d(-4px, 0, 0);
+  }
+
+  40%, 60% {
+    transform: translate3d(4px, 0, 0);
+  }
+}
+
+#icons{
+  height: 100%;
+  vertical-align: middle;
+  width: 65vh;
+  min-width: 256px;
+}
+
+.icon{
+  width: 10%;
+  margin: 2%;
+}
+
+.icon:hover{
+  animation: shake 0.3s cubic-bezier(.36,.07,.19,.97) both;
+  transform: translate3d(0, 0, 0);
+}
+
+#paintbucketInfo {
+  position: absolute;
+  padding-left: 5%;
+  text-align: center;
+}
+
+/* -- toolbar settings dropdown -- */
+
+#dropdown-s{
+  margin: 0px;
+}
+
+#dropdown-s img{
+  width:100%;
+}
+
+#dropdown-s {
+  display: inline-block;
+}
+
+.dropdown-content-settings {
+  text-align: left;
+  display: none;
+  position: absolute;
+  bottom:0px;
+  left: 3em;
+  min-width: 160px;
+  border: #6164bf 2px solid;
+  border-radius: 4px;
+  z-index: 1;
+  background-color:white;
+}
+
+#dropdown-s:hover .dropdown-content-settings {display: block;}
+
+
+/* #container{
   float:left;
   clear:left;
 }
+
+.border{
+  display: inline-block;
+} */

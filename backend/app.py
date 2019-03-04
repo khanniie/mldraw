@@ -1,3 +1,27 @@
+# Taken from https://gist.github.com/lambdalisue/05d5654bd1ec04992ad316d50924137c
+# Let's you use ctrl-c to interrupt the event loop (and so the server)
+
+import asyncio
+import sys
+
+# Ctrl-C (KeyboardInterrupt) does not work well on Windows
+# This module solve that issue with wakeup coroutine.
+# https://stackoverflow.com/questions/24774980/why-cant-i-catch-sigint-when-asyncio-event-loop-is-running/24775107#24775107
+if sys.platform.startswith('win'):
+    def hotfix(loop):
+        loop.call_soon(_wakeup, loop, 1.0)
+        return loop
+
+    def _wakeup(loop, delay=0.5):
+        loop.call_later(delay, _wakeup, loop, delay)
+else:
+    # Do Nothing on non Windows
+    def hotfix(loop):
+        return loop
+
+hotfix(asyncio.get_event_loop())
+
+
 from io import BytesIO
 from functools import wraps
 from inspect import isawaitable
@@ -5,80 +29,32 @@ import asyncio
 import base64
 
 from aiohttp import web
-from PIL import Image
-from PIL import ImageOps
 
 import socketio
-
-from .fix_windows import hotfix # workaround asyncio issue in windows
-
 sio = socketio.AsyncServer()
 app = web.Application()
 sio.attach(app)
 
 available_handlers = {}
 
-from .models.autoimport_models import all_exported_models
-
-def canvas_message_valid(data):
-    return 'canvasData' in data
-
-def canvas_message_handler(message: str):
-    ''' Bind the following function to be a handler for socket.io `message`
-    to be called with a PIL image representing the canvas.
-
-    The handler should return the new bytes of the resulting image.
-    The result image is required to be the same size at the input image.
-    The handler is allowed to be an async function as long as it returns an awaitable.
-    e.g:
-    ```python
-        @canvas_message_handler('process-image')
-        def process_image(img):
-            result = process(img)
-            return result.tobytes()```
-    '''
-
-    def decorator(handler):
-
-        @sio.on(message) #bind it to the socketio message
-        @wraps(handler) #better error messages
-        async def canvas_handler(sid, data):
-            print(f'recieved {message} request')
-            if canvas_message_valid(data):
-                blob = BytesIO(data['canvasData'])
-                img = Image.open(blob)
-                output_img = handler(img)
-                if isawaitable(output_img): # handler was async
-                    output_img = await output_img 
-                output_buf = BytesIO()
-                output_img.save(output_buf, format="PNG")
-                base64_img = base64.b64encode(output_buf.getvalue())
-                print(f'executed {message} request')
-                return {'canvasData': base64_img.decode('utf-8')}
-            else:
-                print(f'rejected {message} request')
-                return {'error': 'canvas message invalid'}
-
-        global available_handlers
-        available_handlers[message] = handler
-
-        return canvas_handler
-
-    return decorator
-
-
-@canvas_message_handler('flip-canvas')
-def flip_canvas(img):
-    flipped = ImageOps.flip(img)
-    return flipped.tobytes()
-
-
-for message, fn in all_exported_models.items():
-    canvas_message_handler(message)(fn)
-
 @sio.on('connect')
-def connect(sid, environ):
+async def connect(sid, environ):
     print("connect ", sid)
+
+
+@sio.on('register')
+async def register(sid, data):
+    addr = data['addr']
+    handlers = data['handlers']
+    available_handlers[addr] = handlers
+    print("discovered new handlers, now available: {}".format(available_handlers))
+    await sio.emit('update-available-handlers', available_handlers)
+
+@sio.on('list-models')
+def list_models(sid):
+  print("listing models", available_handlers)
+  return available_handlers
+  
 
 @sio.on('disconnect')
 def disconnect(sid):

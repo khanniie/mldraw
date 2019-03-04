@@ -7,14 +7,15 @@
  * (e.g we'll never send a message to run a layer until the previous input has been fully processed)
  * @param fn Async functionn
  */
-export function doNothingIfRunning(asyncFn: () => void): () => void {
-    let running = false;
-    const bound = asyncFn.bind ? asyncFn.bind(this) : asyncFn; // arrow functions have no bind
-    return async function () {
-        if(running) return;
-        running = true;
-        await bound();
-        running = false;
+export function doNothingIfRunning(asyncFn: (...args: any[]) => Promise<void>): 
+    (...args: any[]) => Promise<void> {
+    let running = false
+    const bound = asyncFn.bind ? asyncFn.bind(this) : asyncFn // arrow functions have no bind
+    return async (...args) => {
+        if(running) return
+        running = true
+        await bound(...args)
+        running = false
     }
 }
 
@@ -24,6 +25,6 @@ export function doNothingIfRunning(asyncFn: () => void): () => void {
  * @param key Key in params
  */
 export function urlParam(key: string): string | null {
-    const params = new URLSearchParams(window.location.search);
+    const params = new URLSearchParams(window.location.search)
     return params.get(key)
 }

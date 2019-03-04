@@ -2,18 +2,22 @@ import * as choo from 'choo'
 import html from 'choo/html'
 import devTools from 'choo-devtools'
 import { State, AppState, Emit } from './types'
-import { CanvasComponent, canvasStore } from './components/canvas'
-import { PaperCanvasComponent, paperStore} from './components/paper_canvas'
+import { paperStore} from './components/paper_canvas'
 import { MirrorComponent, mirrorStore } from './components/mirror'
-import { paper } from './paperfix'
-
+import { leftView } from './components/left_view'
+import { rightView } from './components/right_view'
+import { topView } from './components/top_view'
+import { localModelsStore } from './local-models'
+import {mirrorView} from './components/mirror_component'
+import {paintBucketStore} from './model-palettes'
 const app = new (choo as any).default()
-console.log(paper)
+
 app.use(devTools())
 app.use(initialState)
-app.use(canvasStore)
 app.use(paperStore)
 app.use(mirrorStore)
+app.use(localModelsStore)
+app.use(paintBucketStore)
 app.route('/', mainView)
 app.mount('body')
 
@@ -21,8 +25,23 @@ function initialState(state: choo.IState, emit: Emit) {
     Object.assign(state, {
         app: {
             server: {
-                address: '128.237.225.218:8080'
-            }
+                address: '128.2.103.85:8080',
+                isConnected: false
+            },
+            activeLayer: 1,
+            layers: [],
+            availableModels: [],
+            localModels: {},
+            paintbucket: {
+                active: true,
+                colorIdx: 0,
+                colorName: '',
+                palette: {
+                    '': ''
+                }
+            },
+            closed: true,
+            smoothing: true
         }
     })
 }
@@ -30,50 +49,9 @@ function initialState(state: choo.IState, emit: Emit) {
 function mainView(state: choo.IState, emit: Emit) {
     return html`
         <body>
-            <h1>mldraw</h1>
-            ${topBar(state.app, emit)}
-            ${state.cache(PaperCanvasComponent, 'paper-canvas').render(state.app)}
-            ${state.cache(MirrorComponent, 'p5-mirror').render(state.app)}
+        ${!state.app.server.isConnected ? html`<p>trying to connecte to server...</p>`: ''}
+            ${topView(state, emit)}
+            ${leftView(state,emit)}
+            ${rightView(state, emit)}
         </body>`
-}
-
-function topBar(state: AppState, emit: Emit) {
-    return html`
-    <div>
-        <ul>
-        <li class="menu-item">${serverSelector(state.server, emit)}</li>
-        <li class="menu-item">${renderButton(emit)}</li>
-        <li class="menu-item">${clearButton(emit)}</li>
-        </ul>
-    </div>`
-}
-
-function serverSelector({ address }: AppState['server'], emit: Emit) {
-    const onsubmit = (e: Event) => {
-        e.preventDefault()
-        const form = e.currentTarget as HTMLFormElement
-        const body = new FormData(form)
-        const url = body.get("serverURL")
-        emit('setURL', url.toString())
-    }
-    return html`
-    <form onsubmit=${onsubmit}>
-        <input name="serverURL" type="url" placeholder="Backend server URL" value=${address}>
-        <button type="submit">Connect</button>
-    </form>
-    `
-}
-
-function renderButton(emit: Emit) {
-    const onclick = () => emit('mlrender')
-    return html`
-        <button onclick=${onclick}>Render</button>
-    `
-}
-
-function clearButton(emit: Emit) {
-    const onclick = () => emit('clear')
-    return html`
-        <button onclick=${onclick}>clear</button>
-    `
 }

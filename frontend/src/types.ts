@@ -1,10 +1,32 @@
-import {paper} from './paperfix';
+/**
+ * API Types
+ */
+
+
+/**
+ * UI Types
+ */
+
+export type Layer = {  layer: paper.Layer, group: paper.Group, model: string }
 
 // Our application's state
 export interface AppState {
     server: {
-        address: string
-    }
+        address: string,
+        isConnected: boolean
+    },
+    activeLayer: number,
+    layers: Layer[],
+    availableModels: string[],
+    localModels: {[key:string]: string},
+    paintbucket: {
+        active: boolean,
+        colorIdx: number,
+        colorName: string,
+        palette: {[key:string] : string}
+    },
+    closed: boolean,
+    smoothing: boolean
 }
 
 /**
@@ -21,6 +43,17 @@ export interface Events {
     mlrender: undefined
     clear: undefined
     drawoutput: [string, paper.Group]
+    changeLayer: number,
+    addLayer: undefined,
+    isConnected: undefined,
+    setSmoothness: boolean,
+    setClosed: boolean,
+    switchTool: string,
+    loadmodel: string,
+    loadedmodel: string,
+    setFill: string | boolean,
+    paintbucketclicked: string,
+    addModel: string
 }
 
 // type magic ~
@@ -44,4 +77,4 @@ declare module "choo" {
     }
 }
 
-export type State = import("choo").Choo.IState;
+export type State = import("choo").Choo.IState

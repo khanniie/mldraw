@@ -4,137 +4,132 @@
 import html from 'choo/html'
 import Component from 'choo/component'
 import { State, AppState, Emit, Emitter } from '../types'
-import {paper} from '../paperfix';
+import {paperLocal as paper} from '../paperfix'
 
-import * as p5 from 'p5'
-
-let debugcanvas;
-
-// the type definition for p5.Graphics is wrong so
-// we have to make our own
-type Graphics = p5 & p5.Element
-type Layer = Graphics;
-
+let debugcanvas
 // in its own function so it can be JIT compiled for performance
 function copy<T>(fromArr: ArrayLike<T>, toArr: Array<T>) {
-    const len = toArr.length;
-    for (let i = 0; i < len; i++) toArr[i] = fromArr[i];
+    const len = toArr.length
+    for (let i = 0; i < len; i++) toArr[i] = fromArr[i]
 }
 
 const make_mirror = (component: MirrorComponent,
                     canvas: HTMLCanvasElement, element,
                     emit: Emit) => {
     // Create an empty project and a view for the canvas:
-    const project = new paper.Project(canvas);
-    //new paper.View();
-    let appState;
+    const project = new paper.Project(canvas)
+    let background = new paper.Layer(); //background
+    background.activate()
+    background.name = 'background'
+    const {width: viewWidth, height: viewHeight} = paper.project.view.bounds
+    console.log('mirror !!', paper.project.view.bounds)
+    let rec = new paper.Rectangle(0, 0, background.bounds.width, background.bounds.height)
+    let path_rec = new paper.Path.Rectangle(rec)
+    path_rec.fillColor = '#ffffff'
+    project.addLayer(background)
+    //new paper.View()
+    let appState
 
-    // converts fromGraphics to a Blob, sends it to the server,
-    // copies the pixel data in the response into toGraphics
-    function drawOutput([bytes, paths]) {
-        // gfx.loadPixels(); // required even though we don't read from pixels
-        // // annoying that this copy is needed
-        // copy(flippedBytes, gfx.pixels);
-        // gfx.updatePixels();
-        // p.image(gfx, 0, 0);
-        project.activate();
-        //let arr = new Uint8Array(bytes)
-        let temp = bytes // String.fromCharCode.apply(null, arr);
-        console.log("paper", paper);
-        var image = document.createElement('img');
-        image.src = 'data:image/png;base64,' + temp;
-        image.width = 256;
-        image.height = 256;
-        let ctx = debugcanvas.getContext('2d')
-        //ctx.drawImage(image, 0, 0, 256, 256, 0, 0, 256, 256);
+    function drawOutput([bytes, clippingPath]: [string | HTMLImageElement, paper.Group]) {
+        project.activate()
+        project.activeLayer.removeChildren()
+        let image;
+        if(bytes instanceof HTMLImageElement) {
+            image = bytes
+        } else {
+            image = document.createElement('img')
+            image.src = 'data:image/png;base64,' + bytes
+            image.width = 256
+            image.height = 256
+        }
+        const raster = new paper.Raster(image, new paper.Point(128, 128))
+        const path = clippingPath.children.filter(ch => ch instanceof paper.Path)
+        const united = path.reduce((a, p) => a.unite(p))
+        united.bringToFront()
+        const clippingGroup = new paper.Group([united, raster])
+        clippingGroup.position = paper.view.bounds.center
+        console.log(clippingGroup.bounds)
+        clippingGroup.scale(paper.view.bounds.width/clippingGroup.bounds.width)
+        clippingGroup.clipped = true
+        console.log(clippingGroup, clippingGroup.bounds)
+    }
 
-        var raster = new paper.Raster(image, new paper.Point(128, 128));
-        paths.visible = true;
-        var gg = paths.clone();
-        //gg.project = project;
-        var g = new paper.Group([gg, raster]);
-        g.clipped = true;
+    function addLayer() {
+        project.activate()
+        const layer = new paper.Layer()
+        console.log('adding mirror lyr')
+        project.addLayer(layer)
+    }
 
-//         var star = new paper.Path.Star({
-//     center: paper.view.center,
-//     points: 6,
-//     radius1: 20,
-//     radius2: 40,
-//     fillColor: 'red'
-// });
-//
-// var circle = new paper.Path.Circle({
-//     center: paper.view.center,
-//     radius: 25,
-//     strokeColor: 'black'
-// });
-//
-// // Create a group of the two items and clip it:
-// var group = new paper.Group([circle, star]);
-// group.clipped = true;
+    function switchLayer(idx: number) {
+        project.activate()
+        console.log("switch layer", idx, project.layers);
+        project.layers[idx].activate()
+    }
 
-
-        //var raster2 = new paper.Raster('https://news.nationalgeographic.com/content/dam/news/2018/05/17/you-can-train-your-cat/02-cat-training-NationalGeographic_1484324.ngsversion.1526587209178.adapt.1900.1.jpg');
-
-        return;
+    function clear() {
+        project.activeLayer.removeChildren()
     }
 
     component.sketch = {
-        drawOutput
+        drawOutput, clear, switchLayer, addLayer
     }
 }
 
 type SketchMethods = {
-    drawOutput: ([str, group]: [string, paper.Group]) => void;
+    drawOutput: ([str, group]: [string, paper.Group]) => void
+    clear: () => void,
+    addLayer: () => void,
+    switchLayer: (idx: number) => void
 }
 
 export class MirrorComponent extends Component {
-    emit: Emit;
-    appState: AppState;
-    sketch: SketchMethods;
+    emit: Emit
+    appState: AppState
+    sketch: SketchMethods
     constructor(id: string, state: State, emit: Emit) {
         super(id)
-        this.appState = state.app;
-        this.emit = emit;
+        this.appState = state.app
+        this.emit = emit
     }
 
     async load(element) {
+        var newcanvas : HTMLCanvasElement = document.createElement('canvas')
+        newcanvas.style.backgroundColor = "white"
+        newcanvas.width = 256
+        newcanvas.height = 256
+        // newcanvas.setAttribute('resize', 'false');
+        element.appendChild(newcanvas)
+        console.log(newcanvas)
 
-        var newcanvas : HTMLCanvasElement = document.createElement('canvas');
-        newcanvas.style.backgroundColor = "white";
-        newcanvas.width = 256;
-        newcanvas.height = 256;
-        newcanvas.id = "mirror";
-        element.appendChild(newcanvas);
-
-        var newcanvas2 : HTMLCanvasElement = document.createElement('canvas');
-        newcanvas2.style.backgroundColor = "white";
-        newcanvas2.width = 256;
-        newcanvas2.height = 256;
-        newcanvas2.style.width = '256px';
-        newcanvas2.style.height = '256px';
-        newcanvas2.id = "mirror2";
-        element.appendChild(newcanvas2);
-        console.log(newcanvas2);
-        debugcanvas = newcanvas2;
-
-        make_mirror(this, newcanvas, element, this.emit);
+        make_mirror(this, newcanvas, element, this.emit)
     }
 
+    update() {}
+
     createElement() {
-        return html`<div></div>`
+        return html`
+        <div id ="mirror-canvas">
+        </div>`
     }
 }
 
 export function mirrorStore(state: State, emitter: Emitter) {
     emitter.on('drawoutput', ([bytes, path]) => {
         // hacky
-        console.log("draw output called", bytes, path);
-        state.cache(MirrorComponent, 'p5-mirror').sketch.drawOutput([bytes, path])
+        state.cache(MirrorComponent, 'mirror-canvas').sketch.drawOutput([bytes, path])
     })
     emitter.on('clear', () => {
         // hacky
-        console.log('clearing mirror');
-        state.cache(MirrorComponent, 'p5-mirror').sketch.clear()
+        console.log('clearing mirror')
+        state.cache(MirrorComponent, 'mirror-canvas').sketch.clear()
     })
+    emitter.on('changeLayer', (layerIdx) => {
+        state.cache(MirrorComponent, 'mirror-canvas').sketch.switchLayer(layerIdx - 1)
+    })
+
+    emitter.on('addLayer', () => {
+        state.cache(MirrorComponent, 'mirror-canvas').sketch.addLayer()
+    })
+
 }
