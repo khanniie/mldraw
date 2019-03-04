@@ -275,7 +275,7 @@ const make_paper = (component: PaperCanvasComponent,
         }
         console.log("got a reply...")
         emit('drawoutput', [reply.canvasData, clippingGroup])
-        console.log("active layer AFTER", project.activeLayer);
+        console.log("active layer AFTER", project.activeLayer)
 
     }
 
