@@ -100,11 +100,6 @@ canvas{
   position: relative;
 }
 
-#mirror-info{
-  height: 1.5em;
-  line-height: 1.5em;
-}
-
 /* ---- this is the top bar ---- */
 
 #top{
