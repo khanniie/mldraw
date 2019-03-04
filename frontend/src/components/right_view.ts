@@ -76,19 +76,12 @@ function getName( model : string){
 function layer(state: AppState, l: Layer, emit: Emit, i, selected:boolean){
     console.log(l);
     let modelname = getName(l.model);
-    if (selected){
-      return html`
-      <div class="layer selected" onclick=${() => emit('changeLayer', i + 1)}>${"layer " + (i + 1)}
+    return html`
+      <div class="layer ${selected ? 'selected' : ''}" onclick=${() => emit('changeLayer', i + 1)}>${"layer " + (i + 1)}
       <div class="dropdown"> ${modelname} ${dropdownContent(emit, l, i, state)}</div>
       <img src=${dotted} alt="bounding button"/>
       </div>`
-    } else {
-      return html`
-      <div class="layer" onclick=${() => emit('changeLayer', i + 1)}>${"layer " + (i + 1)}
-      <div class="dropdown"> ${modelname} ${dropdownContent(emit, l, i, state)}</div>
-      <img src=${dotted} alt="bounding button"/>
-      </div>`
-    }
+    } 
 
 }
 
