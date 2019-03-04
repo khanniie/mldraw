@@ -9,20 +9,25 @@
   "browserslist": [
     "last 1 Chrome version"
   ],
+  "peerDependencies": {
+    "paper": "latest"
+  },
   "dependencies": {
     "choo": "^6.13.1",
     "choo-devtools": "^2.5.1",
     "json5": "^2.1.0",
     "ml5": "^0.2.1",
     "p5": "^0.7.2",
-    "paper": "0.11.8",
     "parcel": "^1.11.0",
     "socket.io": "^2.1.1",
     "socket.io-client": "^2.1.1"
   },
+  "alias": {
+    "paper": "./paper/paper-core"
+  },
   "devDependencies": {
     "@types/p5": "^0.7.0",
-    "@types/paper": "^0.11.2",
+    "@types/paper": "^0.11.9",
     "@types/socket.io": "^1.4.38",
     "@types/socket.io-client": "^1.4.32",
     "babel-core": "^6.26.3",

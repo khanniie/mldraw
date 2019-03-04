@@ -4,17 +4,9 @@
 import html from 'choo/html'
 import Component from 'choo/component'
 import { State, AppState, Emit, Emitter } from '../types'
-import {paper} from '../paperfix'
-
-import * as p5 from 'p5'
+import {paperLocal as paper} from '../paperfix'
 
 let debugcanvas
-
-// the type definition for p5.Graphics is wrong so
-// we have to make our own
-type Graphics = p5 & p5.Element
-type Layer = Graphics
-
 // in its own function so it can be JIT compiled for performance
 function copy<T>(fromArr: ArrayLike<T>, toArr: Array<T>) {
     const len = toArr.length
