@@ -134,9 +134,18 @@ canvas{
   border-top: solid 2px #e0afdb;
 }
 
+.layer img{
+  margin-top: 0.5em;
+  margin-right: 0.25em;
+  float: right;
+  height: 1em;
+}
+
 .layer-container{
   background :#f2d5E5;
   width: 100%;
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
 }
 
 .layer_info_container{
@@ -146,7 +155,7 @@ canvas{
 
 .layer_info{
   height: 2em;
-  background-color:white;
+  background-color: white;
   line-height: 2em;
 }
 
@@ -158,6 +167,7 @@ canvas{
   margin: 0px;
   width: 256px;
   border: #6164bf 2px solid;
+  box-shadow: 3px 3px #C793C4;
   position: relative;
   background-color: white;
 }
@@ -178,14 +188,14 @@ canvas{
 
 .selected{
   border: 2px solid #6164bf;
-  background-color: rgba(255, 255, 255, 0.2);
+  padding: 0.25em;
+  background-color: rgba(255, 255, 255, 0.3);
 }
 
 /* --- layer dropdown --- */
 
 .dropdown {
-  position: absolute;
-  right: 0.1em;
+  float:right;
   display: inline-block;
   background-color: #e0afdb;
   border-radius: 2px;
@@ -195,7 +205,7 @@ canvas{
   height: 1.8em;
   width: 3.5em;
   text-align: center;
-  top: 0.3em;
+  margin-top: 0.3em;
   line-height: 1.8em;
   font-size: 0.8em;
   font-weight: 600;
@@ -237,7 +247,7 @@ canvas{
   margin-top: 0.0em;
 }
 
-.layer:nth-child(1){
+.layer:nth-child(1):not(.selected){
   border-top: solid 0px #e0afdb;
 }
 

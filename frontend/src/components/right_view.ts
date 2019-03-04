@@ -7,6 +7,7 @@ import {mirrorView} from './mirror_component'
 
 const pawprint = require('./../assets/pawprint.svg')
 const arrow = require('./../assets/arrow.png')
+const dotted = require('./../assets/dotted-square.svg')
 
 function dropdownContent(emit:Emit, layer, i:number, state: AppState){
     return html`<div class="dropdown-content">
@@ -79,11 +80,13 @@ function layer(state: AppState, l: Layer, emit: Emit, i, selected:boolean){
       return html`
       <div class="layer selected" onclick=${() => emit('changeLayer', i + 1)}>${"layer " + (i + 1)}
       <div class="dropdown"> ${modelname} ${dropdownContent(emit, l, i, state)}</div>
+      <img src=${dotted} alt="bounding button"/>
       </div>`
     } else {
       return html`
       <div class="layer" onclick=${() => emit('changeLayer', i + 1)}>${"layer " + (i + 1)}
       <div class="dropdown"> ${modelname} ${dropdownContent(emit, l, i, state)}</div>
+      <img src=${dotted} alt="bounding button"/>
       </div>`
     }
 
@@ -93,10 +96,10 @@ export function rightView(state: choo.IState, emit: Emit) {
     return html`
 <div id="rest">
 
-        <div id="right">
+        <div id="middle" class="column">
         ${layerBuilder(state.app, emit)}
     </div>
-    <div id="middle">
+    <div id="right" class="column">
       ${mirrorView(state, emit)}
     </div>
     </div>`
