@@ -80,8 +80,6 @@ function layer(state: AppState, l: Layer, emit: Emit, i, selected:boolean){
       <div class="dropdown"> ${modelname} ${dropdownContent(emit, l, i, state)}</div>
       <img src=${dotted} alt="bounding button"/>
       </div>`
-    } 
-
 }
 
 export function rightView(state: choo.IState, emit: Emit) {
