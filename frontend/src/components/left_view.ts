@@ -36,10 +36,14 @@ function topBar(state: AppState, emit: Emit) {
             <div class="icon" id="dropdown-s"><img src="${more}">
             <div class="dropdown-content-settings">
             <ul>
-                     <li class="menu-item"><input type="checkbox" onclick=${({srcElement}) => emit('setSmoothness', srcElement.checked)} name="smooth">
+                     <li class="menu-item">
+                     <input type="checkbox" onclick=${({srcElement}) => emit('setSmoothness', srcElement.checked)} 
+                            name="smooth" ${state.smoothing ? 'checked' : ''}>
                      <label for="smooth">smooth</label>
                      </li>
-                     <li class="menu-item"><input type="checkbox" onclick=${({srcElement}) => emit('setClosed', srcElement.checked)} name="closed" checked>
+                     <li class="menu-item">
+                     <input type="checkbox" onclick=${({srcElement}) => emit('setClosed', srcElement.checked)} 
+                            name="closed" ${state.closed ? 'checked' : ''}>
                      <label for="closed">closed</label>
                      </li>
             </ul>

@@ -22,6 +22,7 @@ const make_mirror = (component: MirrorComponent,
     background.activate()
     background.name = 'background'
     const {width: viewWidth, height: viewHeight} = paper.project.view.bounds
+    console.log('mirror !!', paper.project.view.bounds)
     let rec = new paper.Rectangle(0, 0, background.bounds.width, background.bounds.height)
     let path_rec = new paper.Path.Rectangle(rec)
     path_rec.fillColor = '#ffffff'
@@ -42,12 +43,15 @@ const make_mirror = (component: MirrorComponent,
             image.height = 256
         }
         const raster = new paper.Raster(image, new paper.Point(128, 128))
-        clippingPath.visible = true
         const path = clippingPath.children.filter(ch => ch instanceof paper.Path)
         const united = path.reduce((a, p) => a.unite(p))
-        project.activate()
+        united.bringToFront()
         const clippingGroup = new paper.Group([united, raster])
+        clippingGroup.position = paper.view.bounds.center
+        console.log(clippingGroup.bounds)
+        clippingGroup.scale(paper.view.bounds.width/clippingGroup.bounds.width)
         clippingGroup.clipped = true
+        console.log(clippingGroup, clippingGroup.bounds)
     }
 
     function addLayer() {
@@ -96,6 +100,7 @@ export class MirrorComponent extends Component {
         newcanvas.height = 256
         // newcanvas.setAttribute('resize', 'false');
         element.appendChild(newcanvas)
+        console.log(newcanvas)
 
         make_mirror(this, newcanvas, element, this.emit)
     }
