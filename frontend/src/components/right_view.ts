@@ -83,7 +83,7 @@ function layer(state: AppState, l: Layer, emit: Emit, i, selected:boolean){
 }
 
 export function rightView(state: choo.IState, emit: Emit) {
-    return html`
+    return html` 
 <div id="rest">
 
         <div id="middle" class="column">
