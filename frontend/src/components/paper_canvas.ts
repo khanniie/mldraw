@@ -17,7 +17,7 @@ type Layer = {
 
 const make_paper = (component: PaperCanvasComponent,
     canvas: HTMLCanvasElement, element, comm: Comm,
-    emit: Emit) => {
+    emit: Emit, state: AppState) => {
     const project = new paper.Project(canvas)
     let background = new paper.Layer(); //background
     background.activate()
@@ -28,10 +28,10 @@ const make_paper = (component: PaperCanvasComponent,
     path_rec.fillColor = '#ffffff'
     project.addLayer(background)
 
-    let fill = false;
-    let fillColor: string;
-    let smoothing = false;
-    let autoclose = true;
+    // let fill = false;
+    //let fillColor: string;
+    //let smoothing = false;
+    //let autoclose = true;
     let dragTool = new paper.Tool();
     let drawTool = new paper.Tool();
     let fillTool = new paper.Tool();
@@ -51,7 +51,7 @@ const make_paper = (component: PaperCanvasComponent,
             fullySelected: true,
             name: 'temp'
         })
-        pathBeingDrawn.closed = autoclose
+        pathBeingDrawn.closed = state.closed
     }
 
     drawTool.onMouseDrag = function (event) {
@@ -70,7 +70,7 @@ const make_paper = (component: PaperCanvasComponent,
         }
         pathBeingDrawn.selected = false
         pathBeingDrawn.fillColor = "#FF000001"
-        if(smoothing) pathBeingDrawn.simplify(10);
+        if(state.smoothing) pathBeingDrawn.simplify(10);
         if(project.activeLayer.children['clippingGroup']){
           project.activeLayer.children['clippingGroup'].addChild(pathBeingDrawn)
         } else {
@@ -194,10 +194,10 @@ const make_paper = (component: PaperCanvasComponent,
 
     fillTool.onMouseDown = function(event: paper.ToolEvent) {
         project.activate()
-        if(fill) {
+        if(state.paintbucket.active) {
             if(event.item instanceof paper.Path) {
                 let path = event.item
-                path.fillColor = fillColor
+                path.fillColor = state.paintbucket.palette[state.paintbucket.colorName]
                 path.strokeColor = "#00000000"
 
             } else if(event.item != null) {
@@ -207,7 +207,7 @@ const make_paper = (component: PaperCanvasComponent,
                 if(hitInfos.length == 0) return
                 const smallest = hitInfos[0]
                 let path = (smallest.item ? smallest.item : smallest) as paper.Path
-                path.fillColor = fillColor
+                path.fillColor = state.paintbucket.palette[state.paintbucket.colorName]
                 path.strokeColor = "#00000000"
             }
         }
@@ -314,14 +314,6 @@ const make_paper = (component: PaperCanvasComponent,
         project.insertLayer(idxB, layerA);
     }
 
-    function setSmoothing(smooth: boolean) {
-        smoothing = smooth
-    }
-
-    function setClosed(closed: boolean) {
-        autoclose = closed
-    }
-
     function switchTool(tool){
         switch (tool) {
             case 'cut':
@@ -342,18 +334,9 @@ const make_paper = (component: PaperCanvasComponent,
         }
     }
 
-    function setFill(color: string | boolean) {
-        if(color == false) {
-            fill = false
-        } else if (color == true) {
-            throw new Error('invalid argument!')
-        } else {
-            fill = true
-            fillColor = color
-        }
+    function setState(newState: AppState) {
+        state = newState;
     }
-
-
 
     component.sketch = {
         renderCanvas,
@@ -361,10 +344,8 @@ const make_paper = (component: PaperCanvasComponent,
         switchLayer,
         swapLayers,
         addLayer,
-        setSmoothing,
-        setClosed,
         switchTool,
-        setFill
+        setState
     }
 }
 
@@ -374,10 +355,8 @@ type SketchMethods = {
     switchLayer: (idx: number) => void,
     swapLayers: (idxA: number, idxB: number) => void,
     addLayer: () => void,
-    setSmoothing: (smooth: boolean) => void,
-    setClosed: (closed: boolean) => void,
     switchTool: (tool: string) => void,
-    setFill: (color: string | boolean) => void // false = don't fill
+    setState: (newState: AppState) => void
 }
 
 export class PaperCanvasComponent extends Component {
@@ -404,7 +383,7 @@ export class PaperCanvasComponent extends Component {
         newcanvas.id = "new"
         element.appendChild(newcanvas)
 
-        make_paper(this, newcanvas, element, this.comm, this.emit)
+        make_paper(this, newcanvas, element, this.comm, this.emit, this.appState)
         setTimeout(() => this.emit('isConnected'), 1)
         setTimeout(() => this.emit('addLayer'), 20)
         setTimeout(() => {
@@ -419,6 +398,7 @@ export class PaperCanvasComponent extends Component {
             this.appState = state
             this.comm.connect(state.server.address)
         }
+        this.sketch.setState(state)
         return false // doesn't need choo to re-render it
     }
 
@@ -461,11 +441,15 @@ export function paperStore(state: State, emitter: Emitter) {
     })
 
     emitter.on('setSmoothness', smooth => {
-        state.cache(PaperCanvasComponent, 'paper-canvas').sketch.setSmoothing(smooth)
+        state.app.smoothing = smooth
+        state.cache(PaperCanvasComponent, 'paper-canvas').sketch.setState(state)
+        emitter.emit('render')
     })
 
     emitter.on('setClosed', close => {
-        state.cache(PaperCanvasComponent, 'paper-canvas').sketch.setClosed(close)
+        state.app.closed = close
+        state.cache(PaperCanvasComponent, 'paper-canvas').sketch.setState(state)
+        emitter.emit('render')
     })
 
     emitter.on('switchTool', (tool) => {
@@ -473,7 +457,7 @@ export function paperStore(state: State, emitter: Emitter) {
     })
 
     emitter.on('setFill', (color) => {
-        state.cache(PaperCanvasComponent, 'paper-canvas').sketch.setFill(color)
+        state.cache(PaperCanvasComponent, 'paper-canvas').sketch.setState(state)
     })
 
     // TODO: make a comm reducer

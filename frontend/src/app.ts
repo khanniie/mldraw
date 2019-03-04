@@ -39,7 +39,9 @@ function initialState(state: choo.IState, emit: Emit) {
                 palette: {
                     '': ''
                 }
-            }
+            },
+            closed: true,
+            smoothing: true
         }
     })
 }

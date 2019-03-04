@@ -24,7 +24,9 @@ export interface AppState {
         colorIdx: number,
         colorName: string,
         palette: {[key:string] : string}
-    }
+    },
+    closed: boolean,
+    smoothing: boolean
 }
 
 /**
