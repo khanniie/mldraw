@@ -4,7 +4,7 @@
   "main": "src/basic.ts",
   "license": "MIT",
   "scripts": {
-    "dev": "yarn run parcel src/index.html --no-hmr --public-url './'"
+    "dev": "yarn run parcel src/index.html --no-hmr"
   },
   "browserslist": [
     "last 1 Chrome version"

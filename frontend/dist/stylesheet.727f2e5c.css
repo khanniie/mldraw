@@ -8,6 +8,13 @@ ul {
     display: inline-block;
 }
 
+#top{
+  border-bottom: #6164bf 2px solid;
+  box-shadow: 0px 2px #C793C4;
+  background-color: #efe0ea;
+  margin-bottom: 1em;
+}
+
 .layer{
   width: 90%;
   position: relative;
@@ -61,12 +68,8 @@ ul {
   border: #6164bf 2px solid;
   border-radius: 4px;
   z-index: 1;
-
   background-color:white;
-
 }
-
-
 
 .dropdown-content a {
   padding: 6px;
@@ -86,13 +89,38 @@ ul {
   color: white;
 }
 
-.dropdown:hover .dropdown-content {display: block;}
+.dropdown:hover .dropdown-content {
+  display: block;
+  margin-top: 0.0em;
+}
+
+
+#dropdown-s {
+  display: inline-block;
+}
+
+.dropdown-content-settings {
+  text-align: left;
+  display: none;
+  position: absolute;
+  bottom:0px;
+  left: 3em;
+  min-width: 160px;
+  border: #6164bf 2px solid;
+  border-radius: 4px;
+  z-index: 1;
+  background-color:white;
+}
+
+#dropdown-s:hover .dropdown-content-settings {display: block;}
+
 
 .layer:nth-child(1){
   border-top: solid 0px #e0afdb;
 }
 
 #layer-menu{
+  margin: 0px;
   width: 256px;
   border: #6164bf 2px solid;
   position: relative;
@@ -104,8 +132,17 @@ ul {
   clear:left;
 }
 
-#cat{
+/* #cat{
+  margin-left: 2em;
   height: 4em;
+} */
+
+#cat{
+  font-weight: 400;
+  margin-left: 1em;
+  padding-top: 0.25em;
+  padding-bottom: 0.25em;
+  font-size: 2em;
 }
 
 .border{
@@ -120,7 +157,7 @@ html, body{
   width: 100%;
   height: 100%;
   padding: 0px;
-  padding-top: 0.5em;
+  padding-top: 0em;
   margin: 0px;
   color:#6164bf;
   overflow: scroll;
@@ -138,11 +175,28 @@ html, body{
   float:left;
 }
 
-#right{
+#rest{
+  float: left;
+}
+
+#middle{
+  padding-right: 2em;
+  height: 100%;
   float: right;
-  padding-top: 3vh;
-  margin-left: 2em;
-  width:  calc(100% - 70vh - 4em);
+  width: auto;
+}
+
+#right{
+  height: 100%;
+  float: right;
+}
+
+#dropdown-s{
+  margin: 0px;
+}
+
+#dropdown-s img{
+  width:100%;
 }
 
 #bar{
@@ -157,6 +211,7 @@ html, body{
   height: 11vh;
   min-height: 4em;
   border: #6164bf 2px solid;
+  box-shadow: 3px 3px #C793C4;
   position: relative;
   background-color: #f2d5E5;
   background-image: url('grid.1dcebfdb.png');
@@ -177,6 +232,8 @@ html, body{
 #bar-info img{
   margin-right: 1em;
 }
+
+
 
 @keyframes shake {
   10%, 90% {
@@ -202,18 +259,19 @@ html, body{
   width: 65vh;
 }
 
-#icons img{
+.icon{
   width: 10%;
   margin: 2%;
   margin-top: 1%;
 }
 
-#icons img:hover{
+.icon:hover{
   animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both;
+  transform: translate3d(0, 0, 0);
 }
 
 #mirror{
-  width: 256px;
+  width: 65vh;
   height: autos;
   padding: 0px;
 
@@ -298,4 +356,10 @@ canvas{
 #mirror-info{
   height: 1.5em;
   line-height: 1.5em;
+}
+
+#paintbucketInfo {
+  position: absolute;
+  padding-left: 5%;
+  text-align: center;
 }
