@@ -30,7 +30,8 @@ const make_mirror = (component: MirrorComponent,
     //new paper.View()
     let appState
 
-    function drawOutput([bytes, clippingPath]: [string | HTMLImageElement, paper.Group]) {
+    function drawOutput([bytes, clippingPath, boundingRect]: 
+        [string | HTMLImageElement, paper.Group, paper.Rectangle]) {
         project.activate()
         project.activeLayer.removeChildren()
         let image;
@@ -42,16 +43,16 @@ const make_mirror = (component: MirrorComponent,
             image.width = 256
             image.height = 256
         }
-        const raster = new paper.Raster(image, new paper.Point(128, 128))
+        const raster = new paper.Raster(image, boundingRect.center)
+        raster.fitBounds(boundingRect)
         const path = clippingPath.children.filter(ch => ch instanceof paper.Path)
-        const united = path.reduce((a, p) => a.unite(p))
+        const united = path.reduce((a, p) => (a as any).unite(p))
+        raster.position = boundingRect.center
+        united.bringToFront()
+        project.activeLayer.addChild(united)
         united.bringToFront()
         const clippingGroup = new paper.Group([united, raster])
-        clippingGroup.position = paper.view.bounds.center
-        console.log(clippingGroup.bounds)
-        clippingGroup.scale(paper.view.bounds.width/clippingGroup.bounds.width)
         clippingGroup.clipped = true
-        console.log(clippingGroup, clippingGroup.bounds)
     }
 
     function addLayer() {
@@ -77,7 +78,7 @@ const make_mirror = (component: MirrorComponent,
 }
 
 type SketchMethods = {
-    drawOutput: ([str, group]: [string, paper.Group]) => void
+    drawOutput: ([str, group, boundingRect]: [string, paper.Group, paper.Rectangle]) => void
     clear: () => void,
     addLayer: () => void,
     switchLayer: (idx: number) => void
@@ -115,9 +116,9 @@ export class MirrorComponent extends Component {
 }
 
 export function mirrorStore(state: State, emitter: Emitter) {
-    emitter.on('drawoutput', ([bytes, path]) => {
+    emitter.on('drawoutput', ([bytes, path, boundingRect]) => {
         // hacky
-        state.cache(MirrorComponent, 'mirror-canvas').sketch.drawOutput([bytes, path])
+        state.cache(MirrorComponent, 'mirror-canvas').sketch.drawOutput([bytes, path, boundingRect])
     })
     emitter.on('clear', () => {
         // hacky

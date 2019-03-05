@@ -78,7 +78,7 @@ function layer(state: AppState, l: Layer, emit: Emit, i, selected:boolean){
     return html`
       <div class="layer ${selected ? 'selected' : ''}" onclick=${() => emit('changeLayer', i + 1)}>${"layer " + (i + 1)}
       <div class="dropdown"> ${modelname} ${dropdownContent(emit, l, i, state)}</div>
-      <img src=${dotted} alt="bounding button"/>
+      <img src=${dotted} onclick=${() => emit('switchTool', 'bounds')} alt="bounding button"/>
       </div>`
 }
 

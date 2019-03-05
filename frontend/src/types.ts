@@ -42,7 +42,7 @@ export interface Events {
     setURL: string
     mlrender: undefined
     clear: undefined
-    drawoutput: [string, paper.Group]
+    drawoutput: [string, paper.Group, paper.Rectangle]
     changeLayer: number,
     addLayer: undefined,
     isConnected: undefined,
