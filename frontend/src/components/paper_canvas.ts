@@ -76,7 +76,7 @@ const make_paper = (component: PaperCanvasComponent,
             pathBeingDrawn.remove()
         }
         pathBeingDrawn.selected = false
-        pathBeingDrawn.fillColor = "#FF000001"
+        pathBeingDrawn.fillColor = '#FF000001'
         if(state.smoothing) pathBeingDrawn.simplify(10)
         if(project.activeLayer.children['clippingGroup']){
           project.activeLayer.children['clippingGroup'].addChild(pathBeingDrawn)
@@ -285,8 +285,16 @@ const make_paper = (component: PaperCanvasComponent,
         const {x, y} = bgRect.bounds // how far "off the page" the top left corner is
         console.log(bgRect.bounds)
         bgRect.remove()
+        const unfilledPartsHack = paper.project.activeLayer.children['clippingGroup'].children.filter(c => c.fillColor.alpha < 0.01)
+        paper.project.activeLayer.children['clippingGroup'].children.forEach(e => {console.log(e.fillColor.alpha)})
+        unfilledPartsHack.forEach(path => {
+            path.fillColor = null
+        })
+        console.log(unfilledPartsHack.length)
         const raster = paper.project.activeLayer.rasterize(72, false)
-        console.log('ppp', x, y)
+        unfilledPartsHack.forEach(path => {
+            path.fillColor = '#FF000001'
+        })
         const pt_topleft = new paper.Point(Math.ceil(scaleX * x), 
                                            Math.ceil(scaleY * y))
         const pt_bottomright = new paper.Size(256, 256)

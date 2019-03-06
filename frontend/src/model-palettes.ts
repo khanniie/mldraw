@@ -16,6 +16,11 @@ export const modelPalettes = {
         column: "#f60001",
         entrance: "#00c9ff",
 
+    },
+    colorize: {
+        red: '#ff0000',
+        green: '#00ff00',
+        blue: '#0000ff'
     }
 }
 
