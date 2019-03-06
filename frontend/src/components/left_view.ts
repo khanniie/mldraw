@@ -26,8 +26,20 @@ function topBar(state: AppState, emit: Emit) {
             tools
         </div></div>
         <div id="icons">
-            <div class="icon">
+            <div class="icon" id="dropdown-s">
               <img onclick=${() => emit('switchTool', 'draw')} src="${pencil}"/>
+              <div class="dropdown-content-settings">
+              <ul>
+                       <li class="menu-item">
+                       <input type="checkbox" onclick=${({srcElement}) => emit('setSmoothness', srcElement.checked)} name="smooth" ${state.smoothing ? 'checked' : ''}/>
+                       <label for="smooth">smooth</label>
+                       </li>
+                       <li class="menu-item">
+                       <input type="checkbox" onclick=${({srcElement}) => emit('setClosed', srcElement.checked)} name="closed" ${state.closed ? 'checked' : ''}/>
+                       <label for="closed">closed</label>
+                       </li>
+              </ul>
+              </div>
             </div>
             <div class="icon">
               <img src="${eraser}" onclick=${() => emit('switchTool', 'cut')}/>
@@ -45,21 +57,6 @@ function topBar(state: AppState, emit: Emit) {
             <div class="icon">
               <img onclick=${() => emit('clear')} src="${trash}">
             </div>
-            <div class="icon" id="dropdown-s">
-            <img src="${more}">
-            <div class="dropdown-content-settings">
-            <ul>
-                     <li class="menu-item">
-                     <input type="checkbox" onclick=${({srcElement}) => emit('setSmoothness', srcElement.checked)} name="smooth" ${state.smoothing ? 'checked' : ''}></input>
-                     <label for="smooth">smooth</label>
-                     </li>
-                     <li class="menu-item">
-                     <input type="checkbox" onclick=${({srcElement}) => emit('setClosed', srcElement.checked)}
-                            name="closed" ${state.closed ? 'checked' : ''}/>
-                     <label for="closed">closed</label>
-                     </li>
-            </ul>
-            </div></div>
         </div>
         </div>
     </div>`
