@@ -26,7 +26,7 @@ function topBar(state: AppState, emit: Emit) {
             tools
         </div></div>
         <div id="icons">
-            <div class="icon" id="dropdown-s">
+            <div class=${state.tool == "draw" ? "selected-icon icon" : "icon"} id="dropdown-s">
               <img onclick=${() => emit('switchTool', 'draw')} src="${pencil}"/>
               <div class="dropdown-content-settings">
               <ul>
@@ -45,17 +45,17 @@ function topBar(state: AppState, emit: Emit) {
               </ul>
               </div>
             </div>
-            <div class="icon">
+            <div class=${state.tool == "cut" ? "selected-icon icon" : "icon"}>
               <img src="${eraser}" onclick=${() => emit('switchTool', 'cut')}/>
             </div>
-            <div class="icon">
+            <div class=${state.tool == "paintbucket" ? "selected-icon icon" : "icon"}>
               <span id="paintbucketInfo">${state.paintbucket.active ? state.paintbucket.colorName : ''}</span>
               <img onclick=${() => emit('paintbucketclicked')} src="${paintbucket}">
             </div>
             <div class="icon">
               <img src="${undo}">
             </div>
-            <div class="icon">
+            <div class=${state.tool == "drag" ? "selected-icon icon" : "icon"}>
               <img onclick=${() => emit('switchTool', 'drag')} src="${transform}">
             </div>
             <div class="icon">
