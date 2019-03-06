@@ -28,6 +28,7 @@ function initialState(state: choo.IState, emit: Emit) {
                 address: '128.2.103.85:8080',
                 isConnected: false
             },
+            strokeColor: '#000000',
             activeLayer: 1,
             layers: [],
             availableModels: [],

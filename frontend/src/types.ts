@@ -26,7 +26,8 @@ export interface AppState {
         palette: {[key:string] : string}
     },
     closed: boolean,
-    smoothing: boolean
+    smoothing: boolean,
+    strokeColor: string
 }
 
 /**
@@ -53,7 +54,8 @@ export interface Events {
     loadedmodel: string,
     setFill: string | boolean,
     paintbucketclicked: string,
-    addModel: string
+    addModel: string,
+    setStrokeColor: string
 }
 
 // type magic ~

@@ -54,7 +54,7 @@ const make_paper = (component: PaperCanvasComponent,
         if(selectedObject) return;
         pathBeingDrawn = new paper.Path({
             segments: [event.point],
-            strokeColor: 'black',
+            strokeColor: state.strokeColor,
             fullySelected: true,
             name: 'temp'
         })
@@ -402,6 +402,7 @@ const make_paper = (component: PaperCanvasComponent,
 
     function setState(newState: AppState) {
         state = newState;
+        console.log(state)
     }
 
     component.sketch = {
@@ -508,13 +509,13 @@ export function paperStore(state: State, emitter: Emitter) {
 
     emitter.on('setSmoothness', smooth => {
         state.app.smoothing = smooth
-        state.cache(PaperCanvasComponent, 'paper-canvas').sketch.setState(state)
+        state.cache(PaperCanvasComponent, 'paper-canvas').sketch.setState(state.app)
         emitter.emit('render')
     })
 
     emitter.on('setClosed', close => {
         state.app.closed = close
-        state.cache(PaperCanvasComponent, 'paper-canvas').sketch.setState(state)
+        state.cache(PaperCanvasComponent, 'paper-canvas').sketch.setState(state.app)
         emitter.emit('render')
     })
 
@@ -522,8 +523,13 @@ export function paperStore(state: State, emitter: Emitter) {
         state.cache(PaperCanvasComponent, 'paper-canvas').sketch.switchTool(tool)
     })
 
+    emitter.on('setStrokeColor', strokeColor => {
+        state.app.strokeColor = strokeColor
+        state.cache(PaperCanvasComponent, 'paper-canvas').sketch.setState(state.app)
+    })
+
     emitter.on('setFill', (color) => {
-        state.cache(PaperCanvasComponent, 'paper-canvas').sketch.setState(state)
+        state.cache(PaperCanvasComponent, 'paper-canvas').sketch.setState(state.app)
     })
 
     // TODO: make a comm reducer

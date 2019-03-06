@@ -38,6 +38,10 @@ function topBar(state: AppState, emit: Emit) {
                        <input type="checkbox" onclick=${({srcElement}) => emit('setClosed', srcElement.checked)} name="closed" ${state.closed ? 'checked' : ''}/>
                        <label for="closed">closed</label>
                        </li>
+                       <li class="menu-item">
+                       <input type="color" onchange=${e => emit('setStrokeColor', e.target.value)} name="colorpicker" value=${state.strokeColor}>
+                       <label for="colorpicker">stroke color</label>
+                       </li>
               </ul>
               </div>
             </div>
