@@ -49,12 +49,15 @@ export function localModelsStore(state: State, emitter: Emitter) {
     emitter.on('loadmodel', async (name) => {
         if(state.app.localModels[name] == 'loaded') return
         state.app.localModels[name] = 'loading'
+        state.app.renderdone = false;
+        emitter.emit('render')
         await localModels.loadModel(name)
         emitter.emit('loadedmodel', name)
         emitter.emit('render')
     })
     emitter.on('loadedmodel', name => {
         state.app.localModels[name] = 'loaded'
+
         emitter.emit('render')
     })
     localModels.loadModel('edges2cat')

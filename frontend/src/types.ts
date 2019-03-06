@@ -18,6 +18,7 @@ export interface AppState {
     activeLayer: number,
     layers: Layer[],
     tool: string,
+    renderdone: boolean,
     availableModels: string[],
     localModels: {[key:string]: string},
     paintbucket: {

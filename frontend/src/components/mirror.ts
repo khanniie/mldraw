@@ -53,8 +53,6 @@ const make_mirror = (component: MirrorComponent,
         united.bringToFront()
         const clippingGroup = new paper.Group([united, raster])
         clippingGroup.clipped = true
-        let renderimg = document.getElementById("render-img");
-        renderimg.classList.remove("spin");
     }
 
     function addLayer() {
@@ -120,6 +118,8 @@ export class MirrorComponent extends Component {
 export function mirrorStore(state: State, emitter: Emitter) {
     emitter.on('drawoutput', ([bytes, path, boundingRect]) => {
         // hacky
+        state.app.renderdone = true;
+        emitter.emit('render')
         state.cache(MirrorComponent, 'mirror-canvas').sketch.drawOutput([bytes, path, boundingRect])
     })
     emitter.on('clear', () => {

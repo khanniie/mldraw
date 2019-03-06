@@ -213,19 +213,25 @@ const make_paper = (component: PaperCanvasComponent,
 
     cutTool.onMouseDown = function(event: paper.ToolEvent) {
         project.activate()
-        console.log(event.item);
         let item = event.item;
         if(item instanceof paper.Path) {
             item.remove();
 
         } else if(event.item != null) {
-            const group = event.item
-            let hitInfos = group.hitTestAll(event.point)
-            // hitInfos = hitInfos.filter(hi => hi.item && hi.item instanceof paper.Path)
-            // if(hitInfos.length == 0) return
-            const smallest = hitInfos[0]
-            let path = (smallest.item ? smallest.item : smallest) as paper.Path
-            path.remove();
+            let hitOptions = {
+                segments: true,
+                stroke: true,
+                fill: true,
+                tolerance: 2
+            };
+            let hitResult = project.activeLayer.hitTestAll(event.point, hitOptions);
+            let item;
+            if(hitResult[0] != undefined && hitResult[0].item) {
+              item = hitResult[0];
+              let path = (item.item ? item.item : item) as paper.Path
+              path.remove();
+            }
+
         }
     }
 
@@ -308,7 +314,6 @@ const make_paper = (component: PaperCanvasComponent,
     const renderCanvas = doNothingIfRunning(async function (model) {
         console.log("edges2shoes requested")
         try {
-            document.getElementById("render-img").classList.add("spin");
             await executeOp(model as any)
             console.log("remove animation here")
         } catch (e) {
@@ -483,6 +488,8 @@ export function paperStore(state: State, emitter: Emitter) {
 
     emitter.on('mlrender', () => {
         // hacky
+        state.app.renderdone = false;
+        emitter.emit('render')
         const model = state.app.layers[state.app.activeLayer - 1].model
         console.log(model);
         state.cache(PaperCanvasComponent, 'paper-canvas').sketch.renderCanvas(model)

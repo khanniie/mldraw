@@ -31,6 +31,7 @@ function initialState(state: choo.IState, emit: Emit) {
             strokeColor: '#000000',
             activeLayer: 1,
             tool: 'draw',
+            renderdone: true,
             layers: [],
             availableModels: [],
             localModels: {},
