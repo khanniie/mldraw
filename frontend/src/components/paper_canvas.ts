@@ -240,7 +240,7 @@ const make_paper = (component: PaperCanvasComponent,
                 path.strokeColor = "#00000000"
 
             } else if(event.item != null) {
-                const group = event.item
+                const group = project.activeLayer
                 let hitInfos = group.hitTestAll(event.point)
                 hitInfos = hitInfos.filter(hi => hi.item && hi.item instanceof paper.Path)
                 if(hitInfos.length == 0) return

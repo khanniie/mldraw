@@ -16,6 +16,15 @@ const trash = require('./../assets/trash.png')
 const close = require('./../assets/close.svg')
 const more = require('./../assets/more.png')
 
+function colorpicker() {
+    return html`
+        <li class="color-picker">
+        <input type="color" name="colorpicker" oninput=${ev => console.log('input', ev.target.value)}>
+        <label for="colorpicker">color</label>
+        </li>
+    `
+}
+
 function topBar(state: AppState, emit: Emit) {
     return html`
     <div id="bar">
@@ -46,6 +55,7 @@ function topBar(state: AppState, emit: Emit) {
                             name="closed" ${state.closed ? 'checked' : ''}>
                      <label for="closed">closed</label>
                      </li>
+                    ${colorpicker()}
             </ul>
             </div></div>
         </div>
