@@ -30,7 +30,7 @@ const make_mirror = (component: MirrorComponent,
     //new paper.View()
     let appState
 
-    function drawOutput([bytes, clippingPath, boundingRect]: 
+    function drawOutput([bytes, clippingPath, boundingRect]:
         [string | HTMLImageElement, paper.Group, paper.Rectangle]) {
         project.activate()
         project.activeLayer.removeChildren()
@@ -53,6 +53,8 @@ const make_mirror = (component: MirrorComponent,
         united.bringToFront()
         const clippingGroup = new paper.Group([united, raster])
         clippingGroup.clipped = true
+        let renderimg = document.getElementById("render-img");
+        renderimg.classList.remove("spin");
     }
 
     function addLayer() {

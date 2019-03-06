@@ -77,8 +77,29 @@ canvas{
   position: relative;
 }
 
+@-moz-keyframes spin {
+    from { -moz-transform: rotate(0deg); }
+    to { -moz-transform: rotate(360deg); }
+}
+@-webkit-keyframes spin {
+    from { -webkit-transform: rotate(0deg); }
+    to { -webkit-transform: rotate(360deg); }
+}
+@keyframes spin {
+    from {transform:rotate(0deg);}
+    to {transform:rotate(360deg);}
+}
+
 #render-img{
   height: 100%;
+  transition-duration: 1s;
+}
+
+.spin{
+  transform-origin: center;
+  animation-name: spin;
+  animation-duration: 1s;
+  animation-iteration-count: infinite;
 }
 
 #render{
@@ -87,6 +108,8 @@ canvas{
   max-width: 8%;
   bottom: 0.3em;
   right: 3.8em;
+
+
 }
 
 /* -- rendered view -- */
@@ -104,7 +127,7 @@ canvas{
 
 #top{
   border-bottom: #6164bf 2px solid;
-  box-shadow: 0px 2px #C793C4;
+  box-shadow: 0px 4px #C793C4;
   background-color: #efe0ea;
   margin-bottom: 1em;
 }
@@ -112,8 +135,8 @@ canvas{
 #cat{
   font-weight: 400;
   margin-left: 0.5em;
-  padding-top: 0.25em;
-  padding-bottom: 0.25em;
+  padding-top: 0.4em;
+  padding-bottom: 0.4em;
   font-size: 2em;
   display: inline-block;
 }

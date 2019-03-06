@@ -185,7 +185,7 @@ const make_paper = (component: PaperCanvasComponent,
         bounding.selected = true
         if(bounding.data.moving) {
             bounding.bounds.center = event.point
-        } else {        
+        } else {
             bounding.bounds = new paper.Rectangle(bounding.data.from, event.point)
             const aspect = bounding.bounds.width / bounding.bounds.height
             bounding.bounds.height = aspect * bounding.bounds.height
@@ -295,21 +295,22 @@ const make_paper = (component: PaperCanvasComponent,
         unfilledPartsHack.forEach(path => {
             path.fillColor = '#FF000001'
         })
-        const pt_topleft = new paper.Point(Math.ceil(scaleX * x), 
+        const pt_topleft = new paper.Point(Math.ceil(scaleX * x),
                                            Math.ceil(scaleY * y))
         const pt_bottomright = new paper.Size(256, 256)
         //bgRect.remove()2
         layerBgRect.remove()
         paper.project.activeLayer.scale(1/scaleX, 1/scaleY, boundingRect.topLeft)
-        return [raster.getImageData(new paper.Rectangle(pt_topleft, pt_bottomright)), 
+        return [raster.getImageData(new paper.Rectangle(pt_topleft, pt_bottomright)),
             scaledClippingGroup]
     }
 
     const renderCanvas = doNothingIfRunning(async function (model) {
         console.log("edges2shoes requested")
         try {
+            document.getElementById("render-img").classList.add("spin");
             await executeOp(model as any)
-            console.log("edges2shoes executed")
+            console.log("remove animation here")
         } catch (e) {
             console.error('edges2shoes failed', e)
         }
@@ -350,7 +351,7 @@ const make_paper = (component: PaperCanvasComponent,
         const clippingGroup = new paper.Group()
         const mirrorLayer = null
         clippingGroup.name = 'clippingGroup'
-        const boundingRectPath = new paper.Path.Rectangle(paper.view.bounds.clone().scale(0.99)) 
+        const boundingRectPath = new paper.Path.Rectangle(paper.view.bounds.clone().scale(0.99))
         boundingRectPath.name = 'boundingRect'
         project.addLayer(layer)
         return [project.activeLayer.index, {
