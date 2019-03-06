@@ -332,7 +332,7 @@ ul {
   width: 50px;
   /* flex-grow: 0;
   flex-shrink: 0; */
-  /* transform: translate3d(0, 0, 0); */
+  transform: translate3d(0, 0, 0);
 }
 
 .icon img{
@@ -341,8 +341,8 @@ ul {
 }
 
 .icon:hover{
-  /* animation: shake 0.7s cubic-bezier(.36,.07,.19,.97) both;
-  transform: translate3d(0, 0, 0); */
+  animation: shake 0.7s cubic-bezier(.36,.07,.19,.97) both;
+  transform: translate3d(0, 0, 0);
 }
 
 #paintbucketInfo {
@@ -354,6 +354,7 @@ ul {
 /* -- toolbar settings dropdown -- */
 
 #dropdown-s{
+  z-index: 1;
   margin: 0px;
 }
 
