@@ -25,6 +25,7 @@ export const modelPalettes = {
 }
 
 export function paintBucketStore(state: State, emitter: Emitter) {
+    state.app.tool = "paintbucket";
     emitter.on('changeLayer', (layerIdx) => {
         if(!state.app.paintbucket.active) return
 
@@ -52,10 +53,10 @@ export function paintBucketStore(state: State, emitter: Emitter) {
                 if(!(modelPalettes[state.app.layers[state.app.activeLayer - 1].model] == state.app.paintbucket.palette)) {
                     state.app.paintbucket.palette = modelPalettes[state.app.layers[state.app.activeLayer - 1].model]
                     state.app.paintbucket.colorIdx = 0
-                    state.app.paintbucket.colorName = Object.keys(state.app.paintbucket.palette)[0]    
+                    state.app.paintbucket.colorName = Object.keys(state.app.paintbucket.palette)[0]
                 }
                 emitter.emit('switchTool', 'fill')
-                emitter.emit('setFill', state.app.paintbucket.palette[state.app.paintbucket.colorName]) 
+                emitter.emit('setFill', state.app.paintbucket.palette[state.app.paintbucket.colorName])
                 emitter.emit('render')
             } else {
                 state.app.paintbucket.active = false;

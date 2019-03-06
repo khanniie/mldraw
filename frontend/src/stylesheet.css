@@ -357,6 +357,10 @@ ul {
   transform: translate3d(0, 0, 0);
 }
 
+.selected-icon{
+  border: #6164bf 2px solid;
+}
+
 .icon img{
   margin-top: calc(15% + 3px);
   height: 70%;

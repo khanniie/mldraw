@@ -29,6 +29,7 @@ function initialState(state: choo.IState, emit: Emit) {
                 isConnected: false
             },
             activeLayer: 1,
+            tool: 'draw',
             layers: [],
             availableModels: [],
             localModels: {},

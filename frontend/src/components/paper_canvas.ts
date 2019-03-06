@@ -519,6 +519,7 @@ export function paperStore(state: State, emitter: Emitter) {
     })
 
     emitter.on('switchTool', (tool) => {
+        state.app.tool = tool;
         state.cache(PaperCanvasComponent, 'paper-canvas').sketch.switchTool(tool)
     })
 
