@@ -32,15 +32,15 @@ function topBar(state: AppState, emit: Emit) {
               <ul>
                        <li class="menu-item">
                        <input type="checkbox" onclick=${({srcElement}) => emit('setSmoothness', srcElement.checked)} name="smooth" ${state.smoothing ? 'checked' : ''}/>
-                       <label for="smooth">smooth</label>
+                       <label for="smooth"> smooth</label>
                        </li>
                        <li class="menu-item">
                        <input type="checkbox" onclick=${({srcElement}) => emit('setClosed', srcElement.checked)} name="closed" ${state.closed ? 'checked' : ''}/>
-                       <label for="closed">closed</label>
+                       <label for="closed"> closed</label>
                        </li>
                        <li class="menu-item">
                        <input type="color" onchange=${e => emit('setStrokeColor', e.target.value)} name="colorpicker" value=${state.strokeColor}>
-                       <label for="colorpicker">stroke color</label>
+                       <label for="colorpicker"> stroke</label>
                        </li>
               </ul>
               </div>
