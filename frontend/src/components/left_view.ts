@@ -16,15 +16,6 @@ const trash = require('./../assets/trash.png')
 const close = require('./../assets/close.svg')
 const more = require('./../assets/more.png')
 
-function colorpicker() {
-    return html`
-        <li class="color-picker">
-        <input type="color" name="colorpicker" oninput=${ev => console.log('input', ev.target.value)}>
-        <label for="colorpicker">color</label>
-        </li>
-    `
-}
-
 function topBar(state: AppState, emit: Emit) {
     return html`
     <div id="bar">
@@ -35,52 +26,44 @@ function topBar(state: AppState, emit: Emit) {
             tools
         </div></div>
         <div id="icons">
-            <img class="icon" onclick=${() => emit('switchTool', 'draw')} src="${pencil}">
-            <img class="icon" src="${eraser}" onclick=${() => emit('switchTool', 'cut')}">
-            <span id="paintbucketInfo">${state.paintbucket.active ? state.paintbucket.colorName : ''}</span>
-            <img class="icon" onclick=${() => emit('paintbucketclicked')} src="${paintbucket}">
-            <img class="icon" src="${undo}">
-            <img class="icon" onclick=${() => emit('switchTool', 'drag')} src="${transform}">
-            <img class="icon" onclick=${() => emit('clear')} src="${trash}">
-            <div class="icon" id="dropdown-s"><img src="${more}">
+            <div class="icon">
+              <img onclick=${() => emit('switchTool', 'draw')} src="${pencil}"/>
+            </div>
+            <div class="icon">
+              <img src="${eraser}" onclick=${() => emit('switchTool', 'cut')}/>
+            </div>
+            <div class="icon">
+              <span id="paintbucketInfo">${state.paintbucket.active ? state.paintbucket.colorName : ''}</span>
+              <img onclick=${() => emit('paintbucketclicked')} src="${paintbucket}">
+            </div>
+            <div class="icon">
+              <img src="${undo}">
+            </div>
+            <div class="icon">
+              <img onclick=${() => emit('switchTool', 'drag')} src="${transform}">
+            </div>
+            <div class="icon">
+              <img onclick=${() => emit('clear')} src="${trash}">
+            </div>
+            <div class="icon" id="dropdown-s">
+            <img src="${more}">
             <div class="dropdown-content-settings">
             <ul>
                      <li class="menu-item">
-                     <input type="checkbox" onclick=${({srcElement}) => emit('setSmoothness', srcElement.checked)} 
-                            name="smooth" ${state.smoothing ? 'checked' : ''}>
+                     <input type="checkbox" onclick=${({srcElement}) => emit('setSmoothness', srcElement.checked)} name="smooth" ${state.smoothing ? 'checked' : ''}></input>
                      <label for="smooth">smooth</label>
                      </li>
                      <li class="menu-item">
-                     <input type="checkbox" onclick=${({srcElement}) => emit('setClosed', srcElement.checked)} 
-                            name="closed" ${state.closed ? 'checked' : ''}>
+                     <input type="checkbox" onclick=${({srcElement}) => emit('setClosed', srcElement.checked)}
+                            name="closed" ${state.closed ? 'checked' : ''}/>
                      <label for="closed">closed</label>
                      </li>
-                    ${colorpicker()}
             </ul>
             </div></div>
         </div>
         </div>
     </div>`
 }
-
-// <li class="menu-item">${renderButton(emit)}</li>
-// <li class="menu-item">${clearButton(emit)}</li>
-
-// function serverSelector({ address }: AppState['server'], emit: Emit) {
-//     const onsubmit = (e: Event) => {
-//         e.preventDefault()
-//         const form = e.currentTarget as HTMLFormElement
-//         const body = new FormData(form)
-//         const url = body.get("serverURL")
-//         emit('setURL', url.toString())
-//     }
-//     return html`
-//     <form onsubmit=${onsubmit}>
-//         <input name="serverURL" type="url" placeholder="Backend server URL" value=${address}>
-//         <button type="submit">Connect</button>
-//     </form>
-//     `
-// }
 
 function clearButton(emit: Emit) {
     const onclick = () => emit('clear')

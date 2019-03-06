@@ -317,20 +317,32 @@ ul {
 }
 
 #icons{
-  height: 100%;
+  height: calc(100% - 1.25em);
   vertical-align: middle;
   width: 65vh;
   min-width: 256px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  /* align-items: center; */
+  flex-wrap: nowrap;
 }
 
 .icon{
-  width: 10%;
-  margin: 2%;
+  width: 50px;
+  /* flex-grow: 0;
+  flex-shrink: 0; */
+  /* transform: translate3d(0, 0, 0); */
+}
+
+.icon img{
+  margin-top: calc(15% + 3px);
+  height: 70%;
 }
 
 .icon:hover{
-  animation: shake 0.3s cubic-bezier(.36,.07,.19,.97) both;
-  transform: translate3d(0, 0, 0);
+  /* animation: shake 0.7s cubic-bezier(.36,.07,.19,.97) both;
+  transform: translate3d(0, 0, 0); */
 }
 
 #paintbucketInfo {
