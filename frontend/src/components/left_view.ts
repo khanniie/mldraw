@@ -28,6 +28,10 @@ function topBar(state: AppState, emit: Emit) {
         <div id="icons">
             <div class=${state.tool == "draw" ? "selected-icon icon" : "icon"} id="dropdown-s">
               <img onclick=${() => emit('switchTool', 'draw')} src="${pencil}"/>
+              <div id="colorpick">
+              <input id="colorpick-i" type="color" onchange=${e => emit('setStrokeColor', e.target.value)} name="colorpicker" value=${state.strokeColor}/>
+              <div id="colorpick-display" style="background-color:${state.strokeColor};">
+              </div>
               <div class="dropdown-content-settings">
               <ul>
                        <li class="menu-item">
@@ -38,13 +42,9 @@ function topBar(state: AppState, emit: Emit) {
                        <input type="checkbox" onclick=${({srcElement}) => emit('setClosed', srcElement.checked)} name="closed" ${state.closed ? 'checked' : ''}/>
                        <label for="closed"> closed</label>
                        </li>
-                       <li class="menu-item">
-                       <input type="color" onchange=${e => emit('setStrokeColor', e.target.value)} name="colorpicker" value=${state.strokeColor}>
-                       <label for="colorpicker"> stroke</label>
-                       </li>
               </ul>
               </div>
-            </div>
+            </div></div>
             <div class=${state.tool == "cut" ? "selected-icon icon" : "icon"}>
               <img src="${eraser}" onclick=${() => emit('switchTool', 'cut')}/>
             </div>

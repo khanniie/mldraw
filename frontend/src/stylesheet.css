@@ -277,6 +277,37 @@ canvas{
 
 /* -- toolbar -----*/
 
+/* input[type="color"] {
+	-webkit-appearance: none;
+	border: none;
+	width: 32px;
+	height: 32px;
+  padding: 0;
+} */
+
+#colorpick{
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  width: 16px;
+  height: 16px;
+}
+
+#colorpick-i{
+  position: absolute;
+    height: 100%;
+    width: 100%;
+    z-index: 1;
+    opacity: 0;
+}
+
+#colorpick-display{
+  position: absolute;
+    border: #6164bf 2px solid;
+    height: 100%;
+    width: 100%;
+}
+
 #bar{
   width: 100%;
   height: auto;

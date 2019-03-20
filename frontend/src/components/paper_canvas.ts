@@ -491,7 +491,6 @@ export function paperStore(state: State, emitter: Emitter) {
         state.app.renderdone = false;
         emitter.emit('render')
         const model = state.app.layers[state.app.activeLayer - 1].model
-        console.log(model);
         state.cache(PaperCanvasComponent, 'paper-canvas').sketch.renderCanvas(model)
     })
 
@@ -534,6 +533,7 @@ export function paperStore(state: State, emitter: Emitter) {
     emitter.on('setStrokeColor', strokeColor => {
         state.app.strokeColor = strokeColor
         state.cache(PaperCanvasComponent, 'paper-canvas').sketch.setState(state.app)
+        emitter.emit('render')
     })
 
     emitter.on('setFill', (color) => {
