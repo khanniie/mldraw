@@ -38,6 +38,8 @@ const make_paper = (component: PaperCanvasComponent,
     //let fillColor: string;
     //let smoothing = false;
     //let autoclose = true;
+    const activeBounds = () => activeBounds()
+
     let dragTool = new paper.Tool();
     let drawTool = new paper.Tool();
     let fillTool = new paper.Tool();
@@ -148,48 +150,25 @@ const make_paper = (component: PaperCanvasComponent,
     }
 
     boundsEditingTool.onMouseDown = function(event) {
-        let hitOptions = {
-            segments: true,
-            stroke: true,
-            fill: true,
-            tolerance: 100
-        };
-        project.activeLayer.selected = false
-        const bounding: paper.Path.Rectangle = project.activeLayer.children['boundingRect']
+        const bounding: paper.Path.Rectangle = activeBounds()
+        bounding.data.startCorner = event.point
         bounding.selected = true
-        if(bounding.hitTest(event.point, hitOptions)) {
-            let closest
-            let closestDist = 1e9
-            for (let i = 0; i < bounding.segments.length; i++) {
-                var p = bounding.segments[i].point;
-                if(p.getDistance(event.point) < closestDist) {
-                    closestDist = p.getDistance(event.point)
-                    closest = i
-                }
-            }
-            if(event.point.getDistance(bounding.bounds.center) < closest) {
-                bounding.data.moving = true
-            } else {
-                bounding.data.moving = false
-                const opposite = (closest + 2) % 4
-                bounding.data.from = bounding.segments[opposite].point;
-                bounding.data.to = bounding.segments[closest].point;
-            }
-        } else if(bounding.contains(event.point)) {
-            bounding.data.moving = true
-        }
+        console.log(bounding.bounds)
     }
 
     boundsEditingTool.onMouseDrag = function (event) {
-        const bounding: paper.Path.Rectangle = project.activeLayer.children['boundingRect']
+        const bounding: paper.Path.Rectangle = activeBounds()
         bounding.selected = true
-        if(bounding.data.moving) {
-            bounding.bounds.center = event.point
+        const delta: paper.Point = bounding.data.startCorner.subtract(event.point)
+        console.log(delta)
+        if(Math.abs(delta.x) < 10 || Math.abs(delta.y) < 10) return
+        if(Math.abs(delta.x) > Math.abs(delta.y)) {
+            delta.y = Math.sign(delta.y) * Math.abs(delta.x);
         } else {
-            bounding.bounds = new paper.Rectangle(bounding.data.from, event.point)
-            const aspect = bounding.bounds.width / bounding.bounds.height
-            bounding.bounds.height = aspect * bounding.bounds.height
+            delta.x = Math.sign(delta.x) * Math.abs(delta.y);
         }
+        const otherCorner = bounding.data.startCorner.add(delta.multiply(-1))
+        bounding.bounds = new paper.Rectangle(bounding.data.startCorner, otherCorner)
     }
 
     cutTool.onMouseMove = function(event) {
@@ -325,7 +304,7 @@ const make_paper = (component: PaperCanvasComponent,
         console.log("active layer:", project.activeLayer);
         const canvas: HTMLCanvasElement = paper.view.element
         console.log("executing")
-        const boundingRect = project.activeLayer.children['boundingRect'].bounds
+        const boundingRect = activeBounds().bounds
         const [raster, clippingGroup] = rasterize(boundingRect)
         const reply = await comm.send(op, raster)
 
@@ -369,7 +348,12 @@ const make_paper = (component: PaperCanvasComponent,
         //blunt force solution - optimize later to just be current layer toggle
         project.layers.map((lyr:paper.Layer) => (lyr.opacity = 0.2));
         project.layers[idx].opacity = 1
+        const prevActiveLayer = project.activeLayer
         project.layers[idx].activate()
+        if(prevActiveLayer != project.activeLayer) {
+            console.log('going back to draw tool')
+            emit('switchTool', 'draw')    
+        }
         console.log("active layer:", project.activeLayer);
     }
 
@@ -381,7 +365,7 @@ const make_paper = (component: PaperCanvasComponent,
     }
 
     function switchTool(tool){
-        project.activeLayer.children['boundingRect'].selected = false
+        for(const layer of project.layers) layer.children['boundingRect'].selected = false
         switch (tool) {
             case 'cut':
                 cutTool.activate();
@@ -396,13 +380,19 @@ const make_paper = (component: PaperCanvasComponent,
                 fillTool.activate();
                 break;
             case 'bounds':
-                project.activeLayer.children['boundingRect'].selected = true
+                activeBounds().selected = true
                 boundsEditingTool.activate();
                 break;
             default:
                 //donothing
                 break;
         }
+    }
+
+
+    function resetBounds() {
+        project.activate()
+        activeBounds().bounds = paper.view.bounds.clone().scale(0.99)
     }
 
     function setState(newState: AppState) {
@@ -417,7 +407,8 @@ const make_paper = (component: PaperCanvasComponent,
         swapLayers,
         addLayer,
         switchTool,
-        setState
+        setState,
+        resetBounds
     }
 }
 
@@ -428,7 +419,8 @@ type SketchMethods = {
     swapLayers: (idxA: number, idxB: number) => void,
     addLayer: () => void,
     switchTool: (tool: string) => void,
-    setState: (newState: AppState) => void
+    setState: (newState: AppState) => void,
+    resetBounds: () => void
 }
 
 export class PaperCanvasComponent extends Component {
@@ -538,6 +530,10 @@ export function paperStore(state: State, emitter: Emitter) {
 
     emitter.on('setFill', (color) => {
         state.cache(PaperCanvasComponent, 'paper-canvas').sketch.setState(state.app)
+    })
+
+    emitter.on('resetBounds', () => {
+        state.cache(PaperCanvasComponent, 'paper-canvas').sketch.resetBounds()
     })
 
     // TODO: make a comm reducer

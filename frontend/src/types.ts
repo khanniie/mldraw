@@ -57,7 +57,8 @@ export interface Events {
     setFill: string | boolean,
     paintbucketclicked: string,
     addModel: string,
-    setStrokeColor: string
+    setStrokeColor: string,
+    resetBounds: undefined
 }
 
 // type magic ~
