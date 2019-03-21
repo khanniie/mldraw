@@ -552,6 +552,7 @@ export function paperStore(state: State, emitter: Emitter) {
     emitter.on('setStrokeColor', strokeColor => {
         state.app.strokeColor = strokeColor
         sketch().setState(state.app)
+        emitter.emit('switchTool', 'draw')
         emitter.emit('render')
     })
 
