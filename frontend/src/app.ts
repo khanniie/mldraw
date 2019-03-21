@@ -44,7 +44,10 @@ function initialState(state: choo.IState, emit: Emit) {
                 }
             },
             closed: true,
-            smoothing: true
+            smoothing: true,
+            // todo change this to show box to accept warning
+            // that changing a model will reset the fills 
+            warningAccepted: true
         }
     })
 }

@@ -38,7 +38,7 @@ const make_paper = (component: PaperCanvasComponent,
     //let fillColor: string;
     //let smoothing = false;
     //let autoclose = true;
-    const activeBounds = () => activeBounds()
+    const activeBounds = () => project.activeLayer.children['boundingRect']
 
     let dragTool = new paper.Tool();
     let drawTool = new paper.Tool();
@@ -389,6 +389,16 @@ const make_paper = (component: PaperCanvasComponent,
         }
     }
 
+    function resetFills() {
+        project.activate()
+        for(const item of project.activeLayer.children['clippingGroup'].children) {
+            if(item instanceof paper.Path) {
+                item.fillColor = '#00000001'
+                item.strokeColor = '#000000'
+            }
+        }
+    }
+
 
     function resetBounds() {
         project.activate()
@@ -408,7 +418,8 @@ const make_paper = (component: PaperCanvasComponent,
         addLayer,
         switchTool,
         setState,
-        resetBounds
+        resetBounds,
+        resetFills
     }
 }
 
@@ -420,7 +431,8 @@ type SketchMethods = {
     addLayer: () => void,
     switchTool: (tool: string) => void,
     setState: (newState: AppState) => void,
-    resetBounds: () => void
+    resetBounds: () => void,
+    resetFills: () => void
 }
 
 export class PaperCanvasComponent extends Component {
@@ -472,6 +484,9 @@ export class PaperCanvasComponent extends Component {
 }
 
 export function paperStore(state: State, emitter: Emitter) {
+
+    const sketch = () => state.cache(PaperCanvasComponent, 'paper-canvas').sketch
+
     emitter.on('isConnected', () => {
         state.app.server.isConnected = true;
         console.log(state.app.server, state.app.server.isConnected)
@@ -483,23 +498,23 @@ export function paperStore(state: State, emitter: Emitter) {
         state.app.renderdone = false;
         emitter.emit('render')
         const model = state.app.layers[state.app.activeLayer - 1].model
-        state.cache(PaperCanvasComponent, 'paper-canvas').sketch.renderCanvas(model)
+        sketch().renderCanvas(model)
     })
 
     emitter.on('clear', () => {
         // hacky
         console.log('clearing canvas')
-        state.cache(PaperCanvasComponent, 'paper-canvas').sketch.clear()
+        sketch().clear()
     })
 
     emitter.on('changeLayer', (layerIdx) => {
-        state.cache(PaperCanvasComponent, 'paper-canvas').sketch.switchLayer(layerIdx)
+        sketch().switchLayer(layerIdx)
         state.app.activeLayer = layerIdx;
         emitter.emit('render')
     })
 
     emitter.on('addLayer', () => {
-        let res = state.cache(PaperCanvasComponent, 'paper-canvas').sketch.addLayer()
+        let res = sketch().addLayer()
         state.app.layers.push(res[1]);
         emitter.emit('changeLayer', res[0] + 1);
         emitter.emit('render')
@@ -507,33 +522,37 @@ export function paperStore(state: State, emitter: Emitter) {
 
     emitter.on('setSmoothness', smooth => {
         state.app.smoothing = smooth
-        state.cache(PaperCanvasComponent, 'paper-canvas').sketch.setState(state.app)
+        sketch().setState(state.app)
         emitter.emit('render')
     })
 
     emitter.on('setClosed', close => {
         state.app.closed = close
-        state.cache(PaperCanvasComponent, 'paper-canvas').sketch.setState(state.app)
+        sketch().setState(state.app)
         emitter.emit('render')
     })
 
     emitter.on('switchTool', (tool) => {
         state.app.tool = tool;
-        state.cache(PaperCanvasComponent, 'paper-canvas').sketch.switchTool(tool)
+        sketch().switchTool(tool)
     })
 
     emitter.on('setStrokeColor', strokeColor => {
         state.app.strokeColor = strokeColor
-        state.cache(PaperCanvasComponent, 'paper-canvas').sketch.setState(state.app)
+        sketch().setState(state.app)
         emitter.emit('render')
     })
 
     emitter.on('setFill', (color) => {
-        state.cache(PaperCanvasComponent, 'paper-canvas').sketch.setState(state.app)
+        sketch().setState(state.app)
     })
 
     emitter.on('resetBounds', () => {
-        state.cache(PaperCanvasComponent, 'paper-canvas').sketch.resetBounds()
+        sketch().resetBounds()
+    })
+
+    emitter.on('resetFills', () => {
+        sketch().resetFills()
     })
 
     // TODO: make a comm reducer

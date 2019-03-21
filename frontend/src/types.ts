@@ -30,6 +30,7 @@ export interface AppState {
     closed: boolean,
     smoothing: boolean,
     strokeColor: string
+    warningAccepted: boolean
 }
 
 /**
@@ -58,7 +59,9 @@ export interface Events {
     paintbucketclicked: string,
     addModel: string,
     setStrokeColor: string,
-    resetBounds: undefined
+    resetBounds: undefined,
+    resetFills: undefined,
+    showModelChangeWarning: undefined
 }
 
 // type magic ~

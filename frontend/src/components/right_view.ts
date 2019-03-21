@@ -4,6 +4,8 @@ import devTools from 'choo-devtools'
 import { State, AppState, Emit, Layer } from './../types'
 import html from 'choo/html'
 import {mirrorView} from './mirror_component'
+import { emit } from 'cluster';
+import { modelPalettes } from '../model-palettes'
 
 const pawprint = require('./../assets/pawprint.svg')
 const arrow = require('./../assets/arrow.png')
@@ -12,12 +14,20 @@ const dotted = require('./../assets/dotted-square.svg')
 function dropdownContent(emit:Emit, layer, i:number, state: AppState){
     return html`<div class="dropdown-content">
       ${state.availableModels.map(modelName =>
-        html`<a href="#" onclick=${() => changeModel(state, i, modelName)}>${getName(modelName)}</a>`
+        html`<a href="#" onclick=${() => changeModel(state, i, modelName, emit)}>${getName(modelName)}</a>`
       )}
    </div>`;
   }
 
-function changeModel(appState:AppState, idx, model){
+function changeModel(appState:AppState, idx, model, emit: Emit){
+  const oldModel = appState.layers[idx].model
+  if(model != oldModel) {
+    if(appState.warningAccepted) {
+      emit('resetFills')
+    } else {
+      emit('showModelChangeWarning')
+    }
+  }
   appState.layers[idx].model = model;
   console.log("model changed idx: ", idx);
   console.log('current state', appState);
