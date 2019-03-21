@@ -80,6 +80,7 @@ const make_paper = (component: PaperCanvasComponent,
         pathBeingDrawn.selected = false
         pathBeingDrawn.fillColor = '#FF000001'
         if(state.smoothing) pathBeingDrawn.simplify(10)
+        if(pathBeingDrawn.length > 0.001) project.activeLayer.data.empty = false
         if(project.activeLayer.children['clippingGroup']){
           project.activeLayer.children['clippingGroup'].addChild(pathBeingDrawn)
         } else {
@@ -291,17 +292,21 @@ const make_paper = (component: PaperCanvasComponent,
     }
 
     const renderCanvas = doNothingIfRunning(async function (model) {
-        console.log("edges2shoes requested")
+        console.log(model + " requested")
         try {
             await executeOp(model as any)
             console.log("remove animation here")
         } catch (e) {
-            console.error('edges2shoes failed', e)
+            console.error(model + ' failed', e)
         }
     })
 
     async function executeOp(op: Operation) {
         console.log("active layer:", project.activeLayer);
+        if(project.activeLayer.data.empty) {
+            emit('canceloutput')
+            return
+        }
         const canvas: HTMLCanvasElement = paper.view.element
         console.log("executing")
         const boundingRect = activeBounds().bounds
@@ -338,6 +343,7 @@ const make_paper = (component: PaperCanvasComponent,
         const boundingRectPath = new paper.Path.Rectangle(paper.view.bounds.clone().scale(0.99))
         boundingRectPath.name = 'boundingRect'
         project.addLayer(layer)
+        layer.data.empty = true
         return [project.activeLayer.index, {
             layer, clippingGroup, model: 'edges2shoes_pretrained', mirrorLayer
         }];

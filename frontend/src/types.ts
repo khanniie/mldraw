@@ -61,7 +61,8 @@ export interface Events {
     setStrokeColor: string,
     resetBounds: undefined,
     resetFills: undefined,
-    showModelChangeWarning: undefined
+    showModelChangeWarning: undefined,
+    canceloutput: undefined
 }
 
 // type magic ~
