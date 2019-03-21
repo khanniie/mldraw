@@ -150,15 +150,19 @@ const make_paper = (component: PaperCanvasComponent,
 
     boundsEditingTool.onMouseDown = function(event) {
         const bounding = activeBounds()
-        bounding.data.startCorner = event.point
+        const clamped = new paper.Point(Math.max(0, Math.min(event.point.x, viewWidth)),
+                                        Math.max(0, Math.min(event.point.y, viewHeight)))
+        bounding.data.startCorner = clamped
         bounding.selected = true
-        console.log(bounding.bounds)
     }
 
     boundsEditingTool.onMouseDrag = function (event) {
         const bounding = activeBounds()
         bounding.selected = true
-        const delta: paper.Point = bounding.data.startCorner.subtract(event.point)
+        const clamped = new paper.Point(Math.max(0, Math.min(event.point.x, viewWidth)),
+                                        Math.max(0, Math.min(event.point.y, viewHeight)))
+
+        const delta: paper.Point = bounding.data.startCorner.subtract(clamped)
         console.log(delta)
         if(Math.abs(delta.x) < 10 || Math.abs(delta.y) < 10) return
         if(Math.abs(delta.x) > Math.abs(delta.y)) {
