@@ -1,7 +1,7 @@
 import { PaperCanvasComponent, paperStore} from './paper_canvas'
 import * as choo from 'choo'
 import devTools from 'choo-devtools'
-import { State, AppState, Emit, Layer } from './../types'
+import { State, AppState, Emit, Layer, Emitter } from './../types'
 import html from 'choo/html'
 import {mirrorView} from './mirror_component'
 import { emit } from 'cluster';
@@ -103,4 +103,13 @@ export function rightView(state: choo.IState, emit: Emit) {
       ${mirrorView(state, emit)}
     </div>
     </div>`
+}
+
+
+export function rightViewStore(state: State, emitter: Emitter) {
+  // todo change this to actually show box to accept warning
+  // that changing a model will reset the fills 
+  emitter.on('showModelChangeWarning', () => {
+    state.app.warningAccepted = true
+  })
 }
