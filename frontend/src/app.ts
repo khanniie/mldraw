@@ -44,7 +44,7 @@ function initialState(state: choo.IState, emit: Emit) {
                 }
             },
             closed: true,
-            smoothing: true,
+            smoothing: false,
             warningAccepted: false
         }
     })
