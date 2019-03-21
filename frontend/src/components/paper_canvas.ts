@@ -38,7 +38,7 @@ const make_paper = (component: PaperCanvasComponent,
     //let fillColor: string;
     //let smoothing = false;
     //let autoclose = true;
-    const activeBounds = () => project.activeLayer.children['boundingRect']
+    const activeBounds = () => project.activeLayer.children['boundingRect'] as paper.Path.Rectangle
 
     let dragTool = new paper.Tool();
     let drawTool = new paper.Tool();
@@ -114,7 +114,7 @@ const make_paper = (component: PaperCanvasComponent,
             segment = selectedObject.segment;
         } else if (selectedObject.type == 'stroke') {
             var location = selectedObject.location;
-        console.log("location: ", location.index, event.point);
+            console.log("location: ", location.index, event.point);
             segment = path.insert(location.index + 1, event.point);
         }
     }
@@ -151,14 +151,14 @@ const make_paper = (component: PaperCanvasComponent,
     }
 
     boundsEditingTool.onMouseDown = function(event) {
-        const bounding: paper.Path.Rectangle = activeBounds()
+        const bounding = activeBounds()
         bounding.data.startCorner = event.point
         bounding.selected = true
         console.log(bounding.bounds)
     }
 
     boundsEditingTool.onMouseDrag = function (event) {
-        const bounding: paper.Path.Rectangle = activeBounds()
+        const bounding = activeBounds()
         bounding.selected = true
         const delta: paper.Point = bounding.data.startCorner.subtract(event.point)
         console.log(delta)
@@ -342,6 +342,8 @@ const make_paper = (component: PaperCanvasComponent,
         clippingGroup.name = 'clippingGroup'
         const boundingRectPath = new paper.Path.Rectangle(paper.view.bounds.clone().scale(0.99))
         boundingRectPath.name = 'boundingRect'
+        boundingRectPath.strokeColor = '#0000005F'
+        boundingRectPath.dashArray = [2, 40]
         project.addLayer(layer)
         layer.data.empty = true
         return [project.activeLayer.index, {
@@ -358,8 +360,10 @@ const make_paper = (component: PaperCanvasComponent,
         project.layers[idx].activate()
         if(prevActiveLayer != project.activeLayer) {
             console.log('going back to draw tool')
+            prevActiveLayer.children['boundingRect'].strokeColor = null
             emit('switchTool', 'draw')    
         }
+        activeBounds().strokeColor = '#0000005F'
         console.log("active layer:", project.activeLayer);
     }
 
