@@ -65,11 +65,9 @@ const make_paper = (component: PaperCanvasComponent,
 
     drawTool.onMouseDrag = function (event) {
         if(selectedObject) return;
-        if(event.point.x < 0) event.point.x = 0
-        if(event.point.y < 0) event.point.y = 0
-        if(event.point.x >= viewWidth) event.point.x = Math.floor(viewWidth)
-        if(event.point.y >= viewHeight) event.point.y = Math.floor(viewHeight)
-        pathBeingDrawn.add(event.point)
+        const clamped = new paper.Point(Math.max(0, Math.min(event.point.x, viewWidth)),
+                                        Math.max(0, Math.min(event.point.y, viewHeight)))
+        pathBeingDrawn.add(clamped)
     }
 
     drawTool.onMouseUp = function (event) {
