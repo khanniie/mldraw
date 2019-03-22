@@ -16,6 +16,14 @@ const trash = require('./../assets/trash.png')
 const close = require('./../assets/close.svg')
 const more = require('./../assets/more.png')
 
+function tool_use_sel(tool_name, active_tool, usable){
+  console.log(tool_name, active_tool, usable);
+  let cla = "icon";
+  if(tool_name === active_tool) {cla += " selected-icon"}
+  if(!usable) {cla += " no_use"}
+  return cla;
+}
+
 function topBar(state: AppState, emit: Emit) {
     return html`
     <div id="bar">
@@ -31,7 +39,7 @@ function topBar(state: AppState, emit: Emit) {
               <div id="colorpick">
               <input id="colorpick-i" type="color" onchange=${e => emit('setStrokeColor', e.target.value)} name="colorpicker" value=${state.strokeColor}/>
               <div id="colorpick-display" style="background-color:${state.strokeColor};">
-              </div>
+              </div></div>
               <div class="dropdown-content-settings">
               <ul>
                        <li class="menu-item">
@@ -44,16 +52,15 @@ function topBar(state: AppState, emit: Emit) {
                        </li>
               </ul>
               </div>
-            </div></div>
+            </div>
             <div class=${state.tool == "cut" ? "selected-icon icon" : "icon"}>
               <img src="${eraser}" onclick=${() => emit('switchTool', 'cut')}/>
             </div>
-            <div class=${state.tool == "paintbucket" ? "selected-icon icon" : "icon"}>
-              <span id="paintbucketInfo">${state.paintbucket.active ? state.paintbucket.colorName : ''}</span>
+            <div class=${tool_use_sel("fill", state.tool, state.paintbucket.usable)}>
+              <span id="paintbucketInfo" class=${state.paintbucket.usable ? "p-info-use" : ''}>
+                ${state.paintbucket.usable ? state.paintbucket.colorName : ''}
+              </span>
               <img onclick=${() => emit('paintbucketclicked')} src="${paintbucket}">
-            </div>
-            <div class="icon">
-              <img src="${undo}">
             </div>
             <div class=${state.tool == "drag" ? "selected-icon icon" : "icon"}>
               <img onclick=${() => emit('switchTool', 'drag')} src="${transform}">

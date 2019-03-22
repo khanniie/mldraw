@@ -28,6 +28,7 @@ function initialState(state: choo.IState, emit: Emit) {
                 address: '128.2.103.85:8080',
                 isConnected: false
             },
+            mouseOnCanvas: false,
             strokeColor: '#000000',
             activeLayer: 1,
             tool: 'draw',
@@ -36,6 +37,7 @@ function initialState(state: choo.IState, emit: Emit) {
             availableModels: [],
             localModels: {},
             paintbucket: {
+                usable: false,
                 active: true,
                 colorIdx: 0,
                 colorName: '',

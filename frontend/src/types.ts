@@ -22,6 +22,7 @@ export interface AppState {
     availableModels: string[],
     localModels: {[key:string]: string},
     paintbucket: {
+        usable: boolean,
         active: boolean,
         colorIdx: number,
         colorName: string,

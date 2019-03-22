@@ -431,6 +431,19 @@ type SketchMethods = {
     setState: (newState: AppState) => void
 }
 
+
+function setMouseDown(state, emit){
+  state.mouseOnCanvas = true;
+  console.log("stat:" + state.mouseOnCanvas);
+  emit('render');
+}
+
+function setMouseUp(state, emit){
+  state.mouseOnCanvas = false;
+  console.log("stat:" + state.mouseOnCanvas);
+  emit('render');
+}
+
 export class PaperCanvasComponent extends Component {
     comm: Comm
     emit: Emit
@@ -454,6 +467,9 @@ export class PaperCanvasComponent extends Component {
         newcanvas.height = 256
         newcanvas.id = "new"
         element.appendChild(newcanvas)
+
+        element.onmousedown = (() => setMouseDown(this.appState, this.emit));
+        element.onmouseup = (() => setMouseUp(this.appState, this.emit))
 
         make_paper(this, newcanvas, element, this.comm, this.emit, this.appState)
         setTimeout(() => this.emit('isConnected'), 1)

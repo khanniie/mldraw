@@ -12,7 +12,8 @@ export function drawView(state: choo.IState, emit: Emit) {
     <div class="cutebox">
         <div class="cutebox_info"><img src=${heart}/> drawing view</div>
         <div id="paper">${state.cache(PaperCanvasComponent, 'paper-canvas').render(state.app)}
-        <div id="render">${renderButton(emit, state.app.renderdone)}</div>
+        <div id="render" class=${state.app.mouseOnCanvas ? "disappear unselectable" : "unselectable"}>
+        ${renderButton(emit, state.app.renderdone)}</div>
         </div>
     </div>
     `
