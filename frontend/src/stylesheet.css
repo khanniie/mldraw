@@ -108,7 +108,7 @@ canvas{
 
 #render-img{
   height: 100%;
-  transition-duration: 1s;
+  transition-duration: 0.5s;
 }
 
 .spin{
@@ -251,7 +251,6 @@ canvas{
   box-sizing: border-box;
   color: white;
   height: 1.8em;
-  width: 3.5em;
   text-align: center;
   margin-left: 0px;
   margin-right: 0px;
@@ -262,9 +261,12 @@ canvas{
 }
 
 .title{
+  display: inline;
+}
+
+.dropdown span{
   padding-left: 0.3em;
   padding-right: 0.3em;
-  display: inline;
 }
 
 .dropdown-content {

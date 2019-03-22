@@ -25,6 +25,7 @@ function dropdownContent(emit:Emit, layer, i:number, state: AppState, l:Layer){
   }
 
 function changeModel(appState:AppState, idx, model, emit: Emit){
+  console.log("CHANGE MODEL");
   const oldModel = appState.layers[idx].model
   if(model != oldModel) {
     if(appState.warningAccepted) {
@@ -36,6 +37,7 @@ function changeModel(appState:AppState, idx, model, emit: Emit){
   appState.layers[idx].model = model;
   console.log("model changed idx: ", idx);
   console.log('current state', appState);
+  emit('render');
 }
 
 function showDropdown(event){
@@ -91,9 +93,9 @@ function getName( model : string){
 function layer(state: AppState, l: Layer, emit: Emit, i, selected:boolean){
     let modelname = getName(l.model);
     return html`
-      <div class="layer unselectable ${selected ? 'selected' : ''}" onclick=${() => {if (!selected) emit('changeLayer', i + 1)}}>
+      <div class="layer unselectable ${selected ? 'selected' : ''}" onclick=${() => emit('changeLayer', i + 1)}>
         <div class="title"> ${(i + 1) + " "}
-        <div class="dropdown"> ${modelname} ${dropdownContent(emit, l, i, state, l)}</div></div>
+        <div class="dropdown"> <span>${modelname}</span> ${dropdownContent(emit, l, i, state, l)}</div></div>
         <img src=${(state.tool === "mask") ? mask_selected : mask} onclick=${() => emit('switchTool', 'mask')} alt="mask"/>
         <img src=${(state.tool === "bounds") ? dotted_selected : dotted} onclick=${() => emit('switchTool', 'bounds')} alt="bounding button"/>
       </div>`
