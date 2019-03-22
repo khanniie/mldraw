@@ -96,8 +96,14 @@ function layer(state: AppState, l: Layer, emit: Emit, i, selected:boolean){
       <div class="layer unselectable ${selected ? 'selected' : ''}" onclick=${() => emit('changeLayer', i + 1)}>
         <div class="title"> ${(i + 1) + " "}
         <div class="dropdown"> <span>${modelname}</span> ${dropdownContent(emit, l, i, state, l)}</div></div>
-        <img src=${(state.tool === "mask") ? mask_selected : mask} onclick=${() => emit('switchTool', 'mask')} alt="mask"/>
-        <img src=${(state.tool === "bounds") ? dotted_selected : dotted} onclick=${() => emit('switchTool', 'bounds')} alt="bounding button"/>
+        <img src=${(state.tool === "mask") ? mask_selected : mask}
+          onclick=${(e) => {emit('switchTool', 'mask');
+                          e.stopPropagation();}}
+          alt="mask"/>
+        <img src=${(state.tool === "bounds") ? dotted_selected : dotted}
+          onclick=${(e) => {emit('switchTool', 'bounds');
+                        e.stopPropagation();}}
+           alt="bounding button"/>
       </div>`
 }
 
