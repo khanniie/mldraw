@@ -116,6 +116,11 @@ export class MirrorComponent extends Component {
 }
 
 export function mirrorStore(state: State, emitter: Emitter) {
+    emitter.on('canceloutput', () => {
+        state.app.renderdone = true;
+        emitter.emit('render')
+    })
+
     emitter.on('drawoutput', ([bytes, path, boundingRect]) => {
         // hacky
         state.app.renderdone = true;

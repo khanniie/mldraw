@@ -1,9 +1,11 @@
 import { PaperCanvasComponent, paperStore} from './paper_canvas'
 import * as choo from 'choo'
 import devTools from 'choo-devtools'
-import { State, AppState, Emit, Layer } from './../types'
+import { State, AppState, Emit, Layer, Emitter } from './../types'
 import html from 'choo/html'
 import {mirrorView} from './mirror_component'
+import { emit } from 'cluster';
+import { modelPalettes } from '../model-palettes'
 
 const pawprint = require('./../assets/pawprint.svg')
 const arrow = require('./../assets/arrow.png')
@@ -17,12 +19,20 @@ function dropdownContent(emit:Emit, layer, i:number, state: AppState, l:Layer){
       ${state.availableModels.map(modelName =>
         html`<a href="#"
         class=${(l.model === modelName) ? "current" : ""}
-        onclick=${() => changeModel(state, i, modelName)}>${getName(modelName)}</a>`
+        onclick=${() => changeModel(state, i, modelName, emit)}>${getName(modelName)}</a>`
       )}
    </div>`;
   }
 
-function changeModel(appState:AppState, idx, model){
+function changeModel(appState:AppState, idx, model, emit: Emit){
+  const oldModel = appState.layers[idx].model
+  if(model != oldModel) {
+    if(appState.warningAccepted) {
+      emit('resetFills')
+    } else {
+      emit('showModelChangeWarning')
+    }
+  }
   appState.layers[idx].model = model;
   console.log("model changed idx: ", idx);
   console.log('current state', appState);
@@ -100,4 +110,13 @@ export function rightView(state: choo.IState, emit: Emit) {
       ${mirrorView(state, emit)}
     </div>
     </div>`
+}
+
+
+export function rightViewStore(state: State, emitter: Emitter) {
+  // todo change this to actually show box to accept warning
+  // that changing a model will reset the fills
+  emitter.on('showModelChangeWarning', () => {
+    state.app.warningAccepted = true
+  })
 }
