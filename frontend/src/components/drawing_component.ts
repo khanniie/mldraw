@@ -8,21 +8,21 @@ const heart = require('./../assets/heart.svg')
 const render = require('./../assets/render.png')
 
 export function drawView(state: choo.IState, emit: Emit) {
+      const onclick = () => emit('mlrender')
     return html`
     <div class="cutebox">
         <div class="cutebox_info"><img src=${heart}/> drawing view</div>
         <div id="paper">${state.cache(PaperCanvasComponent, 'paper-canvas').render(state.app)}
-        <div id="render" class=${state.app.mouseOnCanvas ? "disappear unselectable" : "unselectable"}>
-        ${renderButton(emit, state.app.renderdone)}
+        <div id="render" onclick=${onclick} class=${state.app.mouseOnCanvas ? "disappear unselectable" : "unselectable"}>
+        ${renderButton(state.app.renderdone)}
         <div class="tooltip-container"><div class="tooltip">render layer</div></div>
         </div></div>
     </div>
     `
 }
 
-function renderButton(emit: Emit, renderd) {
-    const onclick = () => emit('mlrender')
+function renderButton(renderd) {
     return html`
-        <img id="render-img" src=${render} onclick=${onclick} class=${renderd ? ``: `spin`} />
+        <img id="render-img" src=${render} class=${renderd ? ``: `spin`} />
     `
 }
