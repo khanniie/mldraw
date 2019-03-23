@@ -13,15 +13,15 @@ export function drawView(state: choo.IState, emit: Emit) {
         <div class="cutebox_info"><img src=${heart}/> drawing view</div>
         <div id="paper">${state.cache(PaperCanvasComponent, 'paper-canvas').render(state.app)}
         <div id="render" class=${state.app.mouseOnCanvas ? "disappear unselectable" : "unselectable"}>
-        ${renderButton(emit, state.app.renderdone)}</div>
-        </div>
+        ${renderButton(emit, state.app.renderdone)}
+        <div class="tooltip-container"><div class="tooltip">render layer</div></div>
+        </div></div>
     </div>
     `
 }
 
 function renderButton(emit: Emit, renderd) {
     const onclick = () => emit('mlrender')
-    console.log("is render done:", renderd);
     return html`
         <img id="render-img" src=${render} onclick=${onclick} class=${renderd ? ``: `spin`} />
     `

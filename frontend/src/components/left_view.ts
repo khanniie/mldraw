@@ -41,6 +41,7 @@ function topBar(state: AppState, emit: Emit) {
               <div id="colorpick-display" style="background-color:${state.strokeColor};">
               </div></div>
               <div class="dropdown-content-settings">
+              <p>draw tool settings</p>
               <ul>
                        <li class="menu-item">
                        <input type="checkbox" onclick=${({srcElement}) => emit('setSmoothness', srcElement.checked)} name="smooth" ${state.smoothing ? 'checked' : ''}/>
@@ -53,20 +54,24 @@ function topBar(state: AppState, emit: Emit) {
               </ul>
               </div>
             </div>
-            <div class=${state.tool == "cut" ? "selected-icon icon" : "icon"}>
-              <img src="${eraser}" onclick=${() => emit('switchTool', 'cut')}/>
+            <div class=${state.tool == "cut" ? "selected-icon icon" : "icon"} onclick=${() => emit('switchTool', 'cut')}>
+              <img src="${eraser}"/>
+              <div class="tooltip-container"><div class=tooltip>erase</div></div>
             </div>
-            <div class=${tool_use_sel("fill", state.tool, state.paintbucket.usable)}>
+            <div class=${tool_use_sel("fill", state.tool, state.paintbucket.usable)} onclick=${() => emit('paintbucketclicked')}>
               <span id="paintbucketInfo" class=${state.paintbucket.usable ? "p-info-use" : ''}>
                 ${state.paintbucket.usable ? state.paintbucket.colorName : ''}
               </span>
-              <img onclick=${() => emit('paintbucketclicked')} src="${paintbucket}">
+              <img src="${paintbucket}">
+              <div class="tooltip-container"><div class=tooltip>fill shapes</div></div>
             </div>
-            <div class=${state.tool == "drag" ? "selected-icon icon" : "icon"}>
-              <img onclick=${() => emit('switchTool', 'drag')} src="${transform}">
+            <div class=${state.tool == "drag" ? "selected-icon icon" : "icon"} onclick=${() => emit('switchTool', 'drag')}>
+              <img src="${transform}">
+              <div class="tooltip-container"><div class=tooltip>drag/edit lines</div></div>
             </div>
-            <div class="icon">
-              <img onclick=${() => emit('clear')} src="${trash}">
+            <div class="icon" onclick=${() => emit('clear')}>
+              <img src="${trash}">
+              <div class="tooltip-container"><div class=tooltip>clear layer</div></div>
             </div>
         </div>
         </div>

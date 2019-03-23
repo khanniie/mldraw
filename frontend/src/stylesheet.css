@@ -26,6 +26,38 @@ canvas{
   -ms-user-select: none;
 }
 
+.tooltip-container{
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+.tooltip{
+  user-drag: none;
+  user-select: none;
+  -moz-user-select: none;
+  -webkit-user-drag: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  opacity: 0;
+  position: absolute;
+  top: -0.6em;
+  left: 0;
+  z-index: 3;
+  background: #f2edbd;
+  padding: 0.3em;
+  font-size: 0.8em;
+  border: #6164bf 1px solid;
+}
+
+.tooltip-container:hover > .tooltip{
+  transition-delay: 0.4s;
+  opacity: 1;
+}
+
 /* -- general layout of columns --- */
 
 .column{
@@ -121,15 +153,14 @@ canvas{
 #render{
   position: absolute;
   height: 4em;
-  max-width: 8%;
   bottom: 0.3em;
-  right: 3.8em;
+  right: 0.3em;
   opacity: 1;
   transition-duration: 1s;
 }
 
 #render:hover{
-  animation: expand 0.4s cubic-bezier(.36,.07,.19,.97) both;
+  animation: expand 0.25s cubic-bezier(.36,.07,.19,.97) both;
 }
 
 /* -- rendered view -- */
@@ -399,8 +430,8 @@ ul {
 
 @keyframes expand {
   50% {
-    height: 4.5em;
-    transform: translate3d(-0.35em, 0.25em, 0);
+    height: 4.3em;
+    transform: translate3d(0.2em, 0.15em, 0);
   }
 }
 
@@ -469,7 +500,7 @@ ul {
 .icon img{
   display: block;
   margin: auto;
-  margin-top: calc(15% + 3px);
+  margin-top: calc(15%);
   height: 70%;
 }
 
@@ -525,7 +556,8 @@ ul {
   position: absolute;
   bottom: 3em;
   left: 0px;
-  min-width: 120px;
+  text-align: center;
+  min-width: 160px;
   border: #6164bf 2px solid;
   border-radius: 4px;
   z-index: 1.75;
@@ -537,12 +569,3 @@ ul {
 .disappear {
   opacity: 0 !important;
 }
-
-/* #container{
-  float:left;
-  clear:left;
-}
-
-.border{
-  display: inline-block;
-} */
