@@ -13,6 +13,7 @@ const dotted = require('./../assets/dotted-square.svg')
 const dotted_selected = require('./../assets/dotted-square-s.svg')
 const mask = require('./../assets/mask.png')
 const mask_selected = require('./../assets/mask-using.png')
+const trash = require('./../assets/garbage.svg')
 
 function dropdownContent(emit:Emit, layer, i:number, state: AppState, l:Layer){
     return html`<div class="dropdown-content">
@@ -104,6 +105,10 @@ function layer(state: AppState, l: Layer, emit: Emit, i, selected:boolean){
           onclick=${(e) => {emit('switchTool', 'bounds');
                         e.stopPropagation();}}
            alt="bounding button"/>
+        <img src=${trash}
+          onclick=${(e) => {emit('deleteLayer', [i, selected]);
+                        e.stopPropagation();}}
+           alt="trash button"/>
       </div>`
 }
 

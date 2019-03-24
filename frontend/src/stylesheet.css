@@ -75,7 +75,6 @@ canvas{
     position: relative;
     height: 100%;
     width: 300%;
-    transition-duration: 1s;
 }
 
 #bottom-container{

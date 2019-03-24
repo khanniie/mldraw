@@ -50,6 +50,7 @@ export interface Events {
     drawoutput: [string, paper.Group, paper.Rectangle]
     changeLayer: number,
     addLayer: undefined,
+    deleteLayer: undefined,
     isConnected: undefined,
     setSmoothness: boolean,
     setClosed: boolean,

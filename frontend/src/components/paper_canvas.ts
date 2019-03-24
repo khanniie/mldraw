@@ -353,6 +353,11 @@ const make_paper = (component: PaperCanvasComponent,
         }];
     }
 
+    function deleteLayer(idx) {
+        project.activate()
+        project.layers.splice(idx, 1)[0].remove();
+    }
+
     function switchLayer(idx: number) {
         project.activate()
         //blunt force solution - optimize later to just be current layer toggle
@@ -428,6 +433,7 @@ const make_paper = (component: PaperCanvasComponent,
         switchLayer,
         swapLayers,
         addLayer,
+        deleteLayer,
         switchTool,
         setState,
         resetBounds,
@@ -441,6 +447,7 @@ type SketchMethods = {
     switchLayer: (idx: number) => void,
     swapLayers: (idxA: number, idxB: number) => void,
     addLayer: () => void,
+    deleteLayer: (idx:number) => void,
     switchTool: (tool: string) => void,
     setState: (newState: AppState) => void,
     resetBounds: () => void,
@@ -482,7 +489,7 @@ export class PaperCanvasComponent extends Component {
         newcanvas.width = 256
         newcanvas.height = 256
         newcanvas.id = "new"
-        newcanvas.setAttribute("resize", "true");
+        //newcanvas.setAttribute("resize", "true");
         element.appendChild(newcanvas)
 
         element.onmousedown = (() => setMouseDown(this.appState, this.emit));
@@ -548,6 +555,27 @@ export function paperStore(state: State, emitter: Emitter) {
         emitter.emit('changeLayer', res[0] + 1);
         emitter.emit('render')
     })
+
+    emitter.on('deleteLayer', (input:[number, boolean]) => {
+        let idx = input[0]
+        let sel = input[1];
+        if(state.app.layers.length < 2){
+          return;
+        }
+        sketch().deleteLayer(idx + 1)
+        state.app.layers.splice(idx, 1)
+
+        if(sel){
+          if(idx == 0){
+            emitter.emit('changeLayer', idx + 1);
+          } else {
+            emitter.emit('changeLayer', idx);
+          }
+        }
+
+        emitter.emit('render')
+    })
+
 
     emitter.on('setSmoothness', smooth => {
         state.app.smoothing = smooth
