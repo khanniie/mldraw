@@ -5,6 +5,7 @@ html, body{
   padding: 0px;
   padding-top: 0em;
   margin: 0px;
+  overflow: hidden;
   color: #6164bf;
   font-family: 'Inconsolata', monospace;
   background-color: #F5F5f1;
@@ -74,10 +75,11 @@ canvas{
     position: relative;
     height: 100%;
     width: 300%;
-    transition-duration: 0.5s;
+    transition-duration: 1s;
 }
 
 #bottom-container{
+    padding-top:1em;
     width: 100%;
     height: calc(100% - 5em);
     overflow: auto;
@@ -200,7 +202,6 @@ canvas{
   box-shadow: 0px 4px #C793C4;
   background-color: #efe0ea;
   height: 4em;
-  margin-bottom: 1em;
 }
 
 #cat{
@@ -465,34 +466,41 @@ ul {
   50% {
     height: 4.3em;
     transform: translate3d(0.2em, 0.15em, 0);
+    -webkit-transform: translate3d(0.2em, 0.15em, 0);
   }
 }
 
 @keyframes shake {
   10%, 90% {
     transform: translate3d(-1px, 0, 0);
+    -webkit-transform: translate3d(-1px, 0, 0);
   }
 
   20%, 80% {
     transform: translate3d(2px, 0, 0);
+    -webkit-transform: translate3d(2px, 0, 0);
   }
 
   30%, 50%, 70% {
     transform: translate3d(-4px, 0, 0);
+    -webkit-transform: translate3d(-4px, 0, 0);
   }
 
   40%, 60% {
     transform: translate3d(4px, 0, 0);
+    -webkit-transform: translate3d(4px, 0, 0);
   }
 }
 
 @keyframes nod {
   0% {
     transform: translate3d(0, 0, 0);
+    -webkit-transform: translate3d(0, 0, 0);
   }
 
   50%{
     transform: translate3d(0, -4px, 0);
+    -webkit-transform: translate3d(0, -4px, 0);
   }
 
   /* 25%, 75% {

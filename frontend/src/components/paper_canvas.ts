@@ -363,7 +363,7 @@ const make_paper = (component: PaperCanvasComponent,
         if(prevActiveLayer != project.activeLayer) {
             console.log('going back to draw tool')
             prevActiveLayer.children['boundingRect'].strokeColor = null
-            emit('switchTool', 'draw')    
+            emit('switchTool', 'draw')
         }
         activeBounds().strokeColor = '#0000005F'
         console.log("active layer:", project.activeLayer);
@@ -482,6 +482,7 @@ export class PaperCanvasComponent extends Component {
         newcanvas.width = 256
         newcanvas.height = 256
         newcanvas.id = "new"
+        newcanvas.setAttribute("resize", "true");
         element.appendChild(newcanvas)
 
         element.onmousedown = (() => setMouseDown(this.appState, this.emit));
