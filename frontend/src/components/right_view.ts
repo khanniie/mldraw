@@ -109,14 +109,8 @@ function layer(state: AppState, l: Layer, emit: Emit, i, selected:boolean){
 
 export function rightView(state: choo.IState, emit: Emit) {
     return html`
-<div id="rest">
-
-        <div id="middle" class="column">
+    <div class="inside-column">
         ${layerBuilder(state.app, emit)}
-    </div>
-    <div id="right" class="column">
-      ${mirrorView(state, emit)}
-    </div>
     </div>`
 }
 

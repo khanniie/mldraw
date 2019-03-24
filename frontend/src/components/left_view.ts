@@ -12,8 +12,8 @@ const eraser = require('./../assets/eraser.png')
 const pencil = require('./../assets/pencil.png')
 const undo = require('./../assets/undo.png')
 const transform = require('./../assets/transform.png')
-const trash = require('./../assets/trash.png')
-const close = require('./../assets/close.svg')
+const trash = require('./../assets/clear.png')
+const close = require('./../assets/gift-box.svg')
 const more = require('./../assets/more.png')
 
 function tool_use_sel(tool_name, active_tool, usable){
@@ -87,7 +87,7 @@ function clearButton(emit: Emit) {
 
 export function leftView(state: choo.IState, emit: Emit) {
     return html`
-    <div id="left" class="column">
+    <div class="inside-column">
         ${drawView(state, emit)}
         ${topBar(state.app, emit)}
     </div>`

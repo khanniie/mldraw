@@ -52,12 +52,35 @@ function initialState(state: choo.IState, emit: Emit) {
     })
 }
 
+function computeWidth(){
+  let totalwid = 0;
+  let em = parseFloat(getComputedStyle(document.body).fontSize);
+  let eles = document.getElementsByClassName('column');
+  for(let i = 0; i < eles.length; i++){
+    console.log(eles[i]);
+    totalwid += eles[i].offsetWidth;
+  }
+  console.log("wid:" + totalwid);
+  return (totalwid + 1);
+}
+
 function mainView(state: choo.IState, emit: Emit) {
+    let wid = computeWidth();
     return html`
         <body>
         ${!state.app.server.isConnected ? html`<p>trying to connecte to server...</p>`: ''}
             ${topView(state, emit)}
-            ${leftView(state,emit)}
-            ${rightView(state, emit)}
+            <div id="bottom-container">
+            <div id="bottom" style=${"width: " + wid + "px;"}>
+              <div class="column">
+                ${leftView(state,emit)}
+              </div>
+              <div class="column">
+                ${rightView(state, emit)}
+              </div>
+              <div class="column">
+                ${mirrorView(state, emit)}
+              </div>
+            </div></div>
         </body>`
 }

@@ -8,9 +8,10 @@ const star = require('./../assets/star.svg')
 
 export function mirrorView(state: choo.IState, emit: Emit) {
     return html`
+    <div class="inside-column">
     <div class="cutebox">
     <div id="mirror-info" class="cutebox_info"> <img src=${star}/> rendered view </div>
         ${state.cache(MirrorComponent, 'mirror-canvas').render(state.app)}
-    </div>
+    </div></div>
     `
 }

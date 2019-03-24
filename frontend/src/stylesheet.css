@@ -1,7 +1,6 @@
 /* ---- general settings ---- */
 
 html, body{
-  width: 100%;
   height: 100%;
   padding: 0px;
   padding-top: 0em;
@@ -66,6 +65,24 @@ canvas{
   float: left;
 }
 
+.inside-column{
+  /* display: block;
+  height: 100%; */
+}
+
+#bottom{
+    position: relative;
+    height: 100%;
+    width: 300%;
+}
+
+#bottom-container{
+    width: 100%;
+    height: calc(100% - 5em);
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
 /* ---- cute box! --- */
 
 .cutebox{
@@ -100,9 +117,9 @@ canvas{
 
 /* --- rest is "right view" -- */
 
-#rest{
+/* #rest{
   height: 100%;
-}
+} */
 
 #middle{
 }
@@ -177,9 +194,11 @@ canvas{
 /* ---- this is the top bar ---- */
 
 #top{
+  position: relative;
   border-bottom: #6164bf 2px solid;
   box-shadow: 0px 4px #C793C4;
   background-color: #efe0ea;
+  height: 4em;
   margin-bottom: 1em;
 }
 
@@ -193,9 +212,20 @@ canvas{
 }
 
 #made-by{
+  text-align: right;
   padding: 0.25em;
   display: inline-block;
   float: right;
+}
+
+#github{
+  font-size: 0.8em;
+  text-align: right;
+  display: inline-block;
+  position: absolute;
+  padding: 0.25em;
+  bottom: 0;
+  right: 0;
 }
 
 /* --- this is for layers -----  */
@@ -257,6 +287,7 @@ canvas{
   padding: 5px;
   padding-top: 3px;
   padding-bottom: 3px;
+  background: white;
   border: solid #6164bf 2px;
 }
 #add:hover{
@@ -426,6 +457,7 @@ ul {
 
 #bar-info img{
   margin-right: 1em;
+  height: 60%;
 }
 
 @keyframes expand {
@@ -491,6 +523,10 @@ ul {
   -webkit-user-drag: none;
   -webkit-user-select: none;
   -ms-user-select: none;
+  -webkit-filter: grayscale(0%);
+  -moz-filter:    grayscale(0%);
+  -ms-filter:     grayscale(0%);
+  -o-filter:      grayscale(0%);
 }
 
 .selected-icon{
@@ -504,7 +540,7 @@ ul {
   height: 70%;
 }
 
-.icon:hover{
+.icon:hover> img{
   animation: nod 0.15s cubic-bezier(.36,.07,.19,.97) both;
   transform: translate3d(0, 0, 0);
 }
