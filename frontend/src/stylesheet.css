@@ -74,6 +74,7 @@ canvas{
     position: relative;
     height: 100%;
     width: 300%;
+    transition-duration: 0.5s;
 }
 
 #bottom-container{
@@ -90,7 +91,7 @@ canvas{
   border-radius: 8px;
   background-color: white;
   overflow: hidden;
-  width: 65vh;
+  width: calc(100vh - 15em);
   min-width: 256px;
   /* box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.2); */
 }
@@ -134,8 +135,8 @@ canvas{
 }
 
 #paper-canvas{
-  width: 65vh;
-  height: 65vh;
+  width: calc(100vh - 15em);
+  height: calc(100vh - 15em);
   min-width: 256px;
   min-height: 256px;
   padding: 0px;
@@ -183,8 +184,8 @@ canvas{
 /* -- rendered view -- */
 
 #mirror-canvas{
-  width: 65vh;
-  height: 65vh;
+  width: calc(100vh - 15em);
+  height: calc(100vh - 15em);
   min-width: 256px;
   min-height: 256px;
   padding: 0px;
@@ -503,7 +504,7 @@ ul {
 #icons{
   height: calc(100% - 1.5em);
   vertical-align: middle;
-  width: 65vh;
+  width: calc(100vh - 15em);
   min-width: 256px;
   display: flex;
   flex-direction: row;
