@@ -48,7 +48,7 @@ function showDropdown(event){
 
 function layerBuilder(state: AppState, emit: Emit) {
     const layers = state.layers.map((l, i) => {
-        return html`${layer(state, l, emit, i, (i + 1) == state.activeLayer)}`;
+        return html`${layer(state, l, emit, i, (i + 1) == state.activeLayer, state.layers.length == 1)}`;
     })
     //!state.app.server.isConnected
     return html`
@@ -91,7 +91,7 @@ function getName( model : string){
   return name
 }
 
-function layer(state: AppState, l: Layer, emit: Emit, i, selected:boolean){
+function layer(state: AppState, l: Layer, emit: Emit, i:number, selected:boolean, singularlayer:boolean){
     let modelname = getName(l.model);
     return html`
       <div class="layer unselectable ${selected ? 'selected' : ''}" onclick=${() => emit('changeLayer', i + 1)}>
@@ -105,7 +105,7 @@ function layer(state: AppState, l: Layer, emit: Emit, i, selected:boolean){
           onclick=${(e) => {emit('switchTool', 'bounds');
                         e.stopPropagation();}}
            alt="bounding button"/>
-        <img src=${trash}
+        <img src=${trash} style=${singularlayer ? "display: none" : ""}
           onclick=${(e) => {emit('deleteLayer', [i, selected]);
                         e.stopPropagation();}}
            alt="trash button"/>
