@@ -51,17 +51,19 @@ function initialState(state: choo.IState, emit: Emit) {
             warningAccepted: false
         }
     })
+    state.app.width = getSumChildrenWidth();
 }
 
-function computeWidth(state, emit){
-  let totalwid = 0;
+function getSumChildrenWidth(){
+  let windowhei = window.innerHeight;
   let em = parseFloat(getComputedStyle(document.body).fontSize);
-  let eles = document.getElementsByClassName('column');
-  for(let i = 0; i < eles.length; i++){
-    //console.log(eles[i]);
-    totalwid += eles[i].offsetWidth;
-  }
-  console.log("wid:" + totalwid);
+  let columnWid = windowhei - (15 * em) + 4; //calc(100vh - 15em) + 2px borders
+  columnWid = (columnWid < 260) ? 260 : columnWid;
+  return (columnWid + em) * 2 + 260 + em + 3; //+3 for any int division.. to be safe
+}
+
+function computeWidth(state, emit:Emit){
+  let totalwid = getSumChildrenWidth();
   state.app.width = (totalwid + 1);
   emit('render')
 }

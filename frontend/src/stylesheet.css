@@ -5,7 +5,7 @@ html, body{
   padding: 0px;
   padding-top: 0em;
   margin: 0px;
-  overflow: hidden;
+  /* overflow: hidden; */
   color: #6164bf;
   font-family: 'Inconsolata', monospace;
   background-color: #F5F5f1;
