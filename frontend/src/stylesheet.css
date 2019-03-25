@@ -43,13 +43,12 @@ canvas{
   -webkit-user-select: none;
   -ms-user-select: none;
   opacity: 0;
-  position: absolute;
-  top: -0.6em;
-  left: 0;
   z-index: 3;
   background: #f2edbd;
   padding: 0.3em;
   font-size: 0.8em;
+  position: absolute;
+  bottom: 100%;
   border: #6164bf 1px solid;
 }
 
@@ -179,7 +178,10 @@ canvas{
 }
 
 #render:hover{
-  animation: expand 0.25s cubic-bezier(.36,.07,.19,.97) both;
+  animation: expand 0.3s cubic-bezier(.36,.07,.19,.97) both;
+  height: 4.2em;
+  transform: translate3d(0.15em, 0.1em, 0);
+  -webkit-transform: translate3d(0.15em, 0.1em, 0);
 }
 
 /* -- rendered view -- */
@@ -463,9 +465,9 @@ ul {
 
 @keyframes expand {
   50% {
-    height: 4.3em;
-    transform: translate3d(0.2em, 0.15em, 0);
-    -webkit-transform: translate3d(0.2em, 0.15em, 0);
+    height: 4.4em;
+    transform: translate3d(0.25em, 0.2em, 0);
+    -webkit-transform: translate3d(0.25em, 0.2em, 0);
   }
 }
 
@@ -575,7 +577,7 @@ ul {
   opacity: 0.3;
 }
 
-.no_use:hover{
+.no_use:hover > img{
   animation: shake 0.7s cubic-bezier(.36,.07,.19,.97) both;
 }
 
@@ -612,4 +614,5 @@ ul {
 
 .disappear {
   opacity: 0 !important;
+  z-index: -1;
 }
