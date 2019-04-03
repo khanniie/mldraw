@@ -370,6 +370,10 @@ canvas{
   color: white;
 }
 
+.dropdown-content a img{
+  margin-top: 0.2em;
+}
+
 .dropdown:hover .dropdown-content {
   display: block;
   margin-top: 0.0em;

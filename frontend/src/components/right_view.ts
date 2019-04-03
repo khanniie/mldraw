@@ -14,13 +14,16 @@ const dotted_selected = require('./../assets/dotted-square-s.svg')
 const mask = require('./../assets/mask.png')
 const mask_selected = require('./../assets/mask-using.png')
 const trash = require('./../assets/garbage.svg')
+const info = require('./../assets/info.svg')
 
 function dropdownContent(emit:Emit, layer, i:number, state: AppState, l:Layer){
     return html`<div class="dropdown-content">
       ${state.availableModels.map(modelName =>
         html`<a href="#"
         class=${(l.model === modelName) ? "current" : ""}
-        onclick=${() => changeModel(state, i, modelName, emit)}>${getName(modelName)}</a>`
+        onclick=${() => changeModel(state, i, modelName, emit)}>${getName(modelName)}
+        <img src=${info} alt="info button"/>
+        </a>`
       )}
    </div>`;
   }
