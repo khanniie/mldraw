@@ -105,7 +105,8 @@ try:
             opts = {} if opts is None else opts
             merged = dict2obj({**PIX2PIX_DEFAULT_OPTS,
                                **opts})
-
+            print('\n\n', merged.name, '\n\n')
+            self.opts = merged
             if len(merged.gpu_ids) > 0:
                 torch.cuda.set_device(merged.gpu_ids[0])
             with torch.no_grad():
@@ -116,6 +117,7 @@ try:
 
         def infer(self, img: Image):
             img.save("input.png")
+            print(self.opts.name)
             with torch.no_grad():
                 tensor_rgb, alpha = img2tensor(img, self.model.device)
                 tensor_input = tensor_rgb.unsqueeze(0)
@@ -128,15 +130,15 @@ try:
             output_img.save("output.png")
             return output_img
 
+        def __call__(self, img):
+            return self.infer(img)
+
     for checkpoint in pix2pix_checkpoints:
         with remember_cwd():
             os.chdir(PIX2PIX_PATH)
             model = Pix2PixWrapper({"name": checkpoint})
 
-        def pix2pix_handler(img: Image):
-            return model.infer(img)
-
-        exported_models[checkpoint] = pix2pix_handler
+        exported_models[checkpoint] = model
 
     sys.path.remove(PIX2PIX_PATH)
 
