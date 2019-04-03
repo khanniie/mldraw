@@ -105,7 +105,6 @@ try:
             opts = {} if opts is None else opts
             merged = dict2obj({**PIX2PIX_DEFAULT_OPTS,
                                **opts})
-            print('\n\n', merged.name, '\n\n')
             self.opts = merged
             if len(merged.gpu_ids) > 0:
                 torch.cuda.set_device(merged.gpu_ids[0])
@@ -116,8 +115,7 @@ try:
                     self.model.eval()
 
         def infer(self, img: Image):
-            img.save("input.png")
-            print(self.opts.name)
+            #img.save("input.png")
             with torch.no_grad():
                 tensor_rgb, alpha = img2tensor(img, self.model.device)
                 tensor_input = tensor_rgb.unsqueeze(0)
@@ -127,7 +125,7 @@ try:
                 r = np.concatenate((r, alpha), axis=0)
                 r = np.transpose(r, (1, 2, 0))
             output_img = Image.fromarray(r)
-            output_img.save("output.png")
+            #output_img.save("output.png")
             return output_img
 
         def __call__(self, img):
