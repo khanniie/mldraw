@@ -1,4 +1,5 @@
 import * as choo from 'choo'
+import raw from 'choo/html/raw'
 import html from 'choo/html'
 import devTools from 'choo-devtools'
 import { State, AppState, Emit } from './types'
@@ -21,6 +22,9 @@ app.use(paintBucketStore)
 app.route('/', mainView)
 app.mount('body')
 
+const close = require('./assets/close.svg')
+const cat = require('./assets/model_info/edges2cat.json');
+
 function initialState(state: choo.IState, emit: Emit) {
     Object.assign(state, {
         app: {
@@ -35,6 +39,7 @@ function initialState(state: choo.IState, emit: Emit) {
             tool: 'draw',
             renderdone: true,
             layers: [],
+            overlay: "",
             availableModels: [],
             localModels: {},
             paintbucket: {
@@ -74,12 +79,38 @@ const resize = function(state, emit){
   doit = setTimeout((()=>computeWidth(state, emit)), 100);
 };
 
+function modelInfoOverlay(modelname:string, state, emit){
+  // let filename = "./assets/model_info/" + modelname + ".json";
+  // let json = require(filename);
+  const close_overlay = () => {
+    state.app.overlay = "";
+    emit('render');
+  }
+  console.log(raw(cat.tutorial));
+
+  return html `<div class="underlay">
+    <div class="overlay">
+      <img id="close_o" src = ${close} onclick=${close_overlay}/>
+      This is an example of ${modelname}.
+        ${raw(cat.tutorial)}
+    </div>
+  </div>`
+}
+
+function overlay(state, emit){
+  if (state.app.overlay === "")
+    return html`<div></div>`;
+  else
+    return modelInfoOverlay(state.app.overlay, state, emit);
+}
+
 function mainView(state: choo.IState, emit: Emit) {
     let wid = state.app.width;
     return html`
         <body onresize=${()=>resize(state, emit)}>
         ${!state.app.server.isConnected ? html`<p>trying to connect to server...</p>`: ''}
             ${topView(state, emit)}
+            ${overlay(state, emit)}
             <div id="bottom-container">
             <div id="bottom" style=${"width: " + wid + "px;"}>
               <div class="column">

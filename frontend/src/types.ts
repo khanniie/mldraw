@@ -17,6 +17,7 @@ export interface AppState {
     },
     activeLayer: number,
     layers: Layer[],
+    overlay: string,
     tool: string,
     renderdone: boolean,
     availableModels: string[],

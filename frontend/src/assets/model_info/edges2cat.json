@@ -1,0 +1,7 @@
+{
+  "name": "Cat",
+  "tools" : ["draw", "cut", "fill", "drag"],
+  "palette" : [],
+  "description" : "this is a model that turns lines into cats.",
+  "tutorial" : "<p class='tutorial'>hi this is the cat tutorial</p>"
+}

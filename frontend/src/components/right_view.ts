@@ -7,7 +7,7 @@ import {mirrorView} from './mirror_component'
 import { emit } from 'cluster';
 import { modelPalettes } from '../model-palettes'
 
-const pawprint = require('./../assets/pawprint.svg')
+const pawprint = require('./../assets/layers.svg')
 const arrow = require('./../assets/arrow.png')
 const dotted = require('./../assets/dotted-square.svg')
 const dotted_selected = require('./../assets/dotted-square-s.svg')
@@ -17,12 +17,14 @@ const trash = require('./../assets/garbage.svg')
 const info = require('./../assets/info.svg')
 
 function dropdownContent(emit:Emit, layer, i:number, state: AppState, l:Layer){
-    return html`<div class="dropdown-content">
+
+  return html`<div class="dropdown-content">
       ${state.availableModels.map(modelName =>
         html`<a href="#"
         class=${(l.model === modelName) ? "current" : ""}
         onclick=${() => changeModel(state, i, modelName, emit)}>${getName(modelName)}
-        <img src=${info} alt="info button"/>
+        <img src=${info} alt="info button" onclick=${() =>
+          (state.overlay = modelName, emit('render'))}/>
         </a>`
       )}
    </div>`;
