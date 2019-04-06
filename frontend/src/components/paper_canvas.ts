@@ -354,7 +354,13 @@ const make_paper = (component: PaperCanvasComponent,
 
     function switchLayer(idx: number) {
         project.activate()
-        project.layers.map((lyr: paper.Layer) => (lyr.opacity = 0.2));
+        project.layers.map((lyr: paper.Layer, i:number) => {
+          if(i == 0) return;
+          lyr.opacity = 0.2
+          if(state.layers[i - 1].deleted){
+            lyr.opacity = 0
+          }
+        });
         console.log(project.layers, idx);
         project.layers[idx].opacity = 1
         const prevActiveLayer = project.activeLayer
