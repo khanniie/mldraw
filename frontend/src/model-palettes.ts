@@ -27,7 +27,7 @@ export const modelPalettes = {
 export function paintBucketStore(state: State, emitter: Emitter) {
     state.app.tool = "paintbucket";
     emitter.on('changeLayer', (layerIdx) => {
-
+        console.log("change layer, ", layerIdx);
         const activeLayer = state.app.layers[layerIdx - 1]
         // switching to layer without palette
         if(activeLayer != null && !(activeLayer.model in modelPalettes)) {

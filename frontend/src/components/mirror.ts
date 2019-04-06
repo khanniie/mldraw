@@ -63,10 +63,8 @@ const make_mirror = (component: MirrorComponent,
     }
 
     function deleteLayer(idx){
-        console.log('mirror is removing ', idx, project.layers.toString());
         project.activate()
-        project.layers.splice(idx, 1)
-        console.log("after mirror remove", project.layers.toString())
+        project.layers[idx].opacity = 0
     }
 
     function switchLayer(idx: number) {
@@ -154,5 +152,4 @@ export function mirrorStore(state: State, emitter: Emitter) {
       //  let idx = input[0]
         state.cache(MirrorComponent, 'mirror-canvas').sketch.deleteLayer(idx + 1)
     })
-
 }

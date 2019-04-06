@@ -341,13 +341,14 @@ const make_paper = (component: PaperCanvasComponent,
         project.addLayer(layer)
         layer.data.empty = true
         return [project.activeLayer.index, {
-            layer, clippingGroup, model: 'edges2shoes_pretrained', mirrorLayer
+            layer, clippingGroup, model: 'edges2shoes_pretrained', mirrorLayer, deleted: false
         }];
     }
 
     function deleteLayer(idx) {
         project.activate()
-        project.layers.splice(idx, 1);
+        // project.layers.splice(idx, 1);
+        project.layers[idx].opacity = 0
         console.log("after",project.layers)
     }
 
@@ -364,7 +365,6 @@ const make_paper = (component: PaperCanvasComponent,
             emit('switchTool', 'draw')
         }
         activeBounds().strokeColor = '#0000005F'
-        console.log("active layer:", project.activeLayer);
     }
 
     function swapLayers(idxA: number, idxB: number) {
@@ -511,6 +511,20 @@ export class PaperCanvasComponent extends Component {
     }
 }
 
+function find_next_layer(idx, layers){
+    for(let i = idx + 1; i< layers.length; i++){
+      if(!layers[i].deleted){
+        return i;
+      }
+    }
+    for(let i = idx - 1; i >= 0; i--){
+      if(!layers[i].deleted){
+        return i;
+      }
+    }
+    return -1;
+}
+
 export function paperStore(state: State, emitter: Emitter) {
 
     const sketch = () => state.cache(PaperCanvasComponent, 'paper-canvas').sketch
@@ -556,16 +570,9 @@ export function paperStore(state: State, emitter: Emitter) {
           return;
         }
         sketch().deleteLayer(idx + 1)
-        state.app.layers.splice(idx, 1)
+        state.app.layers[idx].deleted = true;
 
-        if(sel){
-          if(idx == 0){
-            emitter.emit('changeLayer', idx + 1);
-          } else {
-            emitter.emit('changeLayer', idx);
-          }
-        }
-
+        emitter.emit('changeLayer', find_next_layer(idx, state.app.layers) + 1);
         emitter.emit('render')
     })
 
