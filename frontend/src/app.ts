@@ -48,9 +48,12 @@ function initialState(state: choo.IState, emit: Emit) {
             },
             closed: true,
             smoothing: false,
-            warningAccepted: false
+            warningAccepted: false,
+            maskEditingMode: false
         }
     })
+
+    
 }
 
 function computeWidth(state, emit){
@@ -68,8 +71,8 @@ function computeWidth(state, emit){
 
 var doit
 const resize = function(state, emit){
-  clearTimeout(doit);
-  doit = setTimeout((()=>computeWidth(state, emit)), 100);
+  clearTimeout(doit)
+  doit = setTimeout((()=>computeWidth(state, emit)), 100)
 };
 
 function mainView(state: choo.IState, emit: Emit) {

@@ -36,6 +36,8 @@ const make_paper = (component: PaperCanvasComponent,
     }
 
     const activeBounds = () => project.activeLayer.children['boundingRect'] as paper.Path.Rectangle
+    const clipGroup = () => project.activeLayer.children['clippingGroup'] as paper.Group
+    const customMask = () => project.activeLayer.children['customMask'] as paper.Group
 
     /**
      * Tools
@@ -46,21 +48,28 @@ const make_paper = (component: PaperCanvasComponent,
     const fillTool = new paper.Tool()
     const cutTool = new paper.Tool()
     const boundsEditingTool = new paper.Tool()
-    drawTool.activate();
-
+    drawTool.activate()
     let pathBeingDrawn: paper.Path
-
 
     drawTool.onMouseDown = function (event) {
         project.activate()
-        if (selectedObject) return;
+        if (selectedObject) return
         pathBeingDrawn = new paper.Path({
             segments: [event.point],
             strokeColor: state.strokeColor,
             fullySelected: true,
             name: 'temp'
         })
-        pathBeingDrawn.closed = state.closed
+        pathBeingDrawn.closed = state.maskEditingMode || state.closed
+        if(state.maskEditingMode) {
+            const overlay = customMask().children['overlay'] as paper.CompoundPath
+            if(overlay.hitTest(event.point)) {
+                console.log('started inside')
+                overlay.data.remove = true
+            } else {
+                overlay.data.remove = false
+            }
+        }
     }
 
     drawTool.onMouseDrag = function (event) {
@@ -79,20 +88,24 @@ const make_paper = (component: PaperCanvasComponent,
         pathBeingDrawn.fillColor = '#FF000001'
         if (state.smoothing) pathBeingDrawn.simplify(10)
         if (pathBeingDrawn.length > 0.001) project.activeLayer.data.empty = false
-        if (project.activeLayer.children['clippingGroup']) {
-            project.activeLayer.children['clippingGroup'].addChild(pathBeingDrawn)
+        if (state.maskEditingMode) {
+            const overlay = customMask().children['overlay'] as paper.CompoundPath
+            const result = overlay.data.remove ? overlay.subtract(pathBeingDrawn) : overlay.unite(pathBeingDrawn)
+            overlay.remove()
+            result.name = 'overlay'
+            pathBeingDrawn.visible = false
+            customMask().addChild(result)
+            customMask().addChild(pathBeingDrawn)
+            //project.activeLayer.children['overlay'].sendToBack()
         } else {
-            console.log("error", project.activeLayer);
-            const clippingGroup = new paper.Group()
-            clippingGroup.name = 'clippingGroup'
-            project.activeLayer.children['clippingGroup'].addChild(pathBeingDrawn)
+            clipGroup().addChild(pathBeingDrawn)
         }
         if (pathBeingDrawn) {
             pathBeingDrawn.selected = false
         }
-        pathBeingDrawn = null;
+        pathBeingDrawn = null
         if (selectedObject) {
-            selectedObject = null;
+            selectedObject = null
         }
     }
 
@@ -127,7 +140,12 @@ const make_paper = (component: PaperCanvasComponent,
         };
         project.activeLayer.selected = false
 
-        let hitResult = project.activeLayer.hitTestAll(event.point, hitOptions);
+        let hitResult
+        if (state.maskEditingMode) {
+            hitResult = clipGroup().hitTestAll(event.point, hitOptions)
+        } else {
+            hitResult = customMask().hitTestAll(event.point, hitOptions)
+        }
         if (hitResult[0] != undefined && hitResult[0].item) {
             hitResult[0].item.selected = true
             selectedObject = hitResult[0]
@@ -149,6 +167,7 @@ const make_paper = (component: PaperCanvasComponent,
         }
     }
 
+
     boundsEditingTool.onMouseDown = function (event) {
         project.activate()
         const bounding = activeBounds()
@@ -157,6 +176,7 @@ const make_paper = (component: PaperCanvasComponent,
         bounding.data.startCorner = clamped
         bounding.selected = true
     }
+
 
     boundsEditingTool.onMouseDrag = function (event) {
         const bounding = activeBounds()
@@ -185,7 +205,12 @@ const make_paper = (component: PaperCanvasComponent,
         };
         project.activeLayer.selected = false;
 
-        let hitResult = project.activeLayer.hitTestAll(event.point, hitOptions);
+        let hitResult
+        if (state.maskEditingMode) {
+            hitResult = clipGroup().hitTestAll(event.point, hitOptions)
+        } else {
+            hitResult = customMask().hitTestAll(event.point, hitOptions)
+        }
         if (hitResult[0] != undefined && hitResult[0].item) {
             hitResult[0].item.selected = true
             selectedObject = hitResult[0]
@@ -207,7 +232,12 @@ const make_paper = (component: PaperCanvasComponent,
                 fill: true,
                 tolerance: 2
             };
-            const hitResult = project.activeLayer.hitTestAll(event.point, hitOptions);
+            let hitResult
+            if (state.maskEditingMode) {
+                hitResult = clipGroup().hitTestAll(event.point, hitOptions)
+            } else {
+                hitResult = customMask().hitTestAll(event.point, hitOptions)
+            }
             if (hitResult[0] != undefined && hitResult[0].item) {
                 const item = hitResult[0];
                 let path = (item.item ? item.item : item) as paper.Path
@@ -264,15 +294,16 @@ const make_paper = (component: PaperCanvasComponent,
         layerBgRect.sendToBack()
         // scale it so the raster area within the bounds is 256x256
         const [scaleX, scaleY] = [255 / boundWidth, 255 / boundHeight]
-        const scaledClippingGroup: paper.Group = paper.project.activeLayer.children['clippingGroup'].clone()
+        const scaledClippingGroup: paper.Group = clipGroup().clone()
         scaledClippingGroup.remove()
 
-        paper.project.activeLayer.scale(scaleX, scaleY, boundingRect.topLeft)
+        project.activeLayer.scale(scaleX, scaleY, boundingRect.topLeft)
         // top left corner of bounding rect
         const { x, y } = bgRect.bounds // how far "off the page" the top left corner is
         bgRect.remove()
-        const unfilledPartsHack = paper.project.activeLayer.children['clippingGroup'].children.filter(c => c.fillColor.alpha < 0.01)
-        paper.project.activeLayer.children['clippingGroup'].children.forEach(e => { console.log(e.fillColor.alpha) })
+
+        const unfilledPartsHack = clipGroup().children.filter(c => c.fillColor.alpha < 0.01)
+        clipGroup().children.forEach(e => { console.log(e.fillColor.alpha) })
         unfilledPartsHack.forEach(path => {
             path.fillColor = null
         })
@@ -323,20 +354,30 @@ const make_paper = (component: PaperCanvasComponent,
 
     function clear() {
         project.activate()
-        project.activeLayer.children['clippingGroup'].removeChildren()
+        clipGroup().removeChildren()
     }
 
     function addLayer() {
         project.activate()
         const layer = new paper.Layer()
-        let idx = layer.index;
-        const clippingGroup = new paper.Group()
         const mirrorLayer = null
+
+        const clippingGroup = new paper.Group()
         clippingGroup.name = 'clippingGroup'
+
+        const customMask = new paper.Group()
+        customMask.name = 'customMask'
+        const overlay = new paper.Path.Rectangle(paper.view.bounds.clone())
+        customMask.addChild(overlay)
+        overlay.fillColor = '#0000005F'
+        overlay.name = 'overlay'
+        //customMask.clipped = true
+        customMask.visible = false
         const boundingRectPath = new paper.Path.Rectangle(paper.view.bounds.clone().scale(0.99))
         boundingRectPath.name = 'boundingRect'
         boundingRectPath.strokeColor = '#0000005F'
         boundingRectPath.dashArray = [2, 40]
+        
         project.addLayer(layer)
         layer.data.empty = true
         return [project.activeLayer.index, {
@@ -346,7 +387,7 @@ const make_paper = (component: PaperCanvasComponent,
 
     function deleteLayer(idx) {
         project.activate()
-        project.layers.splice(idx, 1)[0].remove();
+        project.layers.splice(idx, 1)[0].remove()
     }
 
     function switchLayer(idx: number) {
@@ -374,6 +415,8 @@ const make_paper = (component: PaperCanvasComponent,
 
     function switchTool(tool) {
         for (const layer of project.layers) layer.children['boundingRect'].selected = false
+        state.maskEditingMode = false
+        customMask().visible = false
         switch (tool) {
             case 'cut':
                 cutTool.activate();
@@ -391,6 +434,11 @@ const make_paper = (component: PaperCanvasComponent,
                 activeBounds().selected = true
                 boundsEditingTool.activate();
                 break;
+            case 'mask':
+                state.maskEditingMode = true
+                customMask().visible = true
+                drawTool.activate()
+                break;
             default:
                 //donothing
                 break;
@@ -399,7 +447,7 @@ const make_paper = (component: PaperCanvasComponent,
 
     function resetFills() {
         project.activate()
-        for (const item of project.activeLayer.children['clippingGroup'].children) {
+        for (const item of clipGroup().children) {
             if (item instanceof paper.Path) {
                 item.fillColor = '#00000001'
                 item.strokeColor = '#000000'
@@ -438,7 +486,7 @@ type SketchMethods = {
     switchLayer: (idx: number) => void,
     swapLayers: (idxA: number, idxB: number) => void,
     addLayer: () => void,
-    deleteLayer: (idx:number) => void,
+    deleteLayer: (idx: number) => void,
     switchTool: (tool: string) => void,
     setState: (newState: AppState) => void,
     resetBounds: () => void,
@@ -547,21 +595,21 @@ export function paperStore(state: State, emitter: Emitter) {
         emitter.emit('render')
     })
 
-    emitter.on('deleteLayer', (input:[number, boolean]) => {
+    emitter.on('deleteLayer', (input: [number, boolean]) => {
         let idx = input[0]
         let sel = input[1];
-        if(state.app.layers.length < 2){
-          return;
+        if (state.app.layers.length < 2) {
+            return;
         }
         sketch().deleteLayer(idx + 1)
         state.app.layers.splice(idx, 1)
 
-        if(sel){
-          if(idx == 0){
-            emitter.emit('changeLayer', idx + 1);
-          } else {
-            emitter.emit('changeLayer', idx);
-          }
+        if (sel) {
+            if (idx == 0) {
+                emitter.emit('changeLayer', idx + 1);
+            } else {
+                emitter.emit('changeLayer', idx);
+            }
         }
 
         emitter.emit('render')
@@ -608,5 +656,4 @@ export function paperStore(state: State, emitter: Emitter) {
     emitter.on('addModel', (modelName) => {
         state.app.availableModels.push(modelName)
     })
-
 }
