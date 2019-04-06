@@ -2,7 +2,7 @@ import * as choo from 'choo'
 import raw from 'choo/html/raw'
 import html from 'choo/html'
 import devTools from 'choo-devtools'
-import { State, AppState, Emit } from './types'
+import { State, AppState, Emit, Emitter } from './types'
 import { paperStore} from './components/paper_canvas'
 import { MirrorComponent, mirrorStore } from './components/mirror'
 import { leftView } from './components/left_view'
@@ -19,11 +19,11 @@ app.use(paperStore)
 app.use(mirrorStore)
 app.use(localModelsStore)
 app.use(paintBucketStore)
+app.use(tutorialReducer)
 app.route('/', mainView)
 app.mount('body')
 
 const close = require('./assets/close.svg')
-const cat = require('./assets/model_info/edges2cat.json');
 
 function initialState(state: choo.IState, emit: Emit) {
     Object.assign(state, {
@@ -39,6 +39,7 @@ function initialState(state: choo.IState, emit: Emit) {
             tool: 'draw',
             renderdone: true,
             layers: [],
+            tutorials: [],
             overlay: "",
             availableModels: [],
             localModels: {},
@@ -79,22 +80,63 @@ const resize = function(state, emit){
   doit = setTimeout((()=>computeWidth(state, emit)), 100);
 };
 
-function modelInfoOverlay(modelname:string, state, emit){
-  // let filename = "./assets/model_info/" + modelname + ".json";
-  // let json = require(filename);
+function tutorialReducer(state: AppState, emitter: Emitter) {
+    emitter.on('loadtutorial', (model:string) => {
+      console.log(state.app.tutorials);
+      if(state.app.tutorials[model] == undefined) {
+
+        fetch(`./model_info/${model}.json`)
+        .then(res => res.json())
+        .then((tutorial) => {
+          state.app.tutorials[model] = tutorial
+          emitter.emit('render')
+        })
+    } else {
+      console.log("error... shouldn't have gotten here.")
+    }
+  })
+}
+
+const loading_tutorial = {
+  "name": "Loading info...",
+  "tools" : [],
+  "palette" : [],
+  "load_type": "Loading info...",
+  "description" : "Loading info...",
+  "tutorial" : "<p>Loading info...</p>"
+}
+
+function make_overlay(model_json, load_time, state, emit){
   const close_overlay = () => {
     state.app.overlay = "";
     emit('render');
   }
-  console.log(raw(cat.tutorial));
-
   return html `<div class="underlay">
     <div class="overlay">
       <img id="close_o" src = ${close} onclick=${close_overlay}/>
-      This is an example of ${modelname}.
-        ${raw(cat.tutorial)}
+      <h1>${model_json.name} model</h1>
+        ${model_json.description}
+        <br>
+        <p><b>Load times:</b> ${load_time}</p>
+        ${raw(model_json.tutorial)}
     </div>
   </div>`
+}
+
+function modelInfoOverlay(modelname:string, state, emit){
+
+  if(state.app.tutorials[modelname] == undefined){
+    emit('loadtutorial', modelname);
+    return make_overlay(loading_tutorial, "Loading...", state, emit)
+  }
+
+  const tutorial = state.app.tutorials[modelname]
+
+  const load_time = (tutorial.load_type === "server") ? "If our servers are running normally, projected render times are about 1 second." :
+    "This model needs to be loaded once, so on first render it will take 5 - 10 seconds and the next renders should take about 1 second."
+
+  return make_overlay(tutorial, load_time, state, emit)
+
 }
 
 function overlay(state, emit){

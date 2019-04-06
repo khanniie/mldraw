@@ -65,7 +65,7 @@ const make_mirror = (component: MirrorComponent,
     function deleteLayer(idx){
         console.log('mirror is removing ', idx, project.layers.toString());
         project.activate()
-        project.layers.splice(idx, 1)[0].remove()
+        project.layers.splice(idx, 1)
         console.log("after mirror remove", project.layers.toString())
     }
 
@@ -142,16 +142,17 @@ export function mirrorStore(state: State, emitter: Emitter) {
         state.cache(MirrorComponent, 'mirror-canvas').sketch.clear()
     })
     emitter.on('changeLayer', (layerIdx) => {
-        state.cache(MirrorComponent, 'mirror-canvas').sketch.switchLayer(layerIdx - 1)
+        state.cache(MirrorComponent, 'mirror-canvas').sketch.switchLayer(layerIdx)
     })
 
-    emitter.on('addLayer', () => {
+    emitter.on('addLayerMirror', (idx) => {
         state.cache(MirrorComponent, 'mirror-canvas').sketch.addLayer()
+        emitter.emit('changeLayer', idx)
     })
 
     emitter.on('deleteLayer', ([idx, _]:[number, boolean]) => {
       //  let idx = input[0]
-        state.cache(MirrorComponent, 'mirror-canvas').sketch.deleteLayer(idx)
+        state.cache(MirrorComponent, 'mirror-canvas').sketch.deleteLayer(idx + 1)
     })
 
 }

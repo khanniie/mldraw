@@ -30,6 +30,7 @@ const make_paper = (component: PaperCanvasComponent,
     bgLayerFill.name = 'boundingRect'
     bgLayerFill.selected = false
     project.addLayer(background)
+    console.log(project.layers);
 
     paper.project.view.onResize = () => {
         ({ width: viewWidth, height: viewHeight } = paper.project.view.bounds)
@@ -346,13 +347,14 @@ const make_paper = (component: PaperCanvasComponent,
 
     function deleteLayer(idx) {
         project.activate()
-        project.layers.splice(idx, 1)[0].remove();
+        project.layers.splice(idx, 1);
+        console.log("after",project.layers)
     }
 
     function switchLayer(idx: number) {
         project.activate()
-        //blunt force solution - optimize later to just be current layer toggle
         project.layers.map((lyr: paper.Layer) => (lyr.opacity = 0.2));
+        console.log(project.layers, idx);
         project.layers[idx].opacity = 1
         const prevActiveLayer = project.activeLayer
         project.layers[idx].activate()
@@ -415,7 +417,6 @@ const make_paper = (component: PaperCanvasComponent,
 
     function setState(newState: AppState) {
         state = newState;
-        console.log(state)
     }
 
     component.sketch = {
@@ -543,7 +544,8 @@ export function paperStore(state: State, emitter: Emitter) {
     emitter.on('addLayer', () => {
         let res = sketch().addLayer()
         state.app.layers.push(res[1]);
-        emitter.emit('changeLayer', res[0] + 1);
+        emitter.emit('addLayerMirror', res[0] + 1)
+        // emitter.emit('changeLayer');
         emitter.emit('render')
     })
 
