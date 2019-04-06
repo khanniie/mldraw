@@ -5,10 +5,41 @@ html, body{
   padding: 0px;
   padding-top: 0em;
   margin: 0px;
-  overflow: hidden;
+  /* overflow: hidden; */
   color: #6164bf;
   font-family: 'Inconsolata', monospace;
   background-color: #F5F5f1;
+}
+
+.underlay{
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 5;
+  background: rgba(0, 0, 0, 0.1);
+}
+
+#close_o{
+  width: 1rem;
+  position: absolute;
+  top: 1em;
+  right: 1em;
+}
+
+.overlay{
+  width: 60%;
+  left: 20%;
+  top: 20%;
+  z-index: 6;
+  background: white;
+  box-sizing: border-box;
+    border: #6164bf 2px solid;
+  padding: 2.5em;
+  position: absolute;
+  height: 60%;
+  color: #6164bf;
 }
 
 canvas{
@@ -43,13 +74,12 @@ canvas{
   -webkit-user-select: none;
   -ms-user-select: none;
   opacity: 0;
-  position: absolute;
-  top: -0.6em;
-  left: 0;
   z-index: 3;
   background: #f2edbd;
   padding: 0.3em;
   font-size: 0.8em;
+  position: absolute;
+  bottom: 100%;
   border: #6164bf 1px solid;
 }
 
@@ -179,7 +209,10 @@ canvas{
 }
 
 #render:hover{
-  animation: expand 0.25s cubic-bezier(.36,.07,.19,.97) both;
+  animation: expand 0.3s cubic-bezier(.36,.07,.19,.97) both;
+  height: 4.2em;
+  transform: translate3d(0.15em, 0.1em, 0);
+  -webkit-transform: translate3d(0.15em, 0.1em, 0);
 }
 
 /* -- rendered view -- */
@@ -268,7 +301,7 @@ canvas{
 }
 
 .layer_info img{
-  height: 40%;
+  height: 50%;
 }
 
 #layer-menu{
@@ -336,7 +369,7 @@ canvas{
   text-align: left;
   display: none;
   position: absolute;
-  top: 2.25em;
+  top: 2.2em;
   min-width: 120px;
   border: #6164bf 2px solid;
   border-radius: 4px;
@@ -366,6 +399,10 @@ canvas{
 .dropdown-content a.current{
   background-color: #e0afdb;
   color: white;
+}
+
+.dropdown-content a img{
+  margin-top: 0.2em;
 }
 
 .dropdown:hover .dropdown-content {
@@ -463,9 +500,9 @@ ul {
 
 @keyframes expand {
   50% {
-    height: 4.3em;
-    transform: translate3d(0.2em, 0.15em, 0);
-    -webkit-transform: translate3d(0.2em, 0.15em, 0);
+    height: 4.4em;
+    transform: translate3d(0.25em, 0.2em, 0);
+    -webkit-transform: translate3d(0.25em, 0.2em, 0);
   }
 }
 
@@ -575,7 +612,7 @@ ul {
   opacity: 0.3;
 }
 
-.no_use:hover{
+.no_use:hover > img{
   animation: shake 0.7s cubic-bezier(.36,.07,.19,.97) both;
 }
 
@@ -612,4 +649,5 @@ ul {
 
 .disappear {
   opacity: 0 !important;
+  z-index: -1;
 }

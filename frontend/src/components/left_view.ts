@@ -13,8 +13,8 @@ const pencil = require('./../assets/pencil.png')
 const undo = require('./../assets/undo.png')
 const transform = require('./../assets/transform.png')
 const trash = require('./../assets/clear.png')
-const close = require('./../assets/gift-box.svg')
 const more = require('./../assets/more.png')
+const clip = require('./../assets/paperclip.svg')
 
 function tool_use_sel(tool_name, active_tool, usable){
   console.log(tool_name, active_tool, usable);
@@ -30,7 +30,7 @@ function topBar(state: AppState, emit: Emit) {
         <div id="toolbar">
         <div id="bar-info">
         <div id="bar-info" class="cutebox_info">
-            <img src=${close}/>
+            <img src=${clip}/>
             tools
         </div></div>
         <div id="icons">

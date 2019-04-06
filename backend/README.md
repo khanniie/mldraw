@@ -1,5 +1,11 @@
 #henlo
 
+## Building & Running the Docker container
+First, make sure `nvidia-docker` is installed, if you want to run on the GPU
+Then,
+1. `sudo docker build --tag=mldraw:0.0`
+2. `sudo docker run --runtime=nvidia -p 8080:8080 -p 8081:8081 -t --rm mldraw:0.0
+
 ## How to add new models
 
 To add the pix2pix models to the backend, I did the following:
