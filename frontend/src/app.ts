@@ -54,7 +54,8 @@ function initialState(state: choo.IState, emit: Emit) {
             },
             closed: true,
             smoothing: false,
-            warningAccepted: false
+            warningAccepted: false,
+            maskEditingMode: false
         }
     })
     state.app.width = getSumChildrenWidth();
@@ -76,8 +77,8 @@ function computeWidth(state, emit:Emit){
 
 var doit
 const resize = function(state, emit){
-  clearTimeout(doit);
-  doit = setTimeout((()=>computeWidth(state, emit)), 100);
+  clearTimeout(doit)
+  doit = setTimeout((()=>computeWidth(state, emit)), 100)
 };
 
 function tutorialReducer(state: AppState, emitter: Emitter) {

@@ -33,7 +33,8 @@ export interface AppState {
     closed: boolean,
     smoothing: boolean,
     strokeColor: string
-    warningAccepted: boolean
+    warningAccepted: boolean,
+    maskEditingMode: boolean
 }
 
 /**
