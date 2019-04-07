@@ -96,6 +96,7 @@ const make_paper = (component: PaperCanvasComponent,
             pathBeingDrawn.visible = false
             customMask().addChild(result)
             customMask().addChild(pathBeingDrawn)
+            customMask().data.isUsed = true
             //project.activeLayer.children['overlay'].sendToBack()
         } else {
             clipGroup().addChild(pathBeingDrawn)
@@ -185,7 +186,6 @@ const make_paper = (component: PaperCanvasComponent,
             Math.max(0, Math.min(event.point.y, viewHeight)))
 
         const delta: paper.Point = bounding.data.startCorner.subtract(clamped)
-        console.log(delta)
         if (Math.abs(delta.x) < 10 || Math.abs(delta.y) < 10) return
         if (Math.abs(delta.x) > Math.abs(delta.y)) {
             delta.y = Math.sign(delta.y) * Math.abs(delta.x);
@@ -292,18 +292,34 @@ const make_paper = (component: PaperCanvasComponent,
         bgRect.fillColor = "#ffffff"
         bgRect.sendToBack()
         layerBgRect.sendToBack()
+
         // scale it so the raster area within the bounds is 256x256
         const [scaleX, scaleY] = [255 / boundWidth, 255 / boundHeight]
-        const scaledClippingGroup: paper.Group = clipGroup().clone()
-        scaledClippingGroup.remove()
 
+        let scaledClippingGroup: paper.Group
+        if(customMask().data.isUsed) {
+            const overlay = customMask().children['overlay'] as paper.CompoundPath
+            const rect = new paper.Path.Rectangle(overlay.bounds)
+            const inverted = rect.subtract(overlay)
+            scaledClippingGroup = new paper.Group([inverted])
+            scaledClippingGroup.remove()
+
+        } else {
+            scaledClippingGroup = clipGroup().clone()
+            scaledClippingGroup.remove()
+        }
+
+        const prevVisble = customMask().visible
+        customMask().visible = false
+        
         project.activeLayer.scale(scaleX, scaleY, boundingRect.topLeft)
         // top left corner of bounding rect
         const { x, y } = bgRect.bounds // how far "off the page" the top left corner is
         bgRect.remove()
 
+        // things need a non-transparent fill to be clickable
+        // we need to make this transparent before sending to the model
         const unfilledPartsHack = clipGroup().children.filter(c => c.fillColor.alpha < 0.01)
-        clipGroup().children.forEach(e => { console.log(e.fillColor.alpha) })
         unfilledPartsHack.forEach(path => {
             path.fillColor = null
         })
@@ -315,6 +331,7 @@ const make_paper = (component: PaperCanvasComponent,
             Math.ceil(scaleY * y))
         const pt_bottomright = new paper.Size(256, 256)
         layerBgRect.remove()
+        customMask().visible = prevVisble
         paper.project.activeLayer.scale(1 / scaleX, 1 / scaleY, boundingRect.topLeft)
         return [raster.getImageData(new paper.Rectangle(pt_topleft, pt_bottomright)),
             scaledClippingGroup]
@@ -352,9 +369,18 @@ const make_paper = (component: PaperCanvasComponent,
         emit('drawoutput', [reply.canvasData, clippingGroup, boundingRect])
     }
 
-    function clear() {
+    function clear(mask: boolean) {
         project.activate()
-        clipGroup().removeChildren()
+        if(mask) {
+            customMask().removeChildren()
+            const overlay = new paper.Path.Rectangle(paper.view.bounds.clone())
+            customMask().addChild(overlay)
+            customMask().data.isUsed = false
+            overlay.fillColor = '#0000005F'
+            overlay.name = 'overlay'
+        } else {
+            clipGroup().removeChildren()
+        }
     }
 
     function addLayer() {
@@ -482,7 +508,7 @@ const make_paper = (component: PaperCanvasComponent,
 
 type SketchMethods = {
     renderCanvas: () => void,
-    clear: () => void,
+    clear: (mask: boolean) => void,
     switchLayer: (idx: number) => void,
     swapLayers: (idxA: number, idxB: number) => void,
     addLayer: () => void,
@@ -579,7 +605,7 @@ export function paperStore(state: State, emitter: Emitter) {
     emitter.on('clear', () => {
         // hacky
         console.log('clearing canvas')
-        sketch().clear()
+        sketch().clear(state.app.maskEditingMode)
     })
 
     emitter.on('changeLayer', (layerIdx) => {
