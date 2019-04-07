@@ -52,8 +52,13 @@ function showDropdown(event){
 }
 
 function layerBuilder(state: AppState, emit: Emit) {
+    const valid_layers = (state.layers).filter((l) => !(l.deleted))
     const layers = state.layers.map((l, i) => {
-        return html`${layer(state, l, emit, i, (i + 1) == state.activeLayer, state.layers.length == 1)}`;
+      if(l.deleted){
+        return html``;
+      } else {
+        return html`${layer(state, l, emit, i, (i + 1) == state.activeLayer, valid_layers.length == 1)}`;
+      }
     })
     //!state.app.server.isConnected
     return html`

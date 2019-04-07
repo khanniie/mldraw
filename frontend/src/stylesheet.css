@@ -29,17 +29,21 @@ html, body{
 }
 
 .overlay{
-  width: 60%;
+  width: 65%;
   left: 20%;
-  top: 20%;
+  top: 7%;
   z-index: 6;
   background: white;
   box-sizing: border-box;
+  line-height: 1.2em;
     border: #6164bf 2px solid;
   padding: 2.5em;
   position: absolute;
-  height: 60%;
   color: #6164bf;
+}
+
+.tutorial img{
+  width: 30%;
 }
 
 canvas{

@@ -1,0 +1,8 @@
+{
+  "name": "Anime Colorizer",
+  "tools" : ["draw", "cut", "fill", "drag"],
+  "palette" : [],
+  "load_type": "server",
+  "description" : "This is a model that turns lines and color suggestions into a anime-colored translation.",
+  "tutorial" : "<p class='tutorial'><b>Instructions:</b> Draw something and fill it in with *hints* of color. You can change the color of the pen by clicking on the box on the bottom right corner of the pen tool. These *hints* will tell the model what fill color you want for that part of the drawing! When you're ready, hit render.<br/><br/><img src='model_info/images/colorize/colorize-before.png'/><img src='model_info/images/colorize/colorize-after.png'/><img src='model_info/images/colorize/colorizer.gif'/></p>"
+}

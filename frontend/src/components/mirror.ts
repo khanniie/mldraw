@@ -133,11 +133,12 @@ export function mirrorStore(state: State, emitter: Emitter) {
         state.cache(MirrorComponent, 'mirror-canvas').sketch.clear()
     })
     emitter.on('changeLayer', (layerIdx) => {
-        state.cache(MirrorComponent, 'mirror-canvas').sketch.switchLayer(layerIdx - 1)
+        state.cache(MirrorComponent, 'mirror-canvas').sketch.switchLayer(layerIdx)
     })
 
-    emitter.on('addLayer', () => {
+    emitter.on('addLayerMirror', (idx) => {
         state.cache(MirrorComponent, 'mirror-canvas').sketch.addLayer()
+        emitter.emit('changeLayer', idx)
     })
 
 }

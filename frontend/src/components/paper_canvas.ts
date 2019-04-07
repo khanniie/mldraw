@@ -30,6 +30,7 @@ const make_paper = (component: PaperCanvasComponent,
     bgLayerFill.name = 'boundingRect'
     bgLayerFill.selected = false
     project.addLayer(background)
+    console.log(project.layers);
 
     paper.project.view.onResize = () => {
         ({ width: viewWidth, height: viewHeight } = paper.project.view.bounds)
@@ -407,19 +408,27 @@ const make_paper = (component: PaperCanvasComponent,
         project.addLayer(layer)
         layer.data.empty = true
         return [project.activeLayer.index, {
-            layer, clippingGroup, model: 'edges2shoes_pretrained', mirrorLayer
+            layer, clippingGroup, model: 'edges2shoes_pretrained', mirrorLayer, deleted: false
         }];
     }
 
     function deleteLayer(idx) {
         project.activate()
-        project.layers.splice(idx, 1)[0].remove()
+        // project.layers.splice(idx, 1);
+        project.layers[idx].opacity = 0
+        console.log("after",project.layers)
     }
 
     function switchLayer(idx: number) {
         project.activate()
-        //blunt force solution - optimize later to just be current layer toggle
-        project.layers.map((lyr: paper.Layer) => (lyr.opacity = 0.2));
+        project.layers.map((lyr: paper.Layer, i:number) => {
+          if(i == 0) return;
+          lyr.opacity = 0.2
+          if(state.layers[i - 1].deleted){
+            lyr.opacity = 0
+          }
+        });
+        console.log(project.layers, idx);
         project.layers[idx].opacity = 1
         const prevActiveLayer = project.activeLayer
         project.layers[idx].activate()
@@ -429,7 +438,6 @@ const make_paper = (component: PaperCanvasComponent,
             emit('switchTool', 'draw')
         }
         activeBounds().strokeColor = '#0000005F'
-        console.log("active layer:", project.activeLayer);
     }
 
     function swapLayers(idxA: number, idxB: number) {
@@ -489,7 +497,6 @@ const make_paper = (component: PaperCanvasComponent,
 
     function setState(newState: AppState) {
         state = newState;
-        console.log(state)
     }
 
     component.sketch = {
@@ -584,6 +591,20 @@ export class PaperCanvasComponent extends Component {
     }
 }
 
+function find_next_layer(idx, layers){
+    for(let i = idx + 1; i< layers.length; i++){
+      if(!layers[i].deleted){
+        return i;
+      }
+    }
+    for(let i = idx - 1; i >= 0; i--){
+      if(!layers[i].deleted){
+        return i;
+      }
+    }
+    return -1;
+}
+
 export function paperStore(state: State, emitter: Emitter) {
 
     const sketch = () => state.cache(PaperCanvasComponent, 'paper-canvas').sketch
@@ -617,7 +638,8 @@ export function paperStore(state: State, emitter: Emitter) {
     emitter.on('addLayer', () => {
         let res = sketch().addLayer()
         state.app.layers.push(res[1]);
-        emitter.emit('changeLayer', res[0] + 1);
+        emitter.emit('addLayerMirror', res[0] + 1)
+        // emitter.emit('changeLayer');
         emitter.emit('render')
     })
 
@@ -628,16 +650,9 @@ export function paperStore(state: State, emitter: Emitter) {
             return;
         }
         sketch().deleteLayer(idx + 1)
-        state.app.layers.splice(idx, 1)
+        state.app.layers[idx].deleted = true;
 
-        if (sel) {
-            if (idx == 0) {
-                emitter.emit('changeLayer', idx + 1);
-            } else {
-                emitter.emit('changeLayer', idx);
-            }
-        }
-
+        emitter.emit('changeLayer', find_next_layer(idx, state.app.layers) + 1);
         emitter.emit('render')
     })
 
