@@ -29,6 +29,14 @@ const make_paper = (component: PaperCanvasComponent,
     bgLayerFill.fillColor = '#ffffff'
     bgLayerFill.name = 'boundingRect'
     bgLayerFill.selected = false
+    const boundingViewGroup = new paper.Group();
+    boundingViewGroup.addChild(bgLayerFill);
+    boundingViewGroup.name = 'boundingViewGroup'
+
+    const boundingViewContainer = new paper.Group();
+    boundingViewContainer.addChild(boundingViewGroup);
+    boundingViewContainer.name = 'boundingViewContainer'
+
     project.addLayer(background)
     console.log(project.layers);
 
@@ -36,7 +44,8 @@ const make_paper = (component: PaperCanvasComponent,
         ({ width: viewWidth, height: viewHeight } = paper.project.view.bounds)
     }
 
-    const activeBounds = () => project.activeLayer.children['boundingRect'] as paper.Path.Rectangle
+    const activeBounds = () => project.activeLayer.children['boundingViewContainer'].children['boundingViewGroup'].children['boundingRect'] as paper.Path.Rectangle
+    const activeBoundsContainer = () => project.activeLayer.children['boundingViewContainer'] as paper.Group
     const clipGroup = () => project.activeLayer.children['clippingGroup'] as paper.Group
     const customMask = () => project.activeLayer.children['customMask'] as paper.Group
 
@@ -172,7 +181,9 @@ const make_paper = (component: PaperCanvasComponent,
 
     boundsEditingTool.onMouseDown = function (event) {
         project.activate()
+        
         const bounding = activeBounds()
+        console.log(bounding)
         const clamped = new paper.Point(Math.max(0, Math.min(event.point.x, viewWidth)),
             Math.max(0, Math.min(event.point.y, viewHeight)))
         bounding.data.startCorner = clamped
@@ -182,6 +193,7 @@ const make_paper = (component: PaperCanvasComponent,
 
     boundsEditingTool.onMouseDrag = function (event) {
         const bounding = activeBounds()
+        console.log(bounding)
         bounding.selected = true
         const clamped = new paper.Point(Math.max(0, Math.min(event.point.x, viewWidth)),
             Math.max(0, Math.min(event.point.y, viewHeight)))
@@ -195,6 +207,7 @@ const make_paper = (component: PaperCanvasComponent,
         }
         const otherCorner = bounding.data.startCorner.add(delta.multiply(-1))
         bounding.bounds = new paper.Rectangle(bounding.data.startCorner, otherCorner)
+        //const boundingViewGroup = activeBoundsGroup();
     }
 
     cutTool.onMouseMove = function (event) {
@@ -400,10 +413,27 @@ const make_paper = (component: PaperCanvasComponent,
         overlay.name = 'overlay'
         //customMask.clipped = true
         customMask.visible = false
+
         const boundingRectPath = new paper.Path.Rectangle(paper.view.bounds.clone().scale(0.99))
         boundingRectPath.name = 'boundingRect'
         boundingRectPath.strokeColor = '#0000005F'
         boundingRectPath.dashArray = [2, 40]
+
+        const boundingViewGroup = new paper.Group();
+        let outsideBounds = new paper.Path.Rectangle(paper.view.bounds.clone().scale(0.99))
+        outsideBounds.reverse()
+        boundingViewGroup.addChild(outsideBounds);
+        boundingViewGroup.addChild(boundingRectPath);
+        boundingViewGroup.name = 'boundingViewGroup'
+
+        const boundingViewContainer = new paper.Group();
+        boundingViewContainer.name = 'boundingViewContainer'
+        boundingViewContainer.addChild(boundingViewGroup);
+
+        const filled = new paper.Path.Rectangle(paper.view.bounds.clone())
+        filled.fillColor = "#00000033"
+        boundingViewContainer.addChild(filled);
+        boundingViewContainer.clipped = true;
         
         project.addLayer(layer)
         layer.data.empty = true
@@ -434,10 +464,10 @@ const make_paper = (component: PaperCanvasComponent,
         project.layers[idx].activate()
         if (prevActiveLayer != project.activeLayer) {
             console.log('going back to draw tool')
-            prevActiveLayer.children['boundingRect'].strokeColor = null
+            prevActiveLayer.children['boundingViewContainer'].visible = false
             emit('switchTool', 'draw')
         }
-        activeBounds().strokeColor = '#0000005F'
+        activeBoundsContainer().visible = true
     }
 
     function swapLayers(idxA: number, idxB: number) {
@@ -448,7 +478,9 @@ const make_paper = (component: PaperCanvasComponent,
     }
 
     function switchTool(tool) {
-        for (const layer of project.layers) layer.children['boundingRect'].selected = false
+        
+        for (const layer of project.layers) layer.children['boundingViewContainer'].children['boundingViewGroup'].children['boundingRect'].selected = false
+
         state.maskEditingMode = false
         customMask().visible = false
         switch (tool) {
