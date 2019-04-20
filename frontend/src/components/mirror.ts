@@ -61,6 +61,11 @@ const make_mirror = (component: MirrorComponent,
         project.addLayer(layer)
     }
 
+    function deleteLayer(idx:number) {
+        project.activate()
+        project.layers[idx].visible = false
+    }
+
     function switchLayer(idx: number) {
         project.activate()
         console.log("switch layer", idx, project.layers);
@@ -72,7 +77,7 @@ const make_mirror = (component: MirrorComponent,
     }
 
     component.sketch = {
-        drawOutput, clear, switchLayer, addLayer
+        drawOutput, clear, switchLayer, addLayer, deleteLayer
     }
 }
 
@@ -80,7 +85,8 @@ type SketchMethods = {
     drawOutput: ([str, group, boundingRect]: [string, paper.Group, paper.Rectangle]) => void
     clear: () => void,
     addLayer: () => void,
-    switchLayer: (idx: number) => void
+    switchLayer: (idx: number) => void,
+    deleteLayer: (idx: number) => void
 }
 
 export class MirrorComponent extends Component {
@@ -139,6 +145,10 @@ export function mirrorStore(state: State, emitter: Emitter) {
     emitter.on('addLayerMirror', (idx) => {
         state.cache(MirrorComponent, 'mirror-canvas').sketch.addLayer()
         emitter.emit('changeLayer', idx)
+    })
+
+    emitter.on('deleteLayer', (idx : number) => {
+        state.cache(MirrorComponent, 'mirror-canvas').sketch.deleteLayer(idx + 1)
     })
 
 }
