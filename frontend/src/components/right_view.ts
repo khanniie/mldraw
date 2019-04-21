@@ -60,7 +60,6 @@ function layerBuilder(state: AppState, emit: Emit) {
         return html`${layer(state, l, emit, i, (i + 1) == state.activeLayer, valid_layers.length == 1)}`;
       }
     })
-    //!state.app.server.isConnected
     return html`
     <div id="layers">
         <ul id="layer-menu">
@@ -107,18 +106,22 @@ function layer(state: AppState, l: Layer, emit: Emit, i:number, selected:boolean
       <div class="layer unselectable ${selected ? 'selected' : ''}" onclick=${() => emit('changeLayer', i + 1)}>
         <div class="title"> ${(i + 1) + " "}
         <div class="dropdown"> <span>${modelname}</span> ${dropdownContent(emit, l, i, state, l)}</div></div>
-        <img src=${(state.tool === "mask") ? mask_selected : mask}
-          onclick=${(e) => {emit('switchTool', 'mask');
-                          e.stopPropagation();}}
-          alt="mask"/>
-        <img src=${(state.tool === "bounds") ? dotted_selected : dotted}
-          onclick=${(e) => {emit('switchTool', 'bounds');
-                        e.stopPropagation();}}
-           alt="bounding button"/>
-        <img src=${trash} style=${singularlayer ? "display: none" : ""}
-          onclick=${(e) => {emit('deleteLayer', [i, selected]);
-                        e.stopPropagation();}}
-           alt="trash button"/>
+        <div class="layer-icon" onclick=${(e) => {emit('switchTool', 'mask');
+                          if(selected) e.stopPropagation();}}>
+          <img src=${(state.tool === "mask" && selected) ? mask_selected : mask} alt="mask"/>
+          <div class="tooltip-container l-tool"><div class=tooltip>clipping mask</div></div>
+        </div>
+        <div class="layer-icon" onclick=${(e) => {emit('switchTool', 'bounds');
+                      if(selected) e.stopPropagation();}}>
+          <img src=${(state.tool === "bounds" && selected) ? dotted_selected : dotted} alt="bounding button"/>
+          <div class="tooltip-container l-tool"><div class=tooltip>bounding box</div></div>
+        </div>
+        <div class="layer-icon" style=${singularlayer ? "display: none" : ""}
+        onclick=${(e) => {emit('deleteLayer', [i, selected]);
+                      if(selected) e.stopPropagation();}}>
+          <img src=${trash} alt="trash button"/>
+          <div class="tooltip-container l-tool"><div class=tooltip>delete</div></div>
+        </div>
       </div>`
 }
 

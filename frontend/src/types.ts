@@ -67,6 +67,7 @@ export interface Events {
     setStrokeColor: string,
     resetBounds: undefined,
     resetFills: undefined,
+    setMaskToFull: undefined,
     showModelChangeWarning: undefined,
     canceloutput: undefined
 }
