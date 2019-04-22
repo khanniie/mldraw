@@ -111,7 +111,7 @@ export class MirrorComponent extends Component {
 
         make_mirror(this, newcanvas, element, this.emit)
     }
-    
+
 
     update() {}
 

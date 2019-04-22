@@ -241,11 +241,16 @@ canvas{
   padding: 0.4em;
   border-radius: 4px;
   color: #6164bf;
+  max-width: 15em;
   font-family: 'Inconsolata', monospace;
 }
 
 #canvas_button_container button:hover{
   background-color: #f2d5E5;
+}
+
+#mirror-canvas canvas{
+  pointer-events: none;
 }
 
 /* -- rendered view -- */

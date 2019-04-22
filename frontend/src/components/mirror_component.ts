@@ -7,6 +7,7 @@ import html from 'choo/html'
 const star = require('./../assets/star.svg')
 
 export function mirrorView(state: choo.IState, emit: Emit) {
+
     return html`
     <div class="inside-column">
     <div class="cutebox">

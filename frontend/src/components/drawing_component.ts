@@ -35,11 +35,16 @@ function return_mode(state){
 }
 
 function bottom_buttons(state, emit){
-  if(state.app.tool === "mask"){
+  if(state.app.tool === "mask" && state.app.automask){
     return html`
     <div id="canvas_button_container">
-      ${optionButton(()=>emit('setMaskToFull'), "set mask to full canvas", state)}
-      ${optionButton(()=>emit("autoMask"), "reset to auto mask", state)}
+      ${optionButton(()=>emit('customMask'), "switch to custom mask mode", state)}
+    </div>`
+  } else if (state.app.tool === "mask" && !state.app.automask){
+    return html`
+    <div id="canvas_button_container">
+      ${optionButton(()=>emit('setMaskToFull'), "set mask bounds to full canvas", state)}
+      ${optionButton(()=>emit("autoMask"), "switch to automask using drawing", state)}
     </div>`
   } else if(state.app.tool === "bounds"){
     return html`

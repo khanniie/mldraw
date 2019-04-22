@@ -19,6 +19,7 @@ export interface AppState {
     layers: Layer[],
     overlay: string,
     tool: string,
+    automask: boolean,
     renderdone: boolean,
     availableModels: string[],
     localModels: {[key:string]: string},
@@ -68,6 +69,9 @@ export interface Events {
     resetBounds: undefined,
     resetFills: undefined,
     setMaskToFull: undefined,
+    autoMask : undefined,
+    customMask: undefined,
+    resetMask: undefined,
     showModelChangeWarning: undefined,
     canceloutput: undefined
 }
