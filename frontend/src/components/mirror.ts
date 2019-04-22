@@ -104,6 +104,7 @@ export class MirrorComponent extends Component {
         newcanvas.style.backgroundColor = "white"
         newcanvas.width = 256
         newcanvas.height = 256
+        newcanvas.id = "mirror-canvas-element"
         newcanvas.setAttribute("resize", "true");
         // newcanvas.setAttribute('resize', 'false');
         element.appendChild(newcanvas)
@@ -111,7 +112,7 @@ export class MirrorComponent extends Component {
 
         make_mirror(this, newcanvas, element, this.emit)
     }
-    
+
 
     update() {}
 

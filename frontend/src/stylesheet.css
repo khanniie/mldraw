@@ -36,7 +36,7 @@ html, body{
   background: white;
   box-sizing: border-box;
   line-height: 1.2em;
-    border: #6164bf 2px solid;
+  border: #6164bf 2px solid;
   padding: 2.5em;
   position: absolute;
   color: #6164bf;
@@ -114,7 +114,7 @@ canvas{
 #bottom-container{
     padding-top:1em;
     width: 100%;
-    height: calc(100% - 5em);
+    height: calc(100% - 5em - 2px);
     overflow: auto;
     -webkit-overflow-scrolling: touch;
 }
@@ -241,6 +241,7 @@ canvas{
   padding: 0.4em;
   border-radius: 4px;
   color: #6164bf;
+  max-width: 12em;
   font-family: 'Inconsolata', monospace;
 }
 
@@ -250,6 +251,10 @@ canvas{
 
 /* -- rendered view -- */
 
+#mirror-canvas canvas{
+  pointer-events: none;
+}
+
 #mirror-canvas{
   width: calc(100vh - 15em);
   height: calc(100vh - 15em);
@@ -257,6 +262,23 @@ canvas{
   min-height: 256px;
   padding: 0px;
   position: relative;
+}
+
+#save-img{
+  border: #6164bf 2px solid;
+  background-color: white;
+  position: relative;
+  float:right;
+  margin-top: 1rem;
+  font-size: 0.9em;
+  background-color: #f2d5E5;
+  padding: 0.4em;
+  color: #6164bf;
+  font-family: 'Inconsolata', monospace;
+}
+
+#save-img:hover{
+  background-color: white;
 }
 
 /* ---- this is the top bar ---- */
@@ -374,7 +396,7 @@ canvas{
 #add{
   color: #6164bf;
   position: absolute;
-  right: 3%;
+  right: 0%;
   top: 0.35em;
   padding: 5px;
   padding-top: 3px;
@@ -510,6 +532,52 @@ canvas{
     border: #6164bf 2px solid;
     height: 100%;
     width: 100%;
+}
+
+#paintbucket-icon.selected-icon:hover > .palette{
+  display: block;
+}
+
+.palette{
+  display: none;
+  position: absolute;
+  bottom: calc(3.5rem - 4px);
+  left: -2px;
+  border: #6164bf 2px solid;
+  overflow-y: scroll;
+  max-height: 300px;
+  width: 150px;
+  z-index: 30;
+  background: white;
+  box-shadow: 2px 2px #C793C4;
+}
+
+.palette-element{
+  min-height: 1em;
+  padding: 0.25em;
+  padding-left: 0.5em;
+  display: block;
+  position: relative;
+}
+
+.palette-element:hover{
+  background-color: #e0afdb;
+  color: white;
+}
+
+.palette-element.current{
+  background-color: #e0afdb;
+  color: white;
+}
+
+.pal-ele-col{
+  width: 1em;
+  border-radius: 50%;
+  height: 1em;
+  top: 0.25em;
+  margin-right: 0.5em;
+  position: relative;
+  display: inline-block;
 }
 
 #bar{
@@ -650,14 +718,15 @@ ul {
 
 #paintbucketInfo.p-info-use{
   position: absolute;
-  bottom:0;
+  bottom: -2px;
   font-size: 0.5em;
   background: rgba(255, 255, 255, 0.6);
   width: 100%;
-  box-sizing: border-box;
+  left: -2px;
+  box-sizing: content-box;
   padding-top: 5%;
   padding-bottom: 5%;
-  border: #6164bf 1px solid;
+  border: #6164bf 2px solid;
   text-align: center;
 }
 
@@ -693,14 +762,14 @@ ul {
   text-align: left;
   display: none;
   position: absolute;
-  bottom: 3em;
-  left: 0px;
+  bottom: calc(3.5rem - 4px);
+  left: -2px;
   text-align: center;
-  min-width: 160px;
+  min-width: 120px;
   border: #6164bf 2px solid;
-  border-radius: 4px;
   z-index: 1.75;
   background-color:white;
+  box-shadow: 2px 2px #C793C4;
 }
 
 #dropdown-s:hover .dropdown-content-settings {display: block;}

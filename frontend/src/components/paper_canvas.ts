@@ -9,6 +9,8 @@ import { paperLocal as paper } from '../paperfix'
 import { Comm, serialize, Operation } from '../comm'
 import { doNothingIfRunning } from '../util'
 
+const checkerboard = require("../assets/checkerboard.png")
+
 type Layer = {
     model: string
     layer: paper.Layer
@@ -75,8 +77,15 @@ const make_paper = (component: PaperCanvasComponent,
         })
         pathBeingDrawn.closed = state.maskEditingMode || state.closed
         if(state.maskEditingMode) {
-            const overlay = customMask().children['overlay'] as paper.CompoundPath
-            if(overlay.hitTest(event.point)) {
+            console.log(state.automask)
+            if(state.automask){
+              state.automask = false
+              emit('render')
+            }
+            const mask = customMask()
+            const overlay = customMask().children['overlay']
+            let res = mask.hitTest(event.point);
+            if(mask.hitTest(event.point)) {
                 console.log('started inside')
                 overlay.data.remove = true
             } else {
@@ -98,11 +107,12 @@ const make_paper = (component: PaperCanvasComponent,
             pathBeingDrawn.remove()
         }
         pathBeingDrawn.selected = false
-        pathBeingDrawn.fillColor = '#FF000001'
+        pathBeingDrawn.fillColor = '#00000001'
         if (state.smoothing) pathBeingDrawn.simplify(10)
         if (pathBeingDrawn.length > 0.001) project.activeLayer.data.empty = false
         if (state.maskEditingMode) {
             const overlay = customMask().children['overlay'] as paper.CompoundPath
+
             const result = overlay.data.remove ? overlay.subtract(pathBeingDrawn) : overlay.unite(pathBeingDrawn)
             overlay.remove()
             result.name = 'overlay'
@@ -110,6 +120,7 @@ const make_paper = (component: PaperCanvasComponent,
             customMask().addChild(result)
             customMask().addChild(pathBeingDrawn)
             customMask().data.isUsed = true
+            result.bringToFront()
             //project.activeLayer.children['overlay'].sendToBack()
         } else {
             clipGroup().addChild(pathBeingDrawn)
@@ -322,7 +333,7 @@ const make_paper = (component: PaperCanvasComponent,
         const [scaleX, scaleY] = [255 / boundWidth, 255 / boundHeight]
 
         let scaledClippingGroup: paper.Group
-        if(customMask().data.isUsed) {
+        if(!state.automask) {
             const overlay = customMask().children['overlay'] as paper.CompoundPath
             const rect = new paper.Path.Rectangle(overlay.bounds)
             const inverted = rect.subtract(overlay)
@@ -336,6 +347,9 @@ const make_paper = (component: PaperCanvasComponent,
 
         const prevVisble = customMask().visible
         customMask().visible = false
+
+        let c_mask = customMask();
+        //customMask().remove();
 
         project.activeLayer.scale(scaleX, scaleY, boundingRect.topLeft)
         // top left corner of bounding rect
@@ -403,10 +417,24 @@ const make_paper = (component: PaperCanvasComponent,
       project.activate()
       customMask().removeChildren()
       const overlay = new paper.Path.Rectangle(paper.view.bounds.clone())
-      customMask().addChild(overlay)
+      let result;
+      let clip = clipGroup().clone()
+      const path = clip.children.filter(ch => ch instanceof paper.Path || ch instanceof paper.CompoundPath)
+      if(path.length > 0){
+        const united = path.reduce((a, p) => (a as any).unite(p))
+        result = overlay.subtract(united)
+      } else {
+        result = overlay
+      }
+      clip.remove()
+      customMask().addChild(result)
+      overlay.remove();
+      var raster = new paper.Raster(checkerboard, new paper.Point(220, 220));
+      raster.scale(0.43);
+      customMask().addChild(raster)
       customMask().data.isUsed = false
-      overlay.fillColor = '#0000005F'
-      overlay.name = 'overlay'
+      customMask().clipped = true
+      result.name = 'overlay'
     }
 
     function addLayer() {
@@ -421,9 +449,13 @@ const make_paper = (component: PaperCanvasComponent,
         customMask.name = 'customMask'
         const overlay = new paper.Path.Rectangle(paper.view.bounds.clone())
         customMask.addChild(overlay)
-        overlay.fillColor = '#0000005F'
+        //overlay.fillColor = '#0000005F'
         overlay.name = 'overlay'
-        //customMask.clipped = true
+        var url = checkerboard;
+        var raster = new paper.Raster(url, new paper.Point(220, 220));
+        raster.scale(0.43);
+        customMask.addChild(raster)
+        customMask.clipped = true
         customMask.visible = false
 
         const boundingRectPath = new paper.Path.Rectangle(paper.view.bounds.clone().scale(0.99))
@@ -465,7 +497,7 @@ const make_paper = (component: PaperCanvasComponent,
         project.activate()
         project.layers.map((lyr: paper.Layer, i:number) => {
           if(i == 0) return;
-          lyr.opacity = 0.2
+          lyr.opacity = 0.1
           if(state.layers[i - 1].deleted){
             lyr.visible = false
           }
@@ -524,6 +556,10 @@ const make_paper = (component: PaperCanvasComponent,
                   emit("switchTool", "draw");
                 } else {
                     state.maskEditingMode = true
+                    if(state.automask){
+                      autoMask()
+                    }
+
                     customMask().visible = true
                     drawTool.activate()
                 }
@@ -576,7 +612,7 @@ const make_paper = (component: PaperCanvasComponent,
         resetBounds,
         resetFills,
         setMaskToFull,
-        autoMask
+        autoMask,
     }
 }
 
@@ -598,13 +634,11 @@ type SketchMethods = {
 
 function setMouseDown(state, emit) {
     state.mouseOnCanvas = true;
-    console.log("stat:" + state.mouseOnCanvas);
     emit('render');
 }
 
 function setMouseUp(state, emit) {
     state.mouseOnCanvas = false;
-    console.log("stat:" + state.mouseOnCanvas);
     emit('render');
 }
 
@@ -770,7 +804,14 @@ export function paperStore(state: State, emitter: Emitter) {
     })
 
     emitter.on('autoMask', () => {
+        state.app.automask = true;
         sketch().autoMask()
+        emitter.emit('render')
+    })
+
+    emitter.on('customMask', () => {
+        state.app.automask = false;
+        emitter.emit('render')
     })
 
     // TODO: make a comm reducer

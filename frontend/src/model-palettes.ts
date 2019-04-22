@@ -64,15 +64,7 @@ export function paintBucketStore(state: State, emitter: Emitter) {
             } else {
                 state.app.paintbucket.active = false;
             }
-        } else {
-            const palette = state.app.paintbucket.palette;
-            const totalColors = Object.keys(palette)
-            state.app.paintbucket.colorIdx = (state.app.paintbucket.colorIdx + 1) % totalColors.length;
-            state.app.paintbucket.colorName = totalColors[state.app.paintbucket.colorIdx]
-            emitter.emit('switchTool', 'fill')
-            emitter.emit('setFill', palette[state.app.paintbucket.colorName])
-            emitter.emit('render')
-        }
+        } 
     })
     // if switching away from paintbucket, deactivate
     emitter.on('switchTool', tool => {

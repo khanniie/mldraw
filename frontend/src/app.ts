@@ -37,6 +37,7 @@ function initialState(state: choo.IState, emit: Emit) {
             strokeColor: '#000000',
             activeLayer: 1,
             tool: 'draw',
+            automask: true,
             renderdone: true,
             layers: [],
             tutorials: [],
@@ -66,7 +67,7 @@ function getSumChildrenWidth(){
   let em = parseFloat(getComputedStyle(document.body).fontSize);
   let columnWid = windowhei - (15 * em) + 4; //calc(100vh - 15em) + 2px borders
   columnWid = (columnWid < 260) ? 260 : columnWid;
-  return (columnWid + em) * 2 + 260 + em + 3; //+3 for any int division.. to be safe
+  return (columnWid + em) * 2 + 260 + em; //+3 for any int division.. to be safe
 }
 
 function computeWidth(state, emit:Emit){
