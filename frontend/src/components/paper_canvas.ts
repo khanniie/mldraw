@@ -332,24 +332,22 @@ const make_paper = (component: PaperCanvasComponent,
         const [scaleX, scaleY] = [255 / boundWidth, 255 / boundHeight]
 
         let scaledClippingGroup: paper.Group
-        console.log(state.automask)
-        // if(!state.automask) {
+        if(!state.automask) {
             const overlay = customMask().children['overlay'] as paper.CompoundPath
             const rect = new paper.Path.Rectangle(overlay.bounds)
             const inverted = rect.subtract(overlay)
             scaledClippingGroup = new paper.Group([inverted])
             scaledClippingGroup.remove()
 
-        // } else {
-        //     scaledClippingGroup = clipGroup().clone()
-        //     scaledClippingGroup.remove()
-        // }
+        } else {
+            scaledClippingGroup = clipGroup().clone()
+            scaledClippingGroup.remove()
+        }
 
         const prevVisble = customMask().visible
         customMask().visible = false
-        customMask().clipped = false
 
-        //let c_mask = customMask();
+        let c_mask = customMask();
         //customMask().remove();
 
         project.activeLayer.scale(scaleX, scaleY, boundingRect.topLeft)
@@ -359,7 +357,7 @@ const make_paper = (component: PaperCanvasComponent,
 
         // things need a non-transparent fill to be clickable
         // we need to make this transparent before sending to the model
-        const unfilledPartsHack = clipGroup().children.filter(c => c.fillColor.alpha < 0.1)
+        const unfilledPartsHack = clipGroup().children.filter(c => c.fillColor.alpha < 0.01)
         unfilledPartsHack.forEach(path => {
             path.fillColor = null
         })
