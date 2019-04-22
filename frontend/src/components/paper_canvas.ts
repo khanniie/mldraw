@@ -77,7 +77,8 @@ const make_paper = (component: PaperCanvasComponent,
         })
         pathBeingDrawn.closed = state.maskEditingMode || state.closed
         if(state.maskEditingMode) {
-            if(!state.automask){
+            console.log(state.automask)
+            if(state.automask){
               state.automask = false
               emit('render')
             }
@@ -425,6 +426,7 @@ const make_paper = (component: PaperCanvasComponent,
       } else {
         result = overlay
       }
+      clip.remove()
       customMask().addChild(result)
       overlay.remove();
       var raster = new paper.Raster(checkerboard, new paper.Point(220, 220));
@@ -557,6 +559,7 @@ const make_paper = (component: PaperCanvasComponent,
                     if(state.automask){
                       autoMask()
                     }
+
                     customMask().visible = true
                     drawTool.activate()
                 }

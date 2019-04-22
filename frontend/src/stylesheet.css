@@ -249,11 +249,11 @@ canvas{
   background-color: #f2d5E5;
 }
 
+/* -- rendered view -- */
+
 #mirror-canvas canvas{
   pointer-events: none;
 }
-
-/* -- rendered view -- */
 
 #mirror-canvas{
   width: calc(100vh - 15em);
@@ -262,6 +262,23 @@ canvas{
   min-height: 256px;
   padding: 0px;
   position: relative;
+}
+
+#save-img{
+  border: #6164bf 2px solid;
+  background-color: white;
+  position: relative;
+  float:right;
+  margin-top: 1rem;
+  font-size: 0.9em;
+  background-color: #f2d5E5;
+  padding: 0.4em;
+  color: #6164bf;
+  font-family: 'Inconsolata', monospace;
+}
+
+#save-img:hover{
+  background-color: white;
 }
 
 /* ---- this is the top bar ---- */
