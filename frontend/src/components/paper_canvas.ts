@@ -458,13 +458,13 @@ const make_paper = (component: PaperCanvasComponent,
         customMask.clipped = true
         customMask.visible = false
 
-        const boundingRectPath = new paper.Path.Rectangle(paper.view.bounds.clone().scale(0.99))
+        const boundingRectPath = new paper.Path.Rectangle(paper.view.bounds.clone())
         boundingRectPath.name = 'boundingRect'
         boundingRectPath.strokeColor = '#000000FF'
         boundingRectPath.dashArray = [2, 40]
 
         const boundingViewGroup = new paper.Group();
-        let outsideBounds = new paper.Path.Rectangle(paper.view.bounds.clone().scale(0.99))
+        let outsideBounds = new paper.Path.Rectangle(paper.view.bounds.clone())
         outsideBounds.reverse()
         boundingViewGroup.addChild(outsideBounds);
         boundingViewGroup.addChild(boundingRectPath);
@@ -593,7 +593,7 @@ const make_paper = (component: PaperCanvasComponent,
 
     function resetBounds() {
         project.activate()
-        activeBounds().bounds = paper.view.bounds.clone().scale(0.99)
+        activeBounds().bounds = paper.view.bounds.clone()
     }
 
     function setState(newState: AppState) {

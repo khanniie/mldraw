@@ -127,7 +127,7 @@ function layer(state: AppState, l: Layer, emit: Emit, i:number, selected:boolean
 
 export function rightView(state: choo.IState, emit: Emit) {
     return html`
-    <div class="inside-column">
+    <div>
         ${layerBuilder(state.app, emit)}
     </div>`
 }

@@ -5,6 +5,7 @@ import devTools from 'choo-devtools'
 import { State, AppState, Emit, Emitter } from './types'
 import { paperStore} from './components/paper_canvas'
 import { MirrorComponent, mirrorStore } from './components/mirror'
+import { P5CanvasComponent, p5CanvasStore } from './components/p5-canvas'
 import { leftView } from './components/left_view'
 import { rightView } from './components/right_view'
 import { topView } from './components/top_view'
@@ -18,9 +19,11 @@ app.use(initialState)
 app.use(paperStore)
 app.use(mirrorStore)
 app.use(localModelsStore)
+app.use(p5CanvasStore)
 app.use(paintBucketStore)
 app.use(tutorialReducer)
 app.route('/', mainView)
+app.route('/tutorial', tutorialView)
 app.mount('body')
 
 const close = require('./assets/close.svg')
@@ -67,7 +70,7 @@ function getSumChildrenWidth(){
   let em = parseFloat(getComputedStyle(document.body).fontSize);
   let columnWid = windowhei - (15 * em) + 4; //calc(100vh - 15em) + 2px borders
   columnWid = (columnWid < 260) ? 260 : columnWid;
-  return (columnWid + em) * 2 + 260 + em; //+3 for any int division.. to be safe
+  return (columnWid + em) * 2 + 260 + em + 30000; //+3 for any int division.. to be safe
 }
 
 function computeWidth(state, emit:Emit){
@@ -157,15 +160,17 @@ function mainView(state: choo.IState, emit: Emit) {
             ${overlay(state, emit)}
             <div id="bottom-container">
             <div id="bottom" style=${"width: " + wid + "px;"}>
-              <div class="column">
                 ${leftView(state,emit)}
-              </div>
-              <div class="column">
-                ${rightView(state, emit)}
-              </div>
               <div class="column">
                 ${mirrorView(state, emit)}
               </div>
             </div></div>
+        </body>`
+}
+
+function tutorialView(state: choo.IState, emit: Emit) {
+    return html`
+        <body>
+        this is the tutorial
         </body>`
 }

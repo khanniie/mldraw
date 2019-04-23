@@ -77,19 +77,19 @@ canvas{
   -webkit-user-drag: none;
   -webkit-user-select: none;
   -ms-user-select: none;
-  opacity: 0;
+  display: none;
   z-index: 6;
+  text-align: center;
   background: #f2edbd;
   padding: 0.3em;
   font-size: 0.8em;
   position: absolute;
-  bottom: 100%;
+  bottom: 70%;
   border: #6164bf 1px solid;
 }
 
 .tooltip-container:hover > .tooltip{
-  transition-delay: 0.6s;
-  opacity: 1;
+  display: block;
 }
 
 /* -- general layout of columns --- */
@@ -126,8 +126,9 @@ canvas{
   border-radius: 8px;
   background-color: white;
   overflow: hidden;
-  width: calc(100vh - 15em);
+  width: calc(100vh - 7em);
   min-width: 256px;
+  float: left;
   /* box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.2); */
 }
 
@@ -178,8 +179,8 @@ canvas{
 }
 
 #paper-canvas{
-  width: calc(100vh - 15em);
-  height: calc(100vh - 15em);
+  width: calc(100vh - 8em - 4px);
+  height: calc(100vh - 8em - 4px);
   min-width: 256px;
   min-height: 256px;
   padding: 0px;
@@ -255,29 +256,46 @@ canvas{
   pointer-events: none;
 }
 
-#mirror-canvas{
-  width: calc(100vh - 15em);
-  height: calc(100vh - 15em);
+#p5-canvas-container{
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+}
+
+#canvas-container{
+  width: calc(100vh - 8em - 4px);
+  height: calc(100vh - 8em - 4px);
   min-width: 256px;
   min-height: 256px;
   padding: 0px;
   position: relative;
 }
 
-#save-img{
+#mirror-canvas{
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+}
+
+.mirror-button{
   border: #6164bf 2px solid;
   background-color: white;
   position: relative;
-  float:right;
+  float: right;
   margin-top: 1rem;
   font-size: 0.9em;
   background-color: #f2d5E5;
   padding: 0.4em;
+  margin-left: 1rem;
   color: #6164bf;
   font-family: 'Inconsolata', monospace;
 }
 
-#save-img:hover{
+.mirror-button:hover{
   background-color: white;
 }
 
@@ -362,6 +380,11 @@ canvas{
   width: 100%;
 }
 
+.layer-icon .tooltip-container .tooltip{
+  bottom: 100%;
+  right: -100%;
+}
+
 .layer-container{
   background :#f2d5E5;
   width: 100%;
@@ -386,7 +409,7 @@ canvas{
 
 #layer-menu{
   margin: 0px;
-  width: 256px;
+  width: 180px;
   border: #6164bf 2px solid;
   box-shadow: 3px 3px #C793C4;
   position: relative;
@@ -415,6 +438,10 @@ canvas{
 
 .icon.selected-icon{
   box-sizing: border-box;
+}
+
+#layers{
+  margin-top: 1em;
 }
 
 /* --- layer dropdown --- */
@@ -541,7 +568,7 @@ canvas{
 .palette{
   display: none;
   position: absolute;
-  bottom: calc(3.5rem - 4px);
+  top: calc(3.5rem - 4px);
   left: -2px;
   border: #6164bf 2px solid;
   overflow-y: scroll;
@@ -581,8 +608,10 @@ canvas{
 }
 
 #bar{
-  width: 100%;
-  height: auto;
+  /* width: 100%;
+
+  height: auto; */
+  /* float: left; */
 }
 
 ul {
@@ -596,16 +625,18 @@ ul {
 }
 
 #toolbar{
-  position: relative;
+  /* float: left; */
   display: inline-block;
-  margin-top: 1em;
-  height: 5em;
+  height: calc(180px + 1.5em);
+  width: 180px;
+  z-index: 10;
   border: #6164bf 2px solid;
   box-shadow: 3px 3px #C793C4;
   position: relative;
   background-color: #f2d5E5;
   background-image: url('assets/grid.png');
-  background-size: contain;
+  background-repeat: repeat;
+  background-size: 30% 30%;
 }
 
 #bar-info-container{
@@ -672,23 +703,22 @@ ul {
 }
 
 #icons{
-  height: calc(100% - 1.5em);
+  height: 4em;
   vertical-align: middle;
-  width: calc(100vh - 15em);
-  min-width: 256px;
+  width: 180px;
   display: flex;
   flex-direction: row;
+  flex-flow: row wrap;
   justify-content: space-around;
   /* align-items: center; */
-  flex-wrap: nowrap;
 }
 
 .icon{
-  width: 50px;
-  /* flex-grow: 0;
-  flex-shrink: 0; */
-  transform: translate3d(0, 0, 0);
+  width: 50%;
+  height: 60px;
+  position: relative;
   user-drag: none;
+  z-index: 10;
   user-select: none;
   -moz-user-select: none;
   -webkit-user-drag: none;
@@ -709,6 +739,7 @@ ul {
   margin: auto;
   margin-top: calc(15%);
   height: 70%;
+  z-index: 0;
 }
 
 .icon:hover> img{
@@ -723,6 +754,7 @@ ul {
   background: rgba(255, 255, 255, 0.6);
   width: 100%;
   left: -2px;
+  z-index: -1;
   box-sizing: content-box;
   padding-top: 5%;
   padding-bottom: 5%;
@@ -751,7 +783,6 @@ ul {
 }
 
 #dropdown-s img{
-  width:100%;
 }
 
 #dropdown-s {
@@ -762,7 +793,7 @@ ul {
   text-align: left;
   display: none;
   position: absolute;
-  bottom: calc(3.5rem - 4px);
+  top: calc(60px);
   left: -2px;
   text-align: center;
   min-width: 120px;
