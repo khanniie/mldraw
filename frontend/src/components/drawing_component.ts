@@ -15,7 +15,7 @@ export function drawView(state: choo.IState, emit: Emit) {
         <div id="paper">${state.cache(PaperCanvasComponent, 'paper-canvas').render(state.app)}
           <div id="render" onclick=${onclick} class=${state.app.mouseOnCanvas ? "disappear unselectable" : "unselectable"}>
             ${renderButton(state.app.renderdone)}
-            <div class="tooltip-container"><div class="tooltip">render layer</div></div>
+            <div class="tooltip-container"><div class="tooltip"><p>render layer</p></div></div>
           </div>
           ${bottom_buttons(state, emit)}
         </div>

@@ -4,5 +4,5 @@
   "palette" : [],
   "load_type": "local",
   "description" : "This is a model that turns lines into Pikachu.",
-  "tutorial" : "<p class='tutorial'><b>Instructions:</b> Draw lines on the canvas and hit the render button! It is highly recommended that the drawing be centered within the bounding box, occupying 60% - 80% of the bounding box, and drawn with black lines with no fill.</p>"
+  "tutorial" : "<p class='tutorial'><b>Instructions:</b> Draw lines on the canvas and hit the render button! It is highly recommended that the drawing be centered within the bounding box, occupying 60% - 80% of the bounding box, and drawn with black lines with no fill.</br></br><img src='model_info/images/pikachu/pikachu-before.png'/><img src='model_info/images/pikachu/pikachu-after.png'/></p>"
 }

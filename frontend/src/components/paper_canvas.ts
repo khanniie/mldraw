@@ -44,9 +44,21 @@ const make_paper = (component: PaperCanvasComponent,
 
     project.addLayer(background)
     console.log(project.layers);
+    //
+    // paper.project.view.onResize = () => {
+    //     ({ width: viewWidth, height: viewHeight } = paper.project.view.bounds)
+    // }
 
-    paper.project.view.onResize = () => {
-        ({ width: viewWidth, height: viewHeight } = paper.project.view.bounds)
+
+    paper.project.view.onResize = function(){
+
+      ({ width: viewWidth, height: viewHeight } = paper.project.view.bounds)
+
+      // let ele = document.getElementById('paper-canvas');
+      // console.log(project.view.viewSize.width, ele.clientWidth);
+      // if(project.view.viewSize.width != ele.clientWidth){
+      //   project.view.viewSize.height = ele.clientHeight;
+      // }
     }
 
     const activeBounds = () => project.activeLayer.children['boundingViewContainer'].children['boundingViewGroup'].children['boundingRect'] as paper.Path.Rectangle
@@ -664,6 +676,7 @@ export class PaperCanvasComponent extends Component {
         newcanvas.width = 256
         newcanvas.height = 256
         newcanvas.id = "new"
+        //newcanvas.setAttribute("resize", "true");
         //newcanvas.setAttribute("resize", "true");
         element.appendChild(newcanvas)
 

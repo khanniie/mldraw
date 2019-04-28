@@ -80,11 +80,18 @@ canvas{
   display: none;
   z-index: 6;
   text-align: center;
+  width: 100%;
+  position: absolute;
+  bottom: 80%;
+  left: 0%;
+
+}
+
+.tooltip p{
+  margin: 0;
   background: #f2edbd;
   padding: 0.3em;
   font-size: 0.8em;
-  position: absolute;
-  bottom: 70%;
   border: #6164bf 1px solid;
 }
 
@@ -109,6 +116,7 @@ canvas{
     position: relative;
     height: 100%;
     width: 300%;
+    transition-duration: 0.5s;
 }
 
 #bottom-container{
@@ -126,8 +134,8 @@ canvas{
   border-radius: 8px;
   background-color: white;
   overflow: hidden;
-  width: calc(100vh - 7em);
-  min-width: 256px;
+  /* width: calc(100vh - 9em - 4px); */
+  min-width: 356px;
   float: left;
   /* box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.2); */
 }
@@ -179,10 +187,10 @@ canvas{
 }
 
 #paper-canvas{
-  width: calc(100vh - 8em - 4px);
-  height: calc(100vh - 8em - 4px);
-  min-width: 256px;
-  min-height: 256px;
+  width: calc(100vh - 9em - 4px);
+  height: calc(100vh - 9em - 4px);
+  min-width: 356px;
+  min-height: 356px;
   padding: 0px;
   position: relative;
 }
@@ -219,6 +227,10 @@ canvas{
   right: 0.3em;
   opacity: 1;
   transition-duration: 1s;
+}
+
+#render .tooltip-container{
+  top: -15%;
 }
 
 #render:hover{
@@ -265,12 +277,21 @@ canvas{
 }
 
 #canvas-container{
-  width: calc(100vh - 8em - 4px);
-  height: calc(100vh - 8em - 4px);
-  min-width: 256px;
-  min-height: 256px;
+  /*calc(100vw - (100vh - 9em - 4px) - 180px - 4em - 12px); */
+  width: calc(100vw - 100vh + 5em - 188px);
+  height: calc(100vw - 100vh + 5em - 188px);
+  min-width: 356px;
+  min-height: 356px;
+  max-width: calc(100vh - 9em - 4px);
+  max-height: calc(100vh - 9em - 4px);
   padding: 0px;
   position: relative;
+  transition-duration: 0.5s;
+}
+
+.full-size{
+  width: calc(100vh - 9em - 4px) !important;
+  height: calc(100vh - 9em - 4px) !important;
 }
 
 #mirror-canvas{
@@ -299,6 +320,74 @@ canvas{
   background-color: white;
 }
 
+
+/* The switch - the box around the slider */
+.switch {
+  margin-left: 0.5em;
+  position: relative;
+  display: inline-block;
+  width: 2.5em;
+  margin-top: 0.2em;
+  float: right;
+  height: 1.3em;
+}
+
+/* Hide default HTML checkbox */
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* The slider */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 1em;
+  top: 0.15em;
+  width: 1em;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input.checked + .slider {
+  background-color: #e0afdb;
+}
+
+/* input:focus + .slider {
+  box-shadow: 0 0 1px #2196F3;
+} */
+
+input.checked + .slider:before {
+  -webkit-transform: translateX(16px);
+  -ms-transform: translateX(16px);
+  transform: translateX(16px);
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 1.5em;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+
 /* ---- this is the top bar ---- */
 
 #top{
@@ -316,6 +405,13 @@ canvas{
   padding-bottom: 0.4em;
   font-size: 2em;
   display: inline-block;
+}
+
+#info{
+position: absolute;
+font-size: 0.8em;
+bottom: 0.25em;
+left: 1rem;
 }
 
 #made-by{
@@ -366,9 +462,25 @@ canvas{
   line-height: 1em;
 }
 
+#draw-tooltip{
+  z-index: 0;
+}
+
+#draw-img{
+  z-index: 1;
+}
+
 .l-tool > .tooltip{
     font-size: 0.8em;
     display: none;
+    width: 50px;
+    margin-left: -18px;
+    border: #6164bf 2px solid;
+    background-color: #f2edbd;
+}
+
+.l-tool > .tooltip p{
+    border: 0;
 }
 
 .l-tool:hover > .tooltip{
@@ -540,8 +652,8 @@ canvas{
 
 #colorpick{
   position: absolute;
-  bottom: 2px;
-  right: 2px;
+  bottom: 12px;
+  right: 12px;
   width: 16px;
   height: 16px;
 }
@@ -556,6 +668,7 @@ canvas{
 
 #colorpick-display{
   position: absolute;
+  border-radius: 50%;
     border: #6164bf 2px solid;
     height: 100%;
     width: 100%;
@@ -577,6 +690,29 @@ canvas{
   z-index: 30;
   background: white;
   box-shadow: 2px 2px #C793C4;
+}
+
+.palette::-webkit-scrollbar {
+    -webkit-appearance: none;
+}
+
+.palette::-webkit-scrollbar:vertical {
+    width: 8px;
+}
+
+.palette::-webkit-scrollbar:horizontal {
+    height: 8px;
+}
+
+.palette::-webkit-scrollbar-thumb {
+    border-radius: 8px;
+    border: 2px solid white; /* should match background, can't be transparent */
+    background-color: #6164bf;
+}
+
+.palette::-webkit-scrollbar-track {
+    background-color: #fff;
+    border-radius: 8px;
 }
 
 .palette-element{
@@ -627,7 +763,7 @@ ul {
 #toolbar{
   /* float: left; */
   display: inline-block;
-  height: calc(180px + 1.5em);
+  height: calc(180px + 1.6em);
   width: 180px;
   z-index: 10;
   border: #6164bf 2px solid;
@@ -645,14 +781,15 @@ ul {
 }
 
 #bar-info{
+  position: relative;
   background-color: white;
-  height: 1.5em;
-  line-height: 1.4em;
+  height: 1.6em;
+  line-height: 1.6em;
 }
 
 #bar-info img{
   margin-right: 1em;
-  height: 60%;
+  height: 80%;
 }
 
 @keyframes expand {
@@ -730,10 +867,6 @@ ul {
   -o-filter:      grayscale(0%);
 }
 
-.selected-icon{
-  border: #6164bf 2px solid;
-}
-
 .icon img{
   display: block;
   margin: auto;
@@ -751,14 +884,12 @@ ul {
   position: absolute;
   bottom: -2px;
   font-size: 0.5em;
-  background: rgba(255, 255, 255, 0.6);
   width: 100%;
   left: -2px;
   z-index: -1;
   box-sizing: content-box;
   padding-top: 5%;
   padding-bottom: 5%;
-  border: #6164bf 2px solid;
   text-align: center;
 }
 
@@ -793,10 +924,10 @@ ul {
   text-align: left;
   display: none;
   position: absolute;
-  top: calc(60px);
+  top: 60px;
   left: -2px;
   text-align: center;
-  min-width: 120px;
+  width: 180px;
   border: #6164bf 2px solid;
   z-index: 1.75;
   background-color:white;
@@ -808,4 +939,86 @@ ul {
 .disappear {
   opacity: 0 !important;
   z-index: -1;
+}
+
+/** tutorial view **/
+.content{
+  position: relative;
+  padding: 2em;
+}
+.header{
+  position: relative;
+  background-color: white;
+  height: 1.6em;
+  line-height: 1.6em;
+  padding-left: 1em;
+  border-bottom: #6164bf 2px solid;
+}
+
+.header img{
+  margin-right: 1em;
+  height: 80%;
+}
+
+.content-container{
+  display: inline-block;
+  width: 100%;
+  z-index: 10;
+  border: #6164bf 2px solid;
+  box-shadow: 3px 3px #C793C4;
+  position: relative;
+  background-color: #f2d5E5;
+  /* background-image: url('assets/grid.png');
+  background-repeat: repeat;
+  background-size: 50px 50px; */
+}
+
+.section{
+  width: 100%;
+}
+
+.tutorial-view-container{
+  margin-left: 15%;
+  margin-top: 50px;
+  width: 70%;
+}
+
+.tabs{
+  width: 100%;
+}
+
+.tab{
+  display: inline-block;
+  float: left;
+  padding: 1em;
+  padding-top: 0.3em;
+  padding-bottom: 0.3em;
+  background: rgba(240, 240, 240);
+  border-top: #6164bf 2px solid;
+  border-left: #6164bf 2px solid;
+  border-right: #6164bf 2px solid;
+}
+
+.selected-tab{
+  padding-left: 1.5em;
+  padding-right: 1.5em;
+  background: white;
+}
+
+.tab:hover{
+  background-color: #f2d5E5;
+}
+
+#back{
+  background: white;
+  padding: 1em;
+  margin: 2em;
+  color: #6164bf;
+  border: #6164bf 2px solid;
+  box-shadow: 3px 3px #C793C4;
+}
+
+
+#back:hover{
+  background-color: #f2d5E5;
 }
