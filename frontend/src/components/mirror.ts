@@ -25,11 +25,23 @@ const make_mirror = (component: MirrorComponent,
     let path_rec = new paper.Path.Rectangle(rec)
     path_rec.fillColor = '#ffffff'
     project.addLayer(background)
+
+    project.view.onResize = function(e){
+      let ele = document.getElementById('paper-canvas');
+      console.log(paper.view.viewSize.width, ele.clientWidth);
+      if(project.view.viewSize.width != ele.clientWidth && paper.view.viewSize.width * 2 != ele.clientWidth){
+        project.view.viewSize.width = ele.clientWidth;
+        project.view.viewSize.height = ele.clientHeight;
+      }
+    }
+
     //new paper.View()
 
     function drawOutput([bytes, clippingPath, boundingRect]:
         [string | HTMLImageElement, paper.Group, paper.Rectangle]) {
+
         project.activate()
+        paper.project.view.onResize(null);
         project.activeLayer.removeChildren()
         let image;
         if(bytes instanceof HTMLImageElement) {
@@ -105,7 +117,7 @@ export class MirrorComponent extends Component {
         newcanvas.width = 256
         newcanvas.height = 256
         newcanvas.id = "mirror-canvas-element"
-        newcanvas.setAttribute("resize", "true");
+        // newcanvas.setAttribute("resize", "true");
         // newcanvas.setAttribute('resize', 'false');
         element.appendChild(newcanvas)
         console.log(newcanvas)

@@ -109,25 +109,25 @@ function layer(state: AppState, l: Layer, emit: Emit, i:number, selected:boolean
         <div class="layer-icon" onclick=${(e) => {emit('switchTool', 'mask');
                           if(selected) e.stopPropagation();}}>
           <img src=${(state.tool === "mask" && selected) ? mask_selected : mask} alt="mask"/>
-          <div class="tooltip-container l-tool"><div class=tooltip>clipping mask</div></div>
+          <div class="tooltip-container l-tool"><div class="tooltip"><p>clipping mask</p></div></div>
         </div>
         <div class="layer-icon" onclick=${(e) => {emit('switchTool', 'bounds');
                       if(selected) e.stopPropagation();}}>
           <img src=${(state.tool === "bounds" && selected) ? dotted_selected : dotted} alt="bounding button"/>
-          <div class="tooltip-container l-tool"><div class=tooltip>bounding box</div></div>
+          <div class="tooltip-container l-tool"><div class="tooltip"><p>bounding box</p></div></div>
         </div>
         <div class="layer-icon" style=${singularlayer ? "display: none" : ""}
         onclick=${(e) => {emit('deleteLayer', [i, selected]);
                       if(selected) e.stopPropagation();}}>
           <img src=${trash} alt="trash button"/>
-          <div class="tooltip-container l-tool"><div class=tooltip>delete</div></div>
+          <div class="tooltip-container l-tool"><div class="tooltip"><p>delete</p></div></div>
         </div>
       </div>`
 }
 
 export function rightView(state: choo.IState, emit: Emit) {
     return html`
-    <div class="inside-column">
+    <div>
         ${layerBuilder(state.app, emit)}
     </div>`
 }

@@ -5,20 +5,27 @@ import { State, AppState, Emit } from './../types'
 import html from 'choo/html'
 import {drawView} from './drawing_component'
 import {modelPalettes} from "../model-palettes"
+import * as filesaver from 'file-saver'
+
+import { rightView } from './right_view'
 
 const logo = require('./../assets/logo.png')
 const toolbar = require('./../assets/toolbar-naked.png')
-const paintbucket = require('./../assets/paintbucket.png')
-const eraser = require('./../assets/eraser.png')
-const pencil = require('./../assets/pencil.png')
+const paintbucket = require('./../assets/bucket.svg')
+const paintbucket_s = require('./../assets/bucket-selected.svg')
+const eraser = require('./../assets/eraser.svg')
+const eraser_s = require('./../assets/eraser-selected.svg')
+const pencil = require('./../assets/pencil.svg')
+const pencil_s = require('./../assets/pencil-selected.svg')
 const undo = require('./../assets/undo.png')
-const transform = require('./../assets/transform.png')
-const trash = require('./../assets/clear.png')
+const transform = require('./../assets/transform.svg')
+const transform_s = require('./../assets/transform-selected.svg')
+const trash = require('./../assets/bomb.svg')
 const more = require('./../assets/more.png')
-const clip = require('./../assets/paperclip.svg')
+const clip = require('./../assets/hammer.svg')
+const download = require('./../assets/download.svg')
 
 function tool_use_sel(tool_name, active_tool, usable){
-  console.log(tool_name, active_tool, usable);
   let cla = "icon";
   if(tool_name === active_tool) {cla += " selected-icon"}
   if(!usable) {cla += " no_use"}
@@ -26,6 +33,26 @@ function tool_use_sel(tool_name, active_tool, usable){
 }
 
 function topBar(state: AppState, emit: Emit) {
+
+  const saveImg = () => {
+    var mirror_canvas = document.getElementById("mirror-canvas-element");
+    var p5_canvas = document.getElementById("p5-canvas");
+    var new_canvas = document.createElement("CANVAS");
+
+    var can_wid = mirror_canvas.width;
+    var can_hei = mirror_canvas.height;
+
+    new_canvas.width = can_wid;
+    new_canvas.height = can_hei;
+
+    var ctx = new_canvas.getContext('2d');
+
+    ctx.drawImage(mirror_canvas, 0, 0, can_wid, can_hei);
+
+    new_canvas.toBlob(function(blob) {
+      filesaver.saveAs(blob, "mldraw-output.png");
+    });
+  }
     return html`
     <div id="bar">
         <div id="toolbar">
@@ -35,8 +62,32 @@ function topBar(state: AppState, emit: Emit) {
             tools
         </div></div>
         <div id="icons">
+            <div class="icon" onclick=${saveImg}>
+              <img src="${download}"/>
+              <div class="tooltip-container"><div class=tooltip><p>download</p></div></div>
+            </div>
+            <div class=${state.tool == "drag" ? "selected-icon icon" : "icon"} onclick=${() => emit('switchTool', 'drag')}>
+              <img src="${state.tool == "drag" ? transform_s : transform}">
+              <div class="tooltip-container"><div class=tooltip><p>drag/edit</p></div></div>
+            </div>
+            <div class="icon" onclick=${() => emit('clear')}>
+              <img src="${trash}">
+              <div class="tooltip-container"><div class=tooltip><p>clear layer</p></div></div>
+            </div>
+            <div class= "icon" onclick=${() => emit('switchTool', 'cut')}>
+              <img src="${state.tool == "cut" ? eraser_s : eraser}"/>
+              <div class="tooltip-container"><div class=tooltip><p>erase</p></div></div>
+            </div>
+            <div id="paintbucket-icon" class=${tool_use_sel("fill", state.tool, state.paintbucket.usable)} onclick=${() => emit('paintbucketclicked')}>
+              <span id="paintbucketInfo" class=${state.paintbucket.usable ? "p-info-use" : ''}>
+                ${state.paintbucket.usable ? state.paintbucket.colorName : ''}
+              </span>
+              <img src="${state.tool == "fill" ? paintbucket_s : paintbucket}">
+              <div class="tooltip-container"><div class=tooltip><p>fill shapes</p></div></div>
+              <div class="palette">${palette(emit, state)}</div>
+            </div>
             <div class=${state.tool == "draw" ? "selected-icon icon" : "icon"} id="dropdown-s">
-              <img onclick=${() => emit('switchTool', 'draw')} src="${pencil}"/>
+              <img onclick=${() => emit('switchTool', 'draw')} src="${state.tool == "draw" ? pencil_s : pencil}"/>
               <div id="colorpick">
                 <input id="colorpick-i" type="color" onchange=${e => emit('setStrokeColor', e.target.value)} name="colorpicker" value=${state.strokeColor}/>
                 <div id="colorpick-display" style="background-color:${state.strokeColor};">
@@ -54,26 +105,6 @@ function topBar(state: AppState, emit: Emit) {
                        </li>
               </ul>
               </div>
-            </div>
-            <div class=${state.tool == "cut" ? "selected-icon icon" : "icon"} onclick=${() => emit('switchTool', 'cut')}>
-              <img src="${eraser}"/>
-              <div class="tooltip-container"><div class=tooltip>erase</div></div>
-            </div>
-            <div id="paintbucket-icon" class=${tool_use_sel("fill", state.tool, state.paintbucket.usable)} onclick=${() => emit('paintbucketclicked')}>
-              <span id="paintbucketInfo" class=${state.paintbucket.usable ? "p-info-use" : ''}>
-                ${state.paintbucket.usable ? state.paintbucket.colorName : ''}
-              </span>
-              <img src="${paintbucket}">
-              <div class="tooltip-container"><div class=tooltip>fill shapes</div></div>
-              <div class="palette">${palette(emit, state)}</div>
-            </div>
-            <div class=${state.tool == "drag" ? "selected-icon icon" : "icon"} onclick=${() => emit('switchTool', 'drag')}>
-              <img src="${transform}">
-              <div class="tooltip-container"><div class=tooltip>drag/edit lines</div></div>
-            </div>
-            <div class="icon" onclick=${() => emit('clear')}>
-              <img src="${trash}">
-              <div class="tooltip-container"><div class=tooltip>clear layer</div></div>
             </div>
         </div>
         </div>
@@ -131,8 +162,12 @@ function palette_element(emit, state, ele_key, arr, idx){
 
 export function leftView(state: choo.IState, emit: Emit) {
     return html`
-    <div class="inside-column">
-        ${drawView(state, emit)}
-        ${topBar(state.app, emit)}
-    </div>`
+    <div>
+    <div class="column">
+    ${topBar(state.app, emit)}
+    ${rightView(state, emit)}
+    </div>
+    <div class="column">
+    ${drawView(state, emit)}
+    </div></div>`
 }

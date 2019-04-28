@@ -44,9 +44,21 @@ const make_paper = (component: PaperCanvasComponent,
 
     project.addLayer(background)
     console.log(project.layers);
+    //
+    // paper.project.view.onResize = () => {
+    //     ({ width: viewWidth, height: viewHeight } = paper.project.view.bounds)
+    // }
 
-    paper.project.view.onResize = () => {
-        ({ width: viewWidth, height: viewHeight } = paper.project.view.bounds)
+
+    paper.project.view.onResize = function(){
+
+      ({ width: viewWidth, height: viewHeight } = paper.project.view.bounds)
+
+      // let ele = document.getElementById('paper-canvas');
+      // console.log(project.view.viewSize.width, ele.clientWidth);
+      // if(project.view.viewSize.width != ele.clientWidth){
+      //   project.view.viewSize.height = ele.clientHeight;
+      // }
     }
 
     const activeBounds = () => project.activeLayer.children['boundingViewContainer'].children['boundingViewGroup'].children['boundingRect'] as paper.Path.Rectangle
@@ -458,13 +470,13 @@ const make_paper = (component: PaperCanvasComponent,
         customMask.clipped = true
         customMask.visible = false
 
-        const boundingRectPath = new paper.Path.Rectangle(paper.view.bounds.clone().scale(0.99))
+        const boundingRectPath = new paper.Path.Rectangle(paper.view.bounds.clone())
         boundingRectPath.name = 'boundingRect'
         boundingRectPath.strokeColor = '#000000FF'
         boundingRectPath.dashArray = [2, 40]
 
         const boundingViewGroup = new paper.Group();
-        let outsideBounds = new paper.Path.Rectangle(paper.view.bounds.clone().scale(0.99))
+        let outsideBounds = new paper.Path.Rectangle(paper.view.bounds.clone())
         outsideBounds.reverse()
         boundingViewGroup.addChild(outsideBounds);
         boundingViewGroup.addChild(boundingRectPath);
@@ -593,7 +605,7 @@ const make_paper = (component: PaperCanvasComponent,
 
     function resetBounds() {
         project.activate()
-        activeBounds().bounds = paper.view.bounds.clone().scale(0.99)
+        activeBounds().bounds = paper.view.bounds.clone()
     }
 
     function setState(newState: AppState) {
@@ -664,6 +676,7 @@ export class PaperCanvasComponent extends Component {
         newcanvas.width = 256
         newcanvas.height = 256
         newcanvas.id = "new"
+        //newcanvas.setAttribute("resize", "true");
         //newcanvas.setAttribute("resize", "true");
         element.appendChild(newcanvas)
 

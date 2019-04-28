@@ -36,6 +36,7 @@ export function paintBucketStore(state: State, emitter: Emitter) {
             emitter.emit('switchTool', 'draw')
             emitter.emit('render')
         } else {
+            state.app.paintbucket.usable = true
             if(modelPalettes[activeLayer.model] != state.app.paintbucket.palette) {
                 state.app.paintbucket.palette = modelPalettes[activeLayer.model]
                 state.app.paintbucket.colorIdx = 0
@@ -64,7 +65,7 @@ export function paintBucketStore(state: State, emitter: Emitter) {
             } else {
                 state.app.paintbucket.active = false;
             }
-        } 
+        }
     })
     // if switching away from paintbucket, deactivate
     emitter.on('switchTool', tool => {

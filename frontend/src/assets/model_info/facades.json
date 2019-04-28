@@ -4,5 +4,5 @@
   "palette" : [],
   "description" : "this is a model that turns chunks of color into building facades.",
   "load_type": "local",
-  "tutorial" : "<p class='tutorial'><b>Instructions:</b> Draw shapes on the canvas, fill them with the paintbucket tool, and hit the render button! Each filled shape will correspond to a building element, such as a wall. The color of the fill determines what type of element this is, and the paintbucket tool will display this.</p>"
+  "tutorial" : "<p class='tutorial'><b>Instructions:</b> Draw shapes on the canvas, fill them with the paintbucket tool, and hit the render button! Each filled shape will correspond to a building element, such as a wall. The color of the fill determines what type of element this is, and the paintbucket tool will display this.</br></br><img src='model_info/images/facades/facades1.png'/><img src='model_info/images/facades/facades2.png'/></p>"
 }
