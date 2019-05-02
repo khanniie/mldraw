@@ -376,7 +376,7 @@ const make_paper = (component: PaperCanvasComponent,
         })
         const raster = paper.project.activeLayer.rasterize(72, false)
         unfilledPartsHack.forEach(path => {
-            path.fillColor = '#FF000001'
+            path.fillColor = '#00000001'
         })
         const pt_topleft = new paper.Point(Math.ceil(scaleX * x),
             Math.ceil(scaleY * y))
