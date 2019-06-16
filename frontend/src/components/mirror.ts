@@ -21,14 +21,11 @@ const make_mirror = (component: MirrorComponent,
     let background = new paper.Layer(); //background
     background.activate()
     background.name = 'background'
-    const {width: viewWidth, height: viewHeight} = paper.project.view.bounds
-    console.log('mirror !!', paper.project.view.bounds)
     let rec = new paper.Rectangle(0, 0, background.bounds.width, background.bounds.height)
     let path_rec = new paper.Path.Rectangle(rec)
     path_rec.fillColor = '#ffffff'
     project.addLayer(background)
     //new paper.View()
-    let appState
 
     function drawOutput([bytes, clippingPath, boundingRect]:
         [string | HTMLImageElement, paper.Group, paper.Rectangle]) {
@@ -45,7 +42,8 @@ const make_mirror = (component: MirrorComponent,
         }
         const raster = new paper.Raster(image, boundingRect.center)
         raster.fitBounds(boundingRect)
-        const path = clippingPath.children.filter(ch => ch instanceof paper.Path)
+        console.log(clippingPath)
+        const path = clippingPath.children.filter(ch => ch instanceof paper.Path || ch instanceof paper.CompoundPath)
         const united = path.reduce((a, p) => (a as any).unite(p))
         raster.position = boundingRect.center
         united.bringToFront()
@@ -53,6 +51,7 @@ const make_mirror = (component: MirrorComponent,
         united.bringToFront()
         const clippingGroup = new paper.Group([united, raster])
         clippingGroup.clipped = true
+        united.fillColor = '#FF00000F'
     }
 
     function addLayer() {
@@ -60,13 +59,6 @@ const make_mirror = (component: MirrorComponent,
         const layer = new paper.Layer()
         console.log('adding mirror lyr')
         project.addLayer(layer)
-    }
-
-    function deleteLayer(idx){
-        console.log('mirror is removing ', idx, project.layers.toString());
-        project.activate()
-        project.layers.splice(idx, 1)[0].remove()
-        console.log("after mirror remove", project.layers.toString())
     }
 
     function switchLayer(idx: number) {
@@ -80,7 +72,7 @@ const make_mirror = (component: MirrorComponent,
     }
 
     component.sketch = {
-        drawOutput, clear, switchLayer, addLayer, deleteLayer
+        drawOutput, clear, switchLayer, addLayer
     }
 }
 
@@ -88,7 +80,6 @@ type SketchMethods = {
     drawOutput: ([str, group, boundingRect]: [string, paper.Group, paper.Rectangle]) => void
     clear: () => void,
     addLayer: () => void,
-    deleteLayer: (idx) => void,
     switchLayer: (idx: number) => void
 }
 
@@ -142,16 +133,12 @@ export function mirrorStore(state: State, emitter: Emitter) {
         state.cache(MirrorComponent, 'mirror-canvas').sketch.clear()
     })
     emitter.on('changeLayer', (layerIdx) => {
-        state.cache(MirrorComponent, 'mirror-canvas').sketch.switchLayer(layerIdx - 1)
+        state.cache(MirrorComponent, 'mirror-canvas').sketch.switchLayer(layerIdx)
     })
 
-    emitter.on('addLayer', () => {
+    emitter.on('addLayerMirror', (idx) => {
         state.cache(MirrorComponent, 'mirror-canvas').sketch.addLayer()
-    })
-
-    emitter.on('deleteLayer', ([idx, _]:[number, boolean]) => {
-      //  let idx = input[0]
-        state.cache(MirrorComponent, 'mirror-canvas').sketch.deleteLayer(idx)
+        emitter.emit('changeLayer', idx)
     })
 
 }

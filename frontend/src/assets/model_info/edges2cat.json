@@ -2,6 +2,7 @@
   "name": "Cat",
   "tools" : ["draw", "cut", "fill", "drag"],
   "palette" : [],
-  "description" : "this is a model that turns lines into cats.",
-  "tutorial" : "<p class='tutorial'>hi this is the cat tutorial</p>"
+  "load_type" : "local",
+  "description" : "This is a model that turns black lines into cats.",
+  "tutorial" : "<p class='tutorial'><b>Instructions:</b> Draw lines on the canvas and hit the render button! It is highly recommended that the cat be centered within the bounding box, occupying 60% - 80% of the bounding box, and drawn with black lines with no fill. Drawing almond-shaped eyes with slit-like pupils will also help.</p>"
 }

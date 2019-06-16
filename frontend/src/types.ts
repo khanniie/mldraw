@@ -22,6 +22,7 @@ export interface AppState {
     renderdone: boolean,
     availableModels: string[],
     localModels: {[key:string]: string},
+    tutorials: undefined[],
     paintbucket: {
         usable: boolean,
         active: boolean,
@@ -32,7 +33,8 @@ export interface AppState {
     closed: boolean,
     smoothing: boolean,
     strokeColor: string
-    warningAccepted: boolean
+    warningAccepted: boolean,
+    maskEditingMode: boolean
 }
 
 /**
@@ -56,6 +58,7 @@ export interface Events {
     setSmoothness: boolean,
     setClosed: boolean,
     switchTool: string,
+    loadtutorial: undefined,
     loadmodel: string,
     loadedmodel: string,
     setFill: string | boolean,
