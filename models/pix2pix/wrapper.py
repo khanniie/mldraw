@@ -97,7 +97,7 @@ try:
         ''' convert a 4-channel PIL Image to a torch.FloatTensor
         normalised to [-1, 1]
         '''
-        img_arr = np.asarray(img)
+        img_arr = np.ascontiguousarray(np.asarray(img)[::-1])
         img_arr, alpha = img_arr[:, :, :3], img_arr[:, :, 3]
         img_arr = np.transpose(img_arr, (2, 0, 1)) #HWC -> CHW
         img_tensor = torch.from_numpy(img_arr)
