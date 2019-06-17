@@ -3,6 +3,10 @@
 
 import asyncio
 import sys
+import re
+
+URL_RE = '(?:http.*://)?(?P<host>[^:/ ]+).?(?P<port>[0-9]*).*'
+
 
 # Ctrl-C (KeyboardInterrupt) does not work well on Windows
 # This module solve that issue with wakeup coroutine.
@@ -110,6 +114,10 @@ app.add_routes(routes)
 def start(opts):
     print("available handlers: {}".format(available_handlers.keys()))
     sio.start_background_task(register, opts.self_url, opts.backend_url)
-
-    web.run_app(app, port=8081)
+    groups = re.search(URL_RE, opts.self_url)
+    if groups.group('port') != '':
+        port = int(groups.group('port'), base=10)
+    else:
+        port = 8081
+    web.run_app(app, port=port)
 
