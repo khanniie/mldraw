@@ -42,6 +42,7 @@ try:
     pix2pix_checkpoints = [os.path.basename(chkpt) for chkpt in pix2pix_checkpoints]
     print("Discovered Pix2Pix checkpoints: " + str(pix2pix_checkpoints))
 
+
     PIX2PIX_DEFAULT_OPTS = {
         "dataroot": "n/a",
         "batch_size": 1,
@@ -84,7 +85,12 @@ try:
         "pool_size": 0,
         "no_lsgan": True,
         "lambda_L1": 100,
-        "verbose": False
+        "verbose": False,
+        "preprocess": "resize_and_crop",
+        "epoch": "latest",
+        "load_iter": 0,
+        "eval": True,
+        "isTrain": False
     }
 
     def img2tensor(img, device):
@@ -102,9 +108,11 @@ try:
     class Pix2PixWrapper(object):
 
         def __init__(self, opts=None):
-            opts = {} if opts is None else opts
-            merged = dict2obj({**PIX2PIX_DEFAULT_OPTS,
-                               **opts})
+            merged = dict2obj({**PIX2PIX_DEFAULT_OPTS, **opts}) #FakeTestOptions().parse()
+            
+            #sys.argv = old_argv
+            #for k, v in opts.items():
+             #   setattr(merged, k, v)
             self.opts = merged
             if len(merged.gpu_ids) > 0:
                 torch.cuda.set_device(merged.gpu_ids[0])
@@ -134,7 +142,7 @@ try:
     for checkpoint in pix2pix_checkpoints:
         with remember_cwd():
             os.chdir(PIX2PIX_PATH)
-            model = Pix2PixWrapper({"name": checkpoint})
+            model = Pix2PixWrapper({"name": checkpoint, "netG": 'unet_256', 'direction': 'BtoA'})
 
         exported_models[checkpoint] = model
 
