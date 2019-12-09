@@ -35,7 +35,7 @@ RUN source ~/.bashrc && \
     source activate mldraw && \
     conda install -y pip && \
     pip install numpy && \
-    pip install scipy && \
+    pip install scipy==1.1.0 && \
     pip install scikit-image && \
     pip install aiohttp && \
     pip install python-socketio && \
