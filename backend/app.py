@@ -31,7 +31,7 @@ import base64
 from aiohttp import web
 
 import socketio
-sio = socketio.AsyncServer(cors_allowed_origins='*')
+sio = socketio.AsyncServer(cors_allowed_origins=['mldraw.com','mldraw.com:1234'])
 app = web.Application()
 sio.attach(app)
 
