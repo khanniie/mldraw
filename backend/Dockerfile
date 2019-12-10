@@ -35,7 +35,7 @@ RUN source ~/.bashrc && \
     source activate mldraw && \
     conda install -y pip && \
     pip install numpy && \
-    pip install scipy==1.1.0 && \
+    conda install -y scipy==1.1.0 && \
     pip install scikit-image && \
     pip install aiohttp && \
     pip install python-socketio && \
@@ -74,6 +74,7 @@ RUN curl https://raw.githubusercontent.com/creationix/nvm/v0.20.0/install.sh | b
 RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add - && \
     echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list && \
     apt install --no-install-recommends yarn
+
 
 ENTRYPOINT [ "/usr/bin/tini", "--" ]
 CMD [ "/bin/bash" ]
