@@ -63,7 +63,7 @@ export class Comm {
     async connect(url: string) {
         if (this.socket !== undefined) this.socket.disconnect()
         this.socket = socketio.connect(url, {
-            transports: ['websocket']
+//            transports: ['websocket']
         })
 
         await new Promise((res, rej) => {
@@ -87,7 +87,7 @@ export class Comm {
             const url = this.model2url[model]
             if(this.url2socket[url] == undefined) {
                 const new_socket = socketio.connect(url, {
-                    transports: ['websocket']
+//                    transports: ['websocket']
                 })
                 this.url2socket[url] = new Promise((res, rej) => {
                     new_socket.once('connect', () => res(new_socket))
