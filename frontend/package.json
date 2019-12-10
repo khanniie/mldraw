@@ -4,7 +4,7 @@
   "main": "src/basic.ts",
   "license": "MIT",
   "scripts": {
-    "dev": "yarn run parcel src/index.html --no-hmr --host 0.0.0.0"
+    "dev": "yarn run parcel serve src/index.html --host 0.0.0.0"
   },
   "browserslist": [
     "last 1 Chrome version"
@@ -39,7 +39,7 @@
     "babel-polyfill": "^6.26.0",
     "babel-preset-env": "^1.7.0",
     "babel-runtime": "^6.26.0",
-    "parcel-bundler": "^1.10.3",
+    "parcel-bundler": "^1.12.4",
     "parcel-plugin-static-files-copy": "^2.0.0",
     "path": "^0.12.7",
     "typescript": "^3.2.0-dev.20181019"
