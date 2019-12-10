@@ -30,7 +30,7 @@ function initialState(state: choo.IState, emit: Emit) {
     Object.assign(state, {
         app: {
             server: {
-                address: 'http://34.67.243.62:8080',
+                address: `${window.location.hostname}:8080`,
                 isConnected: false
             },
             width: 2000,

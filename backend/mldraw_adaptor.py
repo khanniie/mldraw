@@ -36,7 +36,7 @@ from PIL import Image, ImageOps
 
 import socketio
 
-sio = socketio.AsyncServer()
+sio = socketio.AsyncServer(cors_allowed_origins='*')
 app = web.Application()
 sio.attach(app)
 

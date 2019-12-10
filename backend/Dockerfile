@@ -49,7 +49,6 @@ RUN source ~/.bashrc && \
     pip install cupy-cuda90 && \
     pip install chainer 
 
-
 # install mldraw & various backends
 
 RUN git clone --recurse-submodules https://github.com/khanniie/mldraw && \
@@ -59,7 +58,22 @@ RUN git clone --recurse-submodules https://github.com/khanniie/mldraw && \
     bash scripts/download_pix2pix_model.sh map2sat && \
     mv checkpoints/edges2shoes_pretrained checkpoints/shoes && \
     mv checkpoints/facades_label2photo_pretrained checkpoints/facades2 && \
-    mv checkpoints/map2sat_pretrained checkpoints/satellite
+    mv checkpoints/map2sat_pretrained checkpoints/satellite 
+
+RUN chmod +x /mldraw/backend/quickstart.sh
+
+ENV NVM_DIR /usr/local/nvm
+
+# Install nvm with node and npm
+RUN curl https://raw.githubusercontent.com/creationix/nvm/v0.20.0/install.sh | bash \
+    && . $NVM_DIR/nvm.sh \
+    && nvm install v10.0.0 \
+    && nvm alias default v10.0.0 \
+    && nvm use default
+
+RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add - && \
+    echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list && \
+    apt install --no-install-recommends yarn
 
 ENTRYPOINT [ "/usr/bin/tini", "--" ]
 CMD [ "/bin/bash" ]
