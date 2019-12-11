@@ -1,5 +1,10 @@
 #henlo
 
+## Quickstart:
+
+Try:
+``` docker run --gpus all -p 80:80 -p 8080:8080 -p 8081:8081 -p 8082:8082 --rm -it -v `pwd colorizer`:/colorizer amanamanaman/mldraw:known-good-1```
+
 ## Building & Running the Docker container
 First, make sure `nvidia-docker` is installed, if you want to run on the GPU
 Then,
