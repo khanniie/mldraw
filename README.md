@@ -1,8 +1,10 @@
 # mldraw~
 
-heh
+Mldraw is a new vector drawing tool that lets you play with machine learning! Users can mix cats, anime, Pikachu, handbags, imagined buildings and more. 
 
-lol :)
+Mldraw is a web app that uses a layered vector drawing system where each layer can be given a different machine learning model that translates user input. The user will give us a line drawing of edges, and our app's backend server renders the translation using whatever model is assigned to that layer. 
+
+We've also made it easy to import custom ML models for researchers so that they can use our tool to experiment with their models.
 
 # Development
 Backend requires (all `pip install`able):
